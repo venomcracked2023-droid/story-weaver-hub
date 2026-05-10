@@ -23,7 +23,9 @@ export const Route = createFileRoute("/comic/$comicId")({
     }
     const title = `${m.title}${m.author ? ` — ${m.author}` : ""} | InkScroll`;
     const desc = (m.description || `Đọc ${m.title} online cuộn dọc miễn phí trên InkScroll.`).slice(0, 160);
-    const img = m.cover_id ? driveImageUrl(m.cover_id, 1200) : "/og-default.jpg";
+    const img = m.cover_id
+      ? driveImageUrl(m.cover_id, 1200)
+      : "https://lcucumber.com/og-default.jpg";
     const meta: Array<Record<string, string>> = [
       { title },
       { name: "description", content: desc },

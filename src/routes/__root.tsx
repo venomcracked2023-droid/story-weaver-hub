@@ -88,10 +88,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "InkScroll — Webtoon" },
       { name: "twitter:description", content: "Đọc webtoon cuộn dọc, mượt và đẹp." },
-      { property: "og:image", content: "/og-default.jpg" },
+      { property: "og:url", content: "https://lcucumber.com/" },
+      { property: "og:image", content: "https://lcucumber.com/og-default.jpg" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
-      { name: "twitter:image", content: "/og-default.jpg" },
+      { name: "twitter:image", content: "https://lcucumber.com/og-default.jpg" },
     ],
     links: [
       {
@@ -99,6 +100,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico" },
+      { rel: "canonical", href: "https://lcucumber.com/" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "InkScroll",
+          url: "https://lcucumber.com",
+          logo: "https://lcucumber.com/og-default.jpg",
+          sameAs: [
+            "https://www.facebook.com/profile.php?id=61577465649339",
+          ],
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "InkScroll",
+          url: "https://lcucumber.com",
+        }),
+      },
     ],
   }),
   shellComponent: RootShell,
