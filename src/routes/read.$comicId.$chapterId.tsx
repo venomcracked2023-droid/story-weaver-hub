@@ -5,10 +5,58 @@ import { ArrowLeft, ChevronLeft, ChevronRight, List } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Virtuoso } from "react-virtuoso";
 import { PdfReader } from "@/components/PdfReader";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/read/$comicId/$chapterId")({
   component: Reader,
   ssr: false,
+  loader: async ({ params }) => {
+    const [{ data: comic }, { data: chapter }] = await Promise.all([
+      supabase.from("comics").select("title").eq("id", params.comicId).maybeSingle(),
+      supabase.from("chapters").select("title").eq("id", params.chapterId).maybeSingle(),
+    ]);
+    return { comicTitle: comic?.title ?? null, chapterTitle: chapter?.title ?? null };
+  },
+  head: ({ loaderData, params }) => {
+    const ct = loaderData?.comicTitle;
+    const ch = loaderData?.chapterTitle;
+    if (!ct || !ch) return { meta: [{ title: "Đang đọc — InkScroll" }] };
+    const title = `${ch} — ${ct} | InkScroll`;
+    const desc = `Đọc ${ch} của ${ct} online cuộn dọc miễn phí trên InkScroll.`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "article" },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Trang chủ", item: "/" },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: ct,
+                item: `/comic/${params.comicId}`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: ch,
+                item: `/read/${params.comicId}/${params.chapterId}`,
+              },
+            ],
+          }),
+        },
+      ],
+    };
+  },
   notFoundComponent: () => (
     <div className="p-10 text-center">
       Không tìm thấy chương. <Link to="/" className="text-primary underline">Về trang chủ</Link>

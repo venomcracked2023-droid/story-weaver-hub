@@ -51,6 +51,22 @@ export const Route = createFileRoute("/comic/$comicId")({
             url: `/comic/${params.comicId}`,
           }),
         },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Trang chủ", item: "/" },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: m.title,
+                item: `/comic/${params.comicId}`,
+              },
+            ],
+          }),
+        },
       ],
     };
   },
