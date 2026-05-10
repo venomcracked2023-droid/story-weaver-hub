@@ -11,6 +11,8 @@ import {
 import { extractDriveId, parseDriveIds } from "@/lib/drive";
 import { ChevronDown, ChevronUp, Plus, Save, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -35,6 +37,42 @@ function emptyComic(): Comic {
 function AdminPage() {
   const comics = useComics();
   const [editing, setEditing] = useState<Comic | null>(null);
+  const { user, isContributor, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <SiteHeader />
+        <main className="mx-auto max-w-3xl px-4 py-20 text-center text-muted-foreground">
+          Đang tải…
+        </main>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen">
+        <SiteHeader />
+        <main className="mx-auto max-w-3xl px-4 py-20 text-center">
+          <h1 className="text-2xl font-bold">Bạn cần đăng nhập</h1>
+          <p className="mt-2 text-muted-foreground">Đăng nhập để quản lý truyện.</p>
+        </main>
+      </div>
+    );
+  }
+
+  if (!isContributor) {
+    return (
+      <div className="min-h-screen">
+        <SiteHeader />
+        <main className="mx-auto max-w-3xl px-4 py-20 text-center">
+          <h1 className="text-2xl font-bold">Chưa có quyền cộng tác viên</h1>
+          <p className="mt-2 text-muted-foreground">Vui lòng nộp đơn ứng tuyển và chờ admin duyệt.</p>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -44,7 +82,7 @@ function AdminPage() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Quản lý truyện</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Dữ liệu lưu trên trình duyệt (localStorage). Ảnh nhúng trực tiếp từ Google Drive.
+              Dữ liệu lưu trên Lovable Cloud. Ảnh nhúng trực tiếp từ Google Drive.
             </p>
           </div>
           <button
@@ -93,7 +131,11 @@ function AdminPage() {
                 </button>
                 <button
                   onClick={() => {
-                    if (confirm(`Xoá "${c.title}"?`)) deleteComic(c.id);
+                    if (confirm(`Xoá "${c.title}"?`)) {
+                      deleteComic(c.id)
+                        .then(() => toast.success("Đã xoá"))
+                        .catch((e) => toast.error(e.message));
+                    }
                   }}
                   className="inline-flex items-center gap-1 rounded-md border border-destructive/40 px-3 py-1.5 text-xs text-destructive hover:bg-destructive/10"
                 >
@@ -109,9 +151,14 @@ function AdminPage() {
         <ComicEditor
           comic={editing}
           onClose={() => setEditing(null)}
-          onSave={(c) => {
-            upsertComic(c);
-            setEditing(null);
+          onSave={async (c) => {
+            try {
+              await upsertComic(c);
+              toast.success("Đã lưu");
+              setEditing(null);
+            } catch (e: any) {
+              toast.error(e.message ?? "Lỗi khi lưu");
+            }
           }}
         />
       )}
