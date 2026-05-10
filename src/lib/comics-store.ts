@@ -137,6 +137,18 @@ export function useComics(): Comic[] {
   return cache;
 }
 
+export function useComicsLoaded(): boolean {
+  const [val, setVal] = useState(loaded);
+  useEffect(() => {
+    const cb = () => setVal(loaded);
+    listeners.add(cb);
+    if (!loaded && !loading) loadComics();
+    cb();
+    return () => { listeners.delete(cb); };
+  }, []);
+  return val;
+}
+
 export function uid(): string {
   return (typeof crypto !== "undefined" && "randomUUID" in crypto)
     ? crypto.randomUUID()
