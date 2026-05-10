@@ -4,10 +4,9 @@ import { Virtuoso } from "react-virtuoso";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
+// Dùng đúng version của pdfjs-dist mà react-pdf đang bundle để tránh
+// "API version does not match the Worker version".
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
 
 type Props = {
   fileUrl: string;
