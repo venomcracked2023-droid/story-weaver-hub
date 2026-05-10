@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
-import { useComics } from "@/lib/comics-store";
+import { useComics, useComicsLoaded } from "@/lib/comics-store";
 import { ChevronRight, Layers } from "lucide-react";
 
 export const Route = createFileRoute("/comic/$comicId")({
@@ -23,7 +23,16 @@ export const Route = createFileRoute("/comic/$comicId")({
 function ComicPage() {
   const { comicId } = Route.useParams();
   const comics = useComics();
+  const loaded = useComicsLoaded();
   const comic = comics.find((c) => c.id === comicId);
+  if (!loaded) {
+    return (
+      <div className="min-h-screen">
+        <SiteHeader />
+        <div className="mx-auto max-w-3xl px-4 py-20 text-center text-muted-foreground">Đang tải…</div>
+      </div>
+    );
+  }
   if (!comic) throw notFound();
 
   return (
