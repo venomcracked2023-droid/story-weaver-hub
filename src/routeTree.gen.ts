@@ -9,38 +9,80 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ComicComicIdRouteImport } from './routes/comic.$comicId'
+import { Route as ReadComicIdChapterIdRouteImport } from './routes/read.$comicId.$chapterId'
 
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComicComicIdRoute = ComicComicIdRouteImport.update({
+  id: '/comic/$comicId',
+  path: '/comic/$comicId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReadComicIdChapterIdRoute = ReadComicIdChapterIdRouteImport.update({
+  id: '/read/$comicId/$chapterId',
+  path: '/read/$comicId/$chapterId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/comic/$comicId': typeof ComicComicIdRoute
+  '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/comic/$comicId': typeof ComicComicIdRoute
+  '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/comic/$comicId': typeof ComicComicIdRoute
+  '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/admin' | '/comic/$comicId' | '/read/$comicId/$chapterId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/admin' | '/comic/$comicId' | '/read/$comicId/$chapterId'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/comic/$comicId'
+    | '/read/$comicId/$chapterId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  ComicComicIdRoute: typeof ComicComicIdRoute
+  ReadComicIdChapterIdRoute: typeof ReadComicIdChapterIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +90,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comic/$comicId': {
+      id: '/comic/$comicId'
+      path: '/comic/$comicId'
+      fullPath: '/comic/$comicId'
+      preLoaderRoute: typeof ComicComicIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/read/$comicId/$chapterId': {
+      id: '/read/$comicId/$chapterId'
+      path: '/read/$comicId/$chapterId'
+      fullPath: '/read/$comicId/$chapterId'
+      preLoaderRoute: typeof ReadComicIdChapterIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  ComicComicIdRoute: ComicComicIdRoute,
+  ReadComicIdChapterIdRoute: ReadComicIdChapterIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

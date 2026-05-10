@@ -1,0 +1,318 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { SiteHeader } from "@/components/SiteHeader";
+import {
+  Comic,
+  Chapter,
+  deleteComic,
+  uid,
+  upsertComic,
+  useComics,
+} from "@/lib/comics-store";
+import { extractDriveId, parseDriveIds } from "@/lib/drive";
+import { ChevronDown, ChevronUp, Plus, Save, Trash2 } from "lucide-react";
+import { useState } from "react";
+
+export const Route = createFileRoute("/admin")({
+  component: AdminPage,
+  head: () => ({
+    meta: [{ title: "Quản lý truyện — InkScroll" }],
+  }),
+});
+
+function emptyComic(): Comic {
+  return {
+    id: uid(),
+    title: "",
+    author: "",
+    description: "",
+    coverId: "",
+    genres: [],
+    chapters: [],
+    createdAt: Date.now(),
+  };
+}
+
+function AdminPage() {
+  const comics = useComics();
+  const [editing, setEditing] = useState<Comic | null>(null);
+
+  return (
+    <div className="min-h-screen">
+      <SiteHeader />
+      <main className="mx-auto max-w-5xl px-4 pb-20 pt-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Quản lý truyện</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Dữ liệu lưu trên trình duyệt (localStorage). Ảnh nhúng trực tiếp từ Google Drive.
+            </p>
+          </div>
+          <button
+            onClick={() => setEditing(emptyComic())}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+          >
+            <Plus className="h-4 w-4" /> Truyện mới
+          </button>
+        </div>
+
+        <div className="mt-8 rounded-2xl border border-border bg-card/40 p-5">
+          <h2 className="font-semibold">Hướng dẫn nhanh</h2>
+          <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+            <li>Upload ảnh chương lên Google Drive.</li>
+            <li>
+              Click chuột phải → <em>Share</em> → đổi thành <strong>"Anyone with the link"</strong>.
+            </li>
+            <li>
+              Sao chép link hoặc <strong>File ID</strong> (đoạn dài trong URL <code>/file/d/…/view</code>) và dán vào ô bên dưới — mỗi dòng một file.
+            </li>
+            <li>Lưu — site sẽ tự nhúng ảnh.</li>
+          </ol>
+        </div>
+
+        <div className="mt-8 grid gap-3">
+          {comics.map((c) => (
+            <div key={c.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-4">
+              <div className="min-w-0">
+                <Link
+                  to="/comic/$comicId"
+                  params={{ comicId: c.id }}
+                  className="truncate font-semibold hover:text-primary"
+                >
+                  {c.title || "(chưa có tên)"}
+                </Link>
+                <p className="text-xs text-muted-foreground">
+                  {c.chapters.length} chương · {c.author || "Ẩn danh"}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setEditing(JSON.parse(JSON.stringify(c)))}
+                  className="rounded-md border border-border px-3 py-1.5 text-xs hover:bg-secondary"
+                >
+                  Sửa
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirm(`Xoá "${c.title}"?`)) deleteComic(c.id);
+                  }}
+                  className="inline-flex items-center gap-1 rounded-md border border-destructive/40 px-3 py-1.5 text-xs text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="h-3.5 w-3.5" /> Xoá
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
+
+      {editing && (
+        <ComicEditor
+          comic={editing}
+          onClose={() => setEditing(null)}
+          onSave={(c) => {
+            upsertComic(c);
+            setEditing(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function ComicEditor({
+  comic,
+  onClose,
+  onSave,
+}: {
+  comic: Comic;
+  onClose: () => void;
+  onSave: (c: Comic) => void;
+}) {
+  const [draft, setDraft] = useState<Comic>(comic);
+
+  function patch(p: Partial<Comic>) {
+    setDraft((d) => ({ ...d, ...p }));
+  }
+
+  function addChapter() {
+    const ch: Chapter = { id: uid(), title: `Chương ${draft.chapters.length + 1}`, pages: [], createdAt: Date.now() };
+    patch({ chapters: [...draft.chapters, ch] });
+  }
+
+  function updateChapter(id: string, p: Partial<Chapter>) {
+    patch({
+      chapters: draft.chapters.map((c) => (c.id === id ? { ...c, ...p } : c)),
+    });
+  }
+
+  function removeChapter(id: string) {
+    patch({ chapters: draft.chapters.filter((c) => c.id !== id) });
+  }
+
+  function moveChapter(id: string, dir: -1 | 1) {
+    const arr = [...draft.chapters];
+    const i = arr.findIndex((c) => c.id === id);
+    const j = i + dir;
+    if (j < 0 || j >= arr.length) return;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    patch({ chapters: arr });
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur">
+      <div className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+        <header className="flex items-center justify-between border-b border-border px-5 py-3">
+          <h2 className="font-semibold">{comic.title ? `Sửa: ${comic.title}` : "Truyện mới"}</h2>
+          <button onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground">
+            Đóng
+          </button>
+        </header>
+
+        <div className="space-y-5 overflow-y-auto p-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Tên truyện">
+              <input
+                value={draft.title}
+                onChange={(e) => patch({ title: e.target.value })}
+                className="input"
+                placeholder="VD: Trăng Khuyết Đêm Hè"
+              />
+            </Field>
+            <Field label="Tác giả">
+              <input
+                value={draft.author}
+                onChange={(e) => patch({ author: e.target.value })}
+                className="input"
+              />
+            </Field>
+          </div>
+
+          <Field label="Mô tả">
+            <textarea
+              value={draft.description}
+              onChange={(e) => patch({ description: e.target.value })}
+              rows={3}
+              className="input"
+            />
+          </Field>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Thể loại (cách nhau bằng dấu phẩy)">
+              <input
+                value={draft.genres.join(", ")}
+                onChange={(e) =>
+                  patch({ genres: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })
+                }
+                className="input"
+                placeholder="Action, Romance"
+              />
+            </Field>
+            <Field label="Cover — File ID hoặc link Drive">
+              <input
+                value={draft.coverId}
+                onChange={(e) => patch({ coverId: extractDriveId(e.target.value) ?? e.target.value })}
+                className="input"
+                placeholder="1AbC… hoặc https://drive.google.com/file/d/…"
+              />
+            </Field>
+          </div>
+
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="font-semibold">Chương</h3>
+              <button
+                onClick={addChapter}
+                className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs hover:bg-secondary"
+              >
+                <Plus className="h-3.5 w-3.5" /> Thêm chương
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {draft.chapters.map((ch, i) => (
+                <div key={ch.id} className="rounded-xl border border-border p-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground tabular-nums">#{i + 1}</span>
+                    <input
+                      value={ch.title}
+                      onChange={(e) => updateChapter(ch.id, { title: e.target.value })}
+                      className="input flex-1"
+                    />
+                    <button onClick={() => moveChapter(ch.id, -1)} className="icon-btn" aria-label="Lên">
+                      <ChevronUp className="h-4 w-4" />
+                    </button>
+                    <button onClick={() => moveChapter(ch.id, 1)} className="icon-btn" aria-label="Xuống">
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => removeChapter(ch.id)}
+                      className="icon-btn text-destructive"
+                      aria-label="Xoá"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <textarea
+                    value={ch.pages.join("\n")}
+                    onChange={(e) => updateChapter(ch.id, { pages: parseDriveIds(e.target.value) })}
+                    rows={4}
+                    placeholder="Mỗi dòng một File ID hoặc link Drive (ảnh trang)"
+                    className="input mt-2 font-mono text-xs"
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">{ch.pages.length} trang</p>
+                </div>
+              ))}
+              {draft.chapters.length === 0 && (
+                <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+                  Chưa có chương nào.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <footer className="flex justify-end gap-2 border-t border-border bg-background/40 px-5 py-3">
+          <button onClick={onClose} className="rounded-md border border-border px-4 py-2 text-sm hover:bg-secondary">
+            Huỷ
+          </button>
+          <button
+            onClick={() => onSave(draft)}
+            disabled={!draft.title.trim()}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40 hover:opacity-90"
+          >
+            <Save className="h-4 w-4" /> Lưu
+          </button>
+        </footer>
+      </div>
+
+      <style>{`
+        .input {
+          width: 100%;
+          background: var(--input);
+          border: 1px solid var(--border);
+          border-radius: 0.5rem;
+          padding: 0.5rem 0.75rem;
+          color: var(--foreground);
+          font-size: 0.875rem;
+          outline: none;
+        }
+        .input:focus { border-color: var(--ring); box-shadow: 0 0 0 2px color-mix(in oklab, var(--ring) 30%, transparent); }
+        .icon-btn {
+          display: inline-flex; align-items: center; justify-content: center;
+          height: 2rem; width: 2rem; border-radius: 0.5rem;
+          border: 1px solid var(--border); color: var(--muted-foreground);
+        }
+        .icon-btn:hover { background: var(--secondary); color: var(--foreground); }
+      `}</style>
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-xs font-medium text-muted-foreground">{label}</span>
+      {children}
+    </label>
+  );
+}
