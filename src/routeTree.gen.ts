@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComicComicIdRouteImport } from './routes/comic.$comicId'
+import { Route as ReadComicIdChapterIdRouteImport } from './routes/read.$comicId.$chapterId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,40 @@ const ComicComicIdRoute = ComicComicIdRouteImport.update({
   path: '/comic/$comicId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReadComicIdChapterIdRoute = ReadComicIdChapterIdRouteImport.update({
+  id: '/read/$comicId/$chapterId',
+  path: '/read/$comicId/$chapterId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/comic/$comicId': typeof ComicComicIdRoute
+  '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/comic/$comicId': typeof ComicComicIdRoute
+  '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/comic/$comicId': typeof ComicComicIdRoute
+  '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/comic/$comicId'
+  fullPaths: '/' | '/comic/$comicId' | '/read/$comicId/$chapterId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/comic/$comicId'
-  id: '__root__' | '/' | '/comic/$comicId'
+  to: '/' | '/comic/$comicId' | '/read/$comicId/$chapterId'
+  id: '__root__' | '/' | '/comic/$comicId' | '/read/$comicId/$chapterId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComicComicIdRoute: typeof ComicComicIdRoute
+  ReadComicIdChapterIdRoute: typeof ReadComicIdChapterIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComicComicIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/read/$comicId/$chapterId': {
+      id: '/read/$comicId/$chapterId'
+      path: '/read/$comicId/$chapterId'
+      fullPath: '/read/$comicId/$chapterId'
+      preLoaderRoute: typeof ReadComicIdChapterIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComicComicIdRoute: ComicComicIdRoute,
+  ReadComicIdChapterIdRoute: ReadComicIdChapterIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
