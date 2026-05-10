@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ApplyRouteImport } from './routes/apply'
+import { Route as AdminApplicationsRouteImport } from './routes/admin-applications'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComicComicIdRouteImport } from './routes/comic.$comicId'
@@ -24,6 +25,11 @@ const LoginRoute = LoginRouteImport.update({
 const ApplyRoute = ApplyRouteImport.update({
   id: '/apply',
   path: '/apply',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminApplicationsRoute = AdminApplicationsRouteImport.update({
+  id: '/admin-applications',
+  path: '/admin-applications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -50,6 +56,7 @@ const ReadComicIdChapterIdRoute = ReadComicIdChapterIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
   '/comic/$comicId': typeof ComicComicIdRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
   '/comic/$comicId': typeof ComicComicIdRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
   '/comic/$comicId': typeof ComicComicIdRoute
@@ -77,6 +86,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/admin-applications'
     | '/apply'
     | '/login'
     | '/comic/$comicId'
@@ -85,6 +95,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/admin-applications'
     | '/apply'
     | '/login'
     | '/comic/$comicId'
@@ -93,6 +104,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/admin-applications'
     | '/apply'
     | '/login'
     | '/comic/$comicId'
@@ -102,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AdminApplicationsRoute: typeof AdminApplicationsRoute
   ApplyRoute: typeof ApplyRoute
   LoginRoute: typeof LoginRoute
   ComicComicIdRoute: typeof ComicComicIdRoute
@@ -122,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/apply'
       fullPath: '/apply'
       preLoaderRoute: typeof ApplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-applications': {
+      id: '/admin-applications'
+      path: '/admin-applications'
+      fullPath: '/admin-applications'
+      preLoaderRoute: typeof AdminApplicationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -158,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AdminApplicationsRoute: AdminApplicationsRoute,
   ApplyRoute: ApplyRoute,
   LoginRoute: LoginRoute,
   ComicComicIdRoute: ComicComicIdRoute,
