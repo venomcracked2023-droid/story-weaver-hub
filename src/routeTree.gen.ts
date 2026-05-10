@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComicComicIdRouteImport } from './routes/comic.$comicId'
@@ -18,6 +19,11 @@ import { Route as ReadComicIdChapterIdRouteImport } from './routes/read.$comicId
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApplyRoute = ApplyRouteImport.update({
+  id: '/apply',
+  path: '/apply',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -44,6 +50,7 @@ const ReadComicIdChapterIdRoute = ReadComicIdChapterIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
@@ -59,6 +67,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
@@ -68,6 +77,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/apply'
     | '/login'
     | '/comic/$comicId'
     | '/read/$comicId/$chapterId'
@@ -75,6 +85,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/apply'
     | '/login'
     | '/comic/$comicId'
     | '/read/$comicId/$chapterId'
@@ -82,6 +93,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/apply'
     | '/login'
     | '/comic/$comicId'
     | '/read/$comicId/$chapterId'
@@ -90,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  ApplyRoute: typeof ApplyRoute
   LoginRoute: typeof LoginRoute
   ComicComicIdRoute: typeof ComicComicIdRoute
   ReadComicIdChapterIdRoute: typeof ReadComicIdChapterIdRoute
@@ -102,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apply': {
+      id: '/apply'
+      path: '/apply'
+      fullPath: '/apply'
+      preLoaderRoute: typeof ApplyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -138,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  ApplyRoute: ApplyRoute,
   LoginRoute: LoginRoute,
   ComicComicIdRoute: ComicComicIdRoute,
   ReadComicIdChapterIdRoute: ReadComicIdChapterIdRoute,
