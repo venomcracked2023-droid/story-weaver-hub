@@ -2,10 +2,58 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
 import { useComics, useComicsLoaded } from "@/lib/comics-store";
+import { supabase } from "@/integrations/supabase/client";
+import { driveImageUrl } from "@/lib/drive";
 import { ChevronRight, Layers } from "lucide-react";
 
 export const Route = createFileRoute("/comic/$comicId")({
   component: ComicPage,
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("comics")
+      .select("title,author,description,cover_id,genres")
+      .eq("id", params.comicId)
+      .maybeSingle();
+    return { meta: data };
+  },
+  head: ({ loaderData, params }) => {
+    const m = loaderData?.meta;
+    if (!m) {
+      return { meta: [{ title: "Truyện — InkScroll" }] };
+    }
+    const title = `${m.title}${m.author ? ` — ${m.author}` : ""} | InkScroll`;
+    const desc = (m.description || `Đọc ${m.title} online cuộn dọc miễn phí trên InkScroll.`).slice(0, 160);
+    const img = m.cover_id ? driveImageUrl(m.cover_id, 1200) : undefined;
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: desc },
+      { property: "og:title", content: title },
+      { property: "og:description", content: desc },
+      { property: "og:type", content: "book" },
+    ];
+    if (img) {
+      meta.push({ property: "og:image", content: img });
+      meta.push({ name: "twitter:image", content: img });
+    }
+    return {
+      meta,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Book",
+            name: m.title,
+            author: m.author ? { "@type": "Person", name: m.author } : undefined,
+            description: desc,
+            image: img,
+            genre: m.genres,
+            url: `/comic/${params.comicId}`,
+          }),
+        },
+      ],
+    };
+  },
   notFoundComponent: () => (
     <div className="min-h-screen">
       <SiteHeader />
