@@ -81,9 +81,17 @@ function Reader() {
                 src={driveImageUrl(id, 1200)}
                 alt={`Trang ${i + 1}`}
                 loading={i < 2 ? "eager" : "lazy"}
-                className="block w-full"
+                className="block w-full min-h-[60vh] bg-secondary/40 object-contain"
                 onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.opacity = "0.3";
+                  const img = e.currentTarget as HTMLImageElement;
+                  // Fallback to direct uc?export=view if thumbnail blocked
+                  if (!img.dataset.fallback) {
+                    img.dataset.fallback = "1";
+                    const m = img.src.match(/[?&]id=([A-Za-z0-9_-]+)/);
+                    if (m) img.src = `https://lh3.googleusercontent.com/d/${m[1]}=w1200`;
+                  } else {
+                    img.style.opacity = "0.3";
+                  }
                 }}
               />
             ))}
