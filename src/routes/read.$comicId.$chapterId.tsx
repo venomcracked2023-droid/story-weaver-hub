@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useComics } from "@/lib/comics-store";
+import { useComics, useComicsLoaded } from "@/lib/comics-store";
 import { driveImageUrl } from "@/lib/drive";
 import { ArrowLeft, ChevronLeft, ChevronRight, List } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -18,6 +18,7 @@ function Reader() {
   const { comicId, chapterId } = Route.useParams();
   const navigate = useNavigate();
   const comics = useComics();
+  const loaded = useComicsLoaded();
   const comic = comics.find((c) => c.id === comicId);
   const idx = comic?.chapters.findIndex((c) => c.id === chapterId) ?? -1;
   const chapter = comic && idx >= 0 ? comic.chapters[idx] : null;
@@ -38,6 +39,9 @@ function Reader() {
     window.scrollTo(0, 0);
   }, [chapterId]);
 
+  if (!loaded) {
+    return <div className="p-10 text-center text-muted-foreground">Đang tải…</div>;
+  }
   if (!comic || !chapter) throw notFound();
 
   const prev = idx > 0 ? comic.chapters[idx - 1] : null;
