@@ -3,6 +3,7 @@ import { useComics, useComicsLoaded } from "@/lib/comics-store";
 import { driveImageUrl } from "@/lib/drive";
 import { ArrowLeft, ChevronLeft, ChevronRight, List } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Virtuoso } from "react-virtuoso";
 
 export const Route = createFileRoute("/read/$comicId/$chapterId")({
   component: Reader,
@@ -47,6 +48,44 @@ function Reader() {
   const prev = idx > 0 ? comic.chapters[idx - 1] : null;
   const next = idx < comic.chapters.length - 1 ? comic.chapters[idx + 1] : null;
 
+  const Footer = () => (
+    <nav className="mx-auto flex max-w-3xl items-center justify-between gap-2 p-6">
+      <button
+        disabled={!prev}
+        onClick={() =>
+          prev &&
+          navigate({
+            to: "/read/$comicId/$chapterId",
+            params: { comicId: comic.id, chapterId: prev.id },
+          })
+        }
+        className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm disabled:opacity-40 hover:bg-secondary"
+      >
+        <ChevronLeft className="h-4 w-4" /> Trước
+      </button>
+      <Link
+        to="/comic/$comicId"
+        params={{ comicId: comic.id }}
+        className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm hover:bg-secondary"
+      >
+        <List className="h-4 w-4" /> Mục lục
+      </Link>
+      <button
+        disabled={!next}
+        onClick={() =>
+          next &&
+          navigate({
+            to: "/read/$comicId/$chapterId",
+            params: { comicId: comic.id, chapterId: next.id },
+          })
+        }
+        className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-40 hover:opacity-90"
+      >
+        Sau <ChevronRight className="h-4 w-4" />
+      </button>
+    </nav>
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <header
@@ -68,23 +107,32 @@ function Reader() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl pt-14">
-        {chapter.pages.length === 0 ? (
+      {chapter.pages.length === 0 ? (
+        <main className="mx-auto max-w-3xl pt-14">
           <div className="p-10 text-center text-muted-foreground">
             Chương này chưa có trang nào.
           </div>
-        ) : (
-          <div className="flex flex-col">
-            {chapter.pages.map((id, i) => (
+          <Footer />
+        </main>
+      ) : (
+        <Virtuoso
+          useWindowScroll
+          data={chapter.pages}
+          increaseViewportBy={{ top: 1500, bottom: 2000 }}
+          components={{
+            Header: () => <div className="h-14" />,
+            Footer,
+          }}
+          itemContent={(i, id) => (
+            <div className="mx-auto max-w-3xl">
               <img
-                key={i}
                 src={driveImageUrl(id, 1200)}
                 alt={`Trang ${i + 1}`}
-                loading={i < 2 ? "eager" : "lazy"}
+                loading="lazy"
+                decoding="async"
                 className="block w-full min-h-[60vh] bg-secondary/40 object-contain"
                 onError={(e) => {
                   const img = e.currentTarget as HTMLImageElement;
-                  // Fallback to direct uc?export=view if thumbnail blocked
                   if (!img.dataset.fallback) {
                     img.dataset.fallback = "1";
                     const m = img.src.match(/[?&]id=([A-Za-z0-9_-]+)/);
@@ -94,46 +142,10 @@ function Reader() {
                   }
                 }}
               />
-            ))}
-          </div>
-        )}
-
-        <nav className="flex items-center justify-between gap-2 p-6">
-          <button
-            disabled={!prev}
-            onClick={() =>
-              prev &&
-              navigate({
-                to: "/read/$comicId/$chapterId",
-                params: { comicId: comic.id, chapterId: prev.id },
-              })
-            }
-            className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm disabled:opacity-40 hover:bg-secondary"
-          >
-            <ChevronLeft className="h-4 w-4" /> Trước
-          </button>
-          <Link
-            to="/comic/$comicId"
-            params={{ comicId: comic.id }}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm hover:bg-secondary"
-          >
-            <List className="h-4 w-4" /> Mục lục
-          </Link>
-          <button
-            disabled={!next}
-            onClick={() =>
-              next &&
-              navigate({
-                to: "/read/$comicId/$chapterId",
-                params: { comicId: comic.id, chapterId: next.id },
-              })
-            }
-            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-40 hover:opacity-90"
-          >
-            Sau <ChevronRight className="h-4 w-4" />
-          </button>
-        </nav>
-      </main>
+            </div>
+          )}
+        />
+      )}
     </div>
   );
 }
