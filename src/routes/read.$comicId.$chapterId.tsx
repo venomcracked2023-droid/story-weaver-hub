@@ -1,9 +1,10 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useComics, useComicsLoaded } from "@/lib/comics-store";
-import { driveImageUrl } from "@/lib/drive";
+import { driveImageUrl, extractDriveId } from "@/lib/drive";
 import { ArrowLeft, ChevronLeft, ChevronRight, List } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Virtuoso } from "react-virtuoso";
+import { PdfReader } from "@/components/PdfReader";
 
 export const Route = createFileRoute("/read/$comicId/$chapterId")({
   component: Reader,
@@ -47,6 +48,15 @@ function Reader() {
 
   const prev = idx > 0 ? comic.chapters[idx - 1] : null;
   const next = idx < comic.chapters.length - 1 ? comic.chapters[idx + 1] : null;
+
+  const singleId =
+    chapter.pages.length === 1
+      ? extractDriveId(chapter.pages[0]) ?? chapter.pages[0]
+      : null;
+  const [pdfFailed, setPdfFailed] = useState(false);
+  useEffect(() => {
+    setPdfFailed(false);
+  }, [chapterId]);
 
   const Footer = () => (
     <nav className="mx-auto flex max-w-3xl items-center justify-between gap-2 p-6">
@@ -114,6 +124,12 @@ function Reader() {
           </div>
           <Footer />
         </main>
+      ) : singleId && !pdfFailed ? (
+        <PdfReader
+          fileUrl={`/api/drive-file?id=${singleId}`}
+          Footer={Footer}
+          onFail={() => setPdfFailed(true)}
+        />
       ) : (
         <Virtuoso
           useWindowScroll

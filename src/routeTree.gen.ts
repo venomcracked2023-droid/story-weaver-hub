@@ -15,6 +15,7 @@ import { Route as AdminApplicationsRouteImport } from './routes/admin-applicatio
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComicComicIdRouteImport } from './routes/comic.$comicId'
+import { Route as ApiDriveFileRouteImport } from './routes/api/drive-file'
 import { Route as ReadComicIdChapterIdRouteImport } from './routes/read.$comicId.$chapterId'
 
 const LoginRoute = LoginRouteImport.update({
@@ -47,6 +48,11 @@ const ComicComicIdRoute = ComicComicIdRouteImport.update({
   path: '/comic/$comicId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDriveFileRoute = ApiDriveFileRouteImport.update({
+  id: '/api/drive-file',
+  path: '/api/drive-file',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReadComicIdChapterIdRoute = ReadComicIdChapterIdRouteImport.update({
   id: '/read/$comicId/$chapterId',
   path: '/read/$comicId/$chapterId',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
+  '/api/drive-file': typeof ApiDriveFileRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
+  '/api/drive-file': typeof ApiDriveFileRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
+  '/api/drive-file': typeof ApiDriveFileRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/login'
+    | '/api/drive-file'
     | '/comic/$comicId'
     | '/read/$comicId/$chapterId'
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/login'
+    | '/api/drive-file'
     | '/comic/$comicId'
     | '/read/$comicId/$chapterId'
   id:
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/login'
+    | '/api/drive-file'
     | '/comic/$comicId'
     | '/read/$comicId/$chapterId'
   fileRoutesById: FileRoutesById
@@ -117,6 +129,7 @@ export interface RootRouteChildren {
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   ApplyRoute: typeof ApplyRoute
   LoginRoute: typeof LoginRoute
+  ApiDriveFileRoute: typeof ApiDriveFileRoute
   ComicComicIdRoute: typeof ComicComicIdRoute
   ReadComicIdChapterIdRoute: typeof ReadComicIdChapterIdRoute
 }
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComicComicIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/drive-file': {
+      id: '/api/drive-file'
+      path: '/api/drive-file'
+      fullPath: '/api/drive-file'
+      preLoaderRoute: typeof ApiDriveFileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/read/$comicId/$chapterId': {
       id: '/read/$comicId/$chapterId'
       path: '/read/$comicId/$chapterId'
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminApplicationsRoute: AdminApplicationsRoute,
   ApplyRoute: ApplyRoute,
   LoginRoute: LoginRoute,
+  ApiDriveFileRoute: ApiDriveFileRoute,
   ComicComicIdRoute: ComicComicIdRoute,
   ReadComicIdChapterIdRoute: ReadComicIdChapterIdRoute,
 }
