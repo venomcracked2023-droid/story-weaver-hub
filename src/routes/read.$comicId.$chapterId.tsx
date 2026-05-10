@@ -75,6 +75,7 @@ function Reader() {
   const chapter = comic && idx >= 0 ? comic.chapters[idx] : null;
 
   const [hideUI, setHideUI] = useState(false);
+  const [pdfFailed, setPdfFailed] = useState(false);
   useEffect(() => {
     let last = 0;
     const onScroll = () => {
@@ -88,6 +89,7 @@ function Reader() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setPdfFailed(false);
   }, [chapterId]);
 
   if (!loaded) {
@@ -102,10 +104,6 @@ function Reader() {
     chapter.pages.length === 1
       ? extractDriveId(chapter.pages[0]) ?? chapter.pages[0]
       : null;
-  const [pdfFailed, setPdfFailed] = useState(false);
-  useEffect(() => {
-    setPdfFailed(false);
-  }, [chapterId]);
 
   const Footer = () => (
     <nav className="mx-auto flex max-w-3xl items-center justify-between gap-2 p-6">
