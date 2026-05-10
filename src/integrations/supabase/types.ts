@@ -14,6 +14,77 @@ export type Database = {
   }
   public: {
     Tables: {
+      chapters: {
+        Row: {
+          comic_id: string
+          created_at: string
+          id: string
+          order_index: number
+          pages: string[]
+          title: string
+        }
+        Insert: {
+          comic_id: string
+          created_at?: string
+          id?: string
+          order_index?: number
+          pages?: string[]
+          title: string
+        }
+        Update: {
+          comic_id?: string
+          created_at?: string
+          id?: string
+          order_index?: number
+          pages?: string[]
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chapters_comic_id_fkey"
+            columns: ["comic_id"]
+            isOneToOne: false
+            referencedRelation: "comics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comics: {
+        Row: {
+          author: string
+          cover_id: string
+          created_at: string
+          created_by: string
+          description: string
+          genres: string[]
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string
+          cover_id?: string
+          created_at?: string
+          created_by: string
+          description?: string
+          genres?: string[]
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          cover_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string
+          genres?: string[]
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contributor_applications: {
         Row: {
           created_at: string
