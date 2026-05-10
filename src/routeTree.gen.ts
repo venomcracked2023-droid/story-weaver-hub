@@ -9,17 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminApplicationsRouteImport } from './routes/admin-applications'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComicComicIdRouteImport } from './routes/comic.$comicId'
-import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
-import { Route as ApiRobotsDottxtRouteImport } from './routes/api/robots[.]txt'
 import { Route as ApiDriveFileRouteImport } from './routes/api/drive-file'
 import { Route as ReadComicIdChapterIdRouteImport } from './routes/read.$comicId.$chapterId'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -50,16 +60,6 @@ const ComicComicIdRoute = ComicComicIdRouteImport.update({
   path: '/comic/$comicId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
-  id: '/api/sitemap.xml',
-  path: '/api/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiRobotsDottxtRoute = ApiRobotsDottxtRouteImport.update({
-  id: '/api/robots.txt',
-  path: '/api/robots.txt',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiDriveFileRoute = ApiDriveFileRouteImport.update({
   id: '/api/drive-file',
   path: '/api/drive-file',
@@ -77,9 +77,9 @@ export interface FileRoutesByFullPath {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
-  '/api/robots.txt': typeof ApiRobotsDottxtRoute
-  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
@@ -89,9 +89,9 @@ export interface FileRoutesByTo {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
-  '/api/robots.txt': typeof ApiRobotsDottxtRoute
-  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
@@ -102,9 +102,9 @@ export interface FileRoutesById {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
-  '/api/robots.txt': typeof ApiRobotsDottxtRoute
-  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
@@ -116,9 +116,9 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/login'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/api/drive-file'
-    | '/api/robots.txt'
-    | '/api/sitemap.xml'
     | '/comic/$comicId'
     | '/read/$comicId/$chapterId'
   fileRoutesByTo: FileRoutesByTo
@@ -128,9 +128,9 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/login'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/api/drive-file'
-    | '/api/robots.txt'
-    | '/api/sitemap.xml'
     | '/comic/$comicId'
     | '/read/$comicId/$chapterId'
   id:
@@ -140,9 +140,9 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/login'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/api/drive-file'
-    | '/api/robots.txt'
-    | '/api/sitemap.xml'
     | '/comic/$comicId'
     | '/read/$comicId/$chapterId'
   fileRoutesById: FileRoutesById
@@ -153,15 +153,29 @@ export interface RootRouteChildren {
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   ApplyRoute: typeof ApplyRoute
   LoginRoute: typeof LoginRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiDriveFileRoute: typeof ApiDriveFileRoute
-  ApiRobotsDottxtRoute: typeof ApiRobotsDottxtRoute
-  ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   ComicComicIdRoute: typeof ComicComicIdRoute
   ReadComicIdChapterIdRoute: typeof ReadComicIdChapterIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -204,20 +218,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComicComicIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/sitemap.xml': {
-      id: '/api/sitemap.xml'
-      path: '/api/sitemap.xml'
-      fullPath: '/api/sitemap.xml'
-      preLoaderRoute: typeof ApiSitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/robots.txt': {
-      id: '/api/robots.txt'
-      path: '/api/robots.txt'
-      fullPath: '/api/robots.txt'
-      preLoaderRoute: typeof ApiRobotsDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/drive-file': {
       id: '/api/drive-file'
       path: '/api/drive-file'
@@ -241,9 +241,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminApplicationsRoute: AdminApplicationsRoute,
   ApplyRoute: ApplyRoute,
   LoginRoute: LoginRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiDriveFileRoute: ApiDriveFileRoute,
-  ApiRobotsDottxtRoute: ApiRobotsDottxtRoute,
-  ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   ComicComicIdRoute: ComicComicIdRoute,
   ReadComicIdChapterIdRoute: ReadComicIdChapterIdRoute,
 }
