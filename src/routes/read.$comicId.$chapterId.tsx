@@ -61,7 +61,7 @@ function Reader() {
         }
         className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm disabled:opacity-40 hover:bg-secondary"
       >
-        <ChevronLeft className="h-4 w-4" /> Trước
+        <ChevronLeft className="h-4 w-4" /> Chương trước
       </button>
       <Link
         to="/comic/$comicId"
@@ -81,7 +81,7 @@ function Reader() {
         }
         className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-40 hover:opacity-90"
       >
-        Sau <ChevronRight className="h-4 w-4" />
+        Chương sau <ChevronRight className="h-4 w-4" />
       </button>
     </nav>
   );
