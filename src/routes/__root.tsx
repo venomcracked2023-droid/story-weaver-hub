@@ -75,19 +75,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "InkScroll — Đọc Webtoon online" },
-      { name: "description", content: "Nền tảng đọc webtoon cuộn dọc, ảnh nhúng từ Google Drive." },
+      { name: "description", content: "InkScroll — đọc webtoon online cuộn dọc miễn phí, cập nhật chương mới mỗi ngày, giao diện nhẹ và mượt trên mọi thiết bị." },
       { name: "author", content: "InkScroll" },
-      { property: "og:title", content: "InkScroll — Webtoon" },
-      { property: "og:description", content: "Đọc truyện webtoon online, mượt và đẹp." },
+      { name: "robots", content: "index,follow,max-image-preview:large" },
+      { name: "theme-color", content: "#0b0b10" },
+      { name: "keywords", content: "webtoon, đọc truyện online, manhwa, manhua, manga, truyện tranh, cuộn dọc, InkScroll" },
+      { property: "og:site_name", content: "InkScroll" },
+      { property: "og:title", content: "InkScroll — Đọc Webtoon online" },
+      { property: "og:description", content: "Đọc webtoon cuộn dọc, mượt và đẹp. Cập nhật chương mới mỗi ngày." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { property: "og:locale", content: "vi_VN" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "InkScroll — Webtoon" },
+      { name: "twitter:description", content: "Đọc webtoon cuộn dọc, mượt và đẹp." },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", href: "/favicon.ico" },
     ],
   }),
   shellComponent: RootShell,
@@ -98,7 +105,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="vi">
       <head>
         <HeadContent />
       </head>

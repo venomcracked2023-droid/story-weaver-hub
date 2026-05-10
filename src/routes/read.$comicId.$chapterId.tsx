@@ -8,6 +8,7 @@ import { PdfReader } from "@/components/PdfReader";
 
 export const Route = createFileRoute("/read/$comicId/$chapterId")({
   component: Reader,
+  ssr: false,
   notFoundComponent: () => (
     <div className="p-10 text-center">
       Không tìm thấy chương. <Link to="/" className="text-primary underline">Về trang chủ</Link>
