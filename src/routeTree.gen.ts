@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminApplicationsRouteImport } from './routes/admin-applications'
@@ -18,6 +20,16 @@ import { Route as ComicComicIdRouteImport } from './routes/comic.$comicId'
 import { Route as ApiDriveFileRouteImport } from './routes/api/drive-file'
 import { Route as ReadComicIdChapterIdRouteImport } from './routes/read.$comicId.$chapterId'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -65,6 +77,8 @@ export interface FileRoutesByFullPath {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
@@ -75,6 +89,8 @@ export interface FileRoutesByTo {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
@@ -86,6 +102,8 @@ export interface FileRoutesById {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/login': typeof LoginRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
@@ -98,6 +116,8 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/login'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/api/drive-file'
     | '/comic/$comicId'
     | '/read/$comicId/$chapterId'
@@ -108,6 +128,8 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/login'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/api/drive-file'
     | '/comic/$comicId'
     | '/read/$comicId/$chapterId'
@@ -118,6 +140,8 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/login'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/api/drive-file'
     | '/comic/$comicId'
     | '/read/$comicId/$chapterId'
@@ -129,6 +153,8 @@ export interface RootRouteChildren {
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   ApplyRoute: typeof ApplyRoute
   LoginRoute: typeof LoginRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiDriveFileRoute: typeof ApiDriveFileRoute
   ComicComicIdRoute: typeof ComicComicIdRoute
   ReadComicIdChapterIdRoute: typeof ReadComicIdChapterIdRoute
@@ -136,6 +162,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -201,6 +241,8 @@ const rootRouteChildren: RootRouteChildren = {
   AdminApplicationsRoute: AdminApplicationsRoute,
   ApplyRoute: ApplyRoute,
   LoginRoute: LoginRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiDriveFileRoute: ApiDriveFileRoute,
   ComicComicIdRoute: ComicComicIdRoute,
   ReadComicIdChapterIdRoute: ReadComicIdChapterIdRoute,
@@ -208,3 +250,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
