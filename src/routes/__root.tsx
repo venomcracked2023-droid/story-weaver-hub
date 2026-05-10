@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "sonner";
+import { SITE_LOGO, SITE_NAME, SITE_URL, SOCIAL_LINKS } from "@/lib/seo";
 
 function NotFoundComponent() {
   return (
@@ -108,12 +109,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "InkScroll",
-          url: "https://lcucumber.com",
-          logo: "https://lcucumber.com/og-default.jpg",
-          sameAs: [
-            "https://www.facebook.com/profile.php?id=61577465649339",
-          ],
+          name: SITE_NAME,
+          url: SITE_URL,
+          logo: SITE_LOGO,
+          sameAs: SOCIAL_LINKS,
         }),
       },
       {
@@ -121,8 +120,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "InkScroll",
-          url: "https://lcucumber.com",
+          name: SITE_NAME,
+          url: SITE_URL,
         }),
       },
     ],
