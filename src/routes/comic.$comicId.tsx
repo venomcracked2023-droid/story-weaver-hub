@@ -23,7 +23,7 @@ export const Route = createFileRoute("/comic/$comicId")({
     }
     const title = `${m.title}${m.author ? ` — ${m.author}` : ""} | InkScroll`;
     const desc = (m.description || `Đọc ${m.title} online cuộn dọc miễn phí trên InkScroll.`).slice(0, 160);
-    const img = m.cover_id ? driveImageUrl(m.cover_id, 1200) : undefined;
+    const img = m.cover_id ? driveImageUrl(m.cover_id, 1200) : "/og-default.jpg";
     const meta: Array<Record<string, string>> = [
       { title },
       { name: "description", content: desc },
@@ -31,10 +31,8 @@ export const Route = createFileRoute("/comic/$comicId")({
       { property: "og:description", content: desc },
       { property: "og:type", content: "book" },
     ];
-    if (img) {
-      meta.push({ property: "og:image", content: img });
-      meta.push({ name: "twitter:image", content: img });
-    }
+    meta.push({ property: "og:image", content: img });
+    meta.push({ name: "twitter:image", content: img });
     return {
       meta,
       scripts: [
