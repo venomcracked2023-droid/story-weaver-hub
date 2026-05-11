@@ -4,7 +4,7 @@ import { ComicCover } from "@/components/ComicCover";
 import { useComics, useComicsLoaded } from "@/lib/comics-store";
 import { supabase } from "@/integrations/supabase/client";
 import { driveImageUrl } from "@/lib/drive";
-import { ChevronRight, Layers } from "lucide-react";
+import { BookOpen, ChevronRight, Layers, User } from "lucide-react";
 
 export const Route = createFileRoute("/comic/$comicId")({
   component: ComicPage,
@@ -102,35 +102,59 @@ function ComicPage() {
   return (
     <div className="min-h-screen">
       <SiteHeader />
-      <main className="mx-auto max-w-5xl px-4 pb-20 pt-8">
-        <div className="grid gap-8 md:grid-cols-[240px_1fr]">
-          <div className="aspect-[3/4] overflow-hidden rounded-2xl border border-border bg-card md:max-w-[240px]">
-            <ComicCover id={comic.coverId} title={comic.title} />
-          </div>
-          <div>
-            <div className="flex flex-wrap gap-2">
-              {comic.genres.map((g) => (
-                <span key={g} className="rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground">
-                  {g}
-                </span>
-              ))}
+      <div className="relative isolate overflow-hidden border-b border-border">
+        <div
+          className="absolute inset-0 -z-10 scale-110 opacity-30 blur-2xl"
+          style={{
+            backgroundImage: `url(${driveImageUrl(comic.coverId, 800)})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/70 via-background/85 to-background" aria-hidden />
+        <main className="mx-auto max-w-5xl px-4 pb-10 pt-10 sm:pt-14">
+          <div className="grid gap-8 md:grid-cols-[240px_1fr]">
+            <div className="hover-lift mx-auto aspect-[3/4] w-full max-w-[240px] overflow-hidden rounded-2xl border border-primary/30 bg-card shadow-glow">
+              <ComicCover id={comic.coverId} title={comic.title} />
             </div>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">{comic.title}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Tác giả: {comic.author || "Ẩn danh"}</p>
-            <p className="mt-5 leading-relaxed text-foreground/90">{comic.description}</p>
-            {comic.chapters.length > 0 && (
-              <Link
-                to="/read/$comicId/$chapterId"
-                params={{ comicId: comic.id, chapterId: comic.chapters[0].id }}
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
-              >
-                Đọc từ đầu <ChevronRight className="h-4 w-4" />
-              </Link>
-            )}
+            <div className="animate-fade-in-up">
+              <div className="flex flex-wrap gap-2">
+                {comic.genres.map((g) => (
+                  <span
+                    key={g}
+                    className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+                  >
+                    {g}
+                  </span>
+                ))}
+              </div>
+              <h1 className="mt-3 text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
+                {comic.title}
+              </h1>
+              <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                <User className="h-3.5 w-3.5" /> {comic.author || "Ẩn danh"}
+                <span className="mx-2 text-border">·</span>
+                <BookOpen className="h-3.5 w-3.5" /> {comic.chapters.length} chương
+              </p>
+              <p className="mt-5 leading-relaxed text-foreground/90">{comic.description}</p>
+              {comic.chapters.length > 0 && (
+                <Link
+                  to="/read/$comicId/$chapterId"
+                  params={{ comicId: comic.id, chapterId: comic.chapters[0].id }}
+                  className="group mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-brand px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95"
+                >
+                  Đọc từ đầu
+                  <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              )}
+            </div>
           </div>
-        </div>
+        </main>
+      </div>
 
-        <section className="mt-12">
+      <main className="mx-auto max-w-5xl px-4 pb-20">
+        <section className="mt-10">
           <div className="mb-4 flex items-center gap-2">
             <Layers className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-bold">Danh sách chương</h2>
@@ -143,17 +167,22 @@ function ComicPage() {
           ) : (
             <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
               {comic.chapters.map((ch, i) => (
-                <li key={ch.id}>
+                <li key={ch.id} className="group">
                   <Link
                     to="/read/$comicId/$chapterId"
                     params={{ comicId: comic.id, chapterId: ch.id }}
-                    className="flex items-center justify-between gap-3 px-5 py-3 transition hover:bg-secondary"
+                    className="flex items-center justify-between gap-3 px-5 py-3.5 transition hover:bg-secondary/70"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-muted-foreground tabular-nums">#{i + 1}</span>
-                      <span className="font-medium">{ch.title}</span>
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground tabular-nums transition group-hover:border-primary group-hover:bg-primary/10 group-hover:text-primary">
+                        {i + 1}
+                      </span>
+                      <span className="font-medium transition-colors group-hover:text-primary">{ch.title}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground">{ch.pages.length} trang</span>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span>{ch.pages.length} trang</span>
+                      <ChevronRight className="h-4 w-4 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary" />
+                    </div>
                   </Link>
                 </li>
               ))}
