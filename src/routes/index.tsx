@@ -7,6 +7,9 @@ import cucumberLogo from "@/assets/cucumber-logo.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  validateSearch: (s: Record<string, unknown>) => ({
+    q: typeof s.q === "string" ? s.q : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Lcucumber — Đọc Webtoon cuộn dọc" },
@@ -17,6 +20,16 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const comics = useComics();
+  const { q } = Route.useSearch();
+  const term = (q ?? "").trim().toLowerCase();
+  const filtered = term
+    ? comics.filter((c) =>
+        [c.title, c.author, ...(c.genres ?? [])]
+          .join(" ")
+          .toLowerCase()
+          .includes(term),
+      )
+    : comics;
   const featured = comics.filter((c) => c.featured);
   const totalChapters = comics.reduce((s, c) => s + c.chapters.length, 0);
   return (
@@ -121,9 +134,11 @@ function Index() {
           <div className="mb-6 flex items-end justify-between">
             <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
               <Library className="h-5 w-5 text-primary" />
-              Thư viện truyện
+              {term ? `Kết quả cho "${q}"` : "Thư viện truyện"}
             </h2>
-            <span className="text-sm text-muted-foreground">{comics.length} tác phẩm</span>
+            <span className="text-sm text-muted-foreground">
+              {filtered.length}/{comics.length} tác phẩm
+            </span>
           </div>
 
           {comics.length === 0 ? (
@@ -132,9 +147,14 @@ function Index() {
               <p>Chưa có truyện nào trong thư viện.</p>
               <Link to="/admin" className="text-primary underline-offset-4 hover:underline">Vào Quản lý để thêm</Link>
             </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border bg-card/40 p-12 text-center text-muted-foreground">
+              <BookOpen className="h-10 w-10 text-primary/60" />
+              <p>Không tìm thấy truyện nào khớp với "{q}".</p>
+            </div>
           ) : (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {comics.map((c, i) => (
+              {filtered.map((c, i) => (
                 <Link
                   key={c.id}
                   to="/comic/$comicId"
