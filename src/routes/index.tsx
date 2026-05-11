@@ -45,9 +45,32 @@ function Index() {
     : comics;
   const featured = comics.filter((c) => c.featured);
   const totalChapters = comics.reduce((s, c) => s + c.chapters.length, 0);
+  const libraryJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Lcucumber — Thư viện truyện",
+    url: `${SITE_URL}/`,
+    inLanguage: "vi-VN",
+    isPartOf: { "@type": "WebSite", name: "Lcucumber", url: SITE_URL },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: filtered.length,
+      itemListOrder: "https://schema.org/ItemListOrderAscending",
+      itemListElement: filtered.map((c, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `${SITE_URL}/comic/${c.id}`,
+        name: c.title,
+      })),
+    },
+  };
   return (
     <div className="min-h-screen">
       <SiteHeader />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(libraryJsonLd) }}
+      />
       <main className="mx-auto max-w-6xl px-4 pb-20">
         <section className="relative mt-6 overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-secondary to-card px-6 py-9 sm:px-12 sm:py-12">
           <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-primary/25 blur-3xl animate-pulse-glow" />
