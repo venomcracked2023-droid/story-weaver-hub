@@ -17,18 +17,40 @@ export const Route = createFileRoute("/sitemap.xml")({
           .order("created_at", { ascending: false })
           .limit(5000);
 
+        const iso = (v: string | number | Date) => new Date(v).toISOString();
+        const maxIso = (a?: string, b?: string) =>
+          !a ? b : !b ? a : new Date(a) > new Date(b) ? a : b;
+
+        // lastmod chương = thời điểm tạo chương (bảng chapters chưa có updated_at).
+        // lastmod truyện = max(comic.updated_at, chương mới nhất thuộc truyện đó).
+        const latestChapterByComic = new Map<string, string>();
+        let globalLatest: string | undefined;
+        for (const ch of chapters ?? []) {
+          const ts = iso(ch.created_at);
+          latestChapterByComic.set(
+            ch.comic_id,
+            maxIso(latestChapterByComic.get(ch.comic_id), ts) as string,
+          );
+          globalLatest = maxIso(globalLatest, ts);
+        }
+        for (const c of comics ?? []) {
+          globalLatest = maxIso(globalLatest, iso(c.updated_at));
+        }
+        const siteLastmod = globalLatest ?? iso(Date.now());
+
         const urls: string[] = [
-          `<url><loc>${origin}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`,
-          `<url><loc>${origin}/featured</loc><changefreq>daily</changefreq><priority>0.9</priority></url>`,
+          `<url><loc>${origin}/</loc><lastmod>${siteLastmod}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,
+          `<url><loc>${origin}/featured</loc><lastmod>${siteLastmod}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,
         ];
         for (const c of comics ?? []) {
+          const lastmod = maxIso(iso(c.updated_at), latestChapterByComic.get(c.id))!;
           urls.push(
-            `<url><loc>${origin}/comic/${c.id}</loc><lastmod>${new Date(c.updated_at).toISOString()}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`
+            `<url><loc>${origin}/comic/${c.id}</loc><lastmod>${lastmod}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`,
           );
         }
         for (const ch of chapters ?? []) {
           urls.push(
-            `<url><loc>${origin}/read/${ch.comic_id}/${ch.id}</loc><lastmod>${new Date(ch.created_at).toISOString()}</lastmod><priority>0.6</priority></url>`
+            `<url><loc>${origin}/read/${ch.comic_id}/${ch.id}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>`,
           );
         }
 
