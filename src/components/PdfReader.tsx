@@ -50,6 +50,7 @@ export function PdfReader({ fileUrl, Footer, onFail }: Props) {
             useWindowScroll
             totalCount={numPages}
             increaseViewportBy={{ top: 1500, bottom: 2000 }}
+            defaultItemHeight={width * 1.4}
             components={{
               Header: () => <div className="h-14" />,
               Footer: () => <Footer />,
