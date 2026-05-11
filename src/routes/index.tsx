@@ -30,9 +30,6 @@ function Index() {
             <h1 className="mt-5 text-4xl font-bold tracking-tight sm:text-5xl">
               Truyện hay, <span className="text-primary">cuộn không ngừng.</span>
             </h1>
-            <p className="mt-4 max-w-xl text-base text-muted-foreground">
-              Tải ảnh chương lên Google Drive, dán File ID vào trang quản lý — Lcucumber sẽ tự nhúng và hiển thị đẹp như app webtoon thật.
-            </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link to="/admin" className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90">
                 <BookOpen className="h-4 w-4" /> Bắt đầu đăng truyện
