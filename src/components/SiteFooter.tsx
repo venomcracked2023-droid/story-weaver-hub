@@ -91,21 +91,40 @@ export function SiteFooter() {
   }
   const allGroups = [...navGroups, ...dynamicGroups];
 
-  // JSON-LD chuẩn schema.org:
-  // - SiteNavigationElement: chỉ cần `name` + `url` (description tuỳ chọn, vẫn hợp lệ).
-  // - URL phải tuyệt đối, dùng giao thức http/https; không đưa mailto, hash, sitemap.xml.
-  // - Khử trùng lặp theo URL chuẩn hoá.
-  // - Gói trong ItemList để thể hiện thứ tự điều hướng.
-  const toAbsoluteUrl = (raw: string): string | null => {
+  // JSON-LD chuẩn schema.org. Quy tắc chuẩn hoá URL để khử trùng:
+  //  1. Tuyệt đối hoá theo SITE_URL; chỉ giữ http/https.
+  //  2. Loại mailto, fragment (#...), và các tài nguyên non-page (.xml/.txt).
+  //  3. Scheme + host chuyển về chữ thường, bỏ cổng mặc định (80/443).
+  //  4. Bỏ trailing slash thừa (trừ root "/").
+  //  5. Sort query params theo alphabet, loại tham số rỗng.
+  //  6. Khoá dedupe = chuỗi chuẩn hoá; URL hiển thị = phiên bản chuẩn hoá đó.
+  const normalizeUrl = (raw: string): string | null => {
     try {
       const u = new URL(raw, SITE_URL);
       if (u.protocol !== "http:" && u.protocol !== "https:") return null;
-      if (u.hash) return null;
       if (/\.(xml|txt)$/i.test(u.pathname)) return null;
-      // Bỏ trailing slash thừa (trừ root) để khử trùng.
-      if (u.pathname.length > 1 && u.pathname.endsWith("/")) {
+
+      u.protocol = u.protocol.toLowerCase();
+      u.hostname = u.hostname.toLowerCase();
+      if (
+        (u.protocol === "http:" && u.port === "80") ||
+        (u.protocol === "https:" && u.port === "443")
+      ) {
+        u.port = "";
+      }
+      u.hash = "";
+
+      if (u.pathname.length > 1) {
         u.pathname = u.pathname.replace(/\/+$/, "");
       }
+
+      const params = Array.from(u.searchParams.entries())
+        .filter(([, v]) => v !== "")
+        .sort(([a], [b]) => a.localeCompare(b));
+      u.search = "";
+      const sorted = new URLSearchParams(params).toString();
+      if (sorted) u.search = `?${sorted}`;
+
       return u.toString();
     } catch {
       return null;
@@ -116,8 +135,8 @@ export function SiteFooter() {
   const seen = new Set<string>();
   const navItems: NavEntry[] = [];
   const pushNav = (raw: string, name: string, description?: string) => {
-    const url = toAbsoluteUrl(raw);
-    if (!url || seen.has(url) || !name) return;
+    const url = normalizeUrl(raw);
+    if (!url || !name || seen.has(url)) return;
     seen.add(url);
     navItems.push(description ? { name, url, description } : { name, url });
   };
