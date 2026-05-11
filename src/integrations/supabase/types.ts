@@ -88,6 +88,36 @@ export type Database = {
         }
         Relationships: []
       }
+      comments: {
+        Row: {
+          chapter_id: string | null
+          comic_id: string
+          content: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chapter_id?: string | null
+          comic_id: string
+          content: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chapter_id?: string | null
+          comic_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       contributor_applications: {
         Row: {
           created_at: string
@@ -145,6 +175,33 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+        }
+        Relationships: []
+      }
+      ratings: {
+        Row: {
+          comic_id: string
+          created_at: string
+          id: string
+          score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comic_id: string
+          created_at?: string
+          id?: string
+          score: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comic_id?: string
+          created_at?: string
+          id?: string
+          score?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Virtuoso } from "react-virtuoso";
 import { PdfReader } from "@/components/PdfReader";
 import { supabase } from "@/integrations/supabase/client";
+import { CommentSection } from "@/components/CommentSection";
 
 export const Route = createFileRoute("/read/$comicId/$chapterId")({
   component: Reader,
@@ -204,6 +205,9 @@ function Reader() {
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Quay lại mục lục truyện
         </Link>
+      </div>
+      <div className="mt-6">
+        <CommentSection comicId={comic.id} chapterId={chapter.id} />
       </div>
     </div>
   );
