@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
-import { Virtuoso } from "react-virtuoso";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
@@ -46,17 +45,10 @@ export function PdfReader({ fileUrl, Footer, onFail }: Props) {
         }
       >
         {numPages && (
-          <Virtuoso
-            useWindowScroll
-            totalCount={numPages}
-            increaseViewportBy={{ top: 1500, bottom: 2000 }}
-            defaultItemHeight={width * 1.4}
-            components={{
-              Header: () => <div className="h-14" />,
-              Footer: () => <Footer />,
-            }}
-            itemContent={(i) => (
-              <div className="flex justify-center py-2">
+          <>
+            <div className="h-14" />
+            {Array.from({ length: numPages }, (_, i) => (
+              <div key={i} className="flex justify-center py-2">
                 <Page
                   pageNumber={i + 1}
                   width={width}
@@ -70,8 +62,9 @@ export function PdfReader({ fileUrl, Footer, onFail }: Props) {
                   }
                 />
               </div>
-            )}
-          />
+            ))}
+            <Footer />
+          </>
         )}
       </Document>
     </div>
