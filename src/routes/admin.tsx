@@ -41,6 +41,14 @@ function AdminPage() {
   const [editing, setEditing] = useState<Comic | null>(null);
   const { user, isContributor, loading } = useAuth();
 
+  // Gom tác giả & thể loại đã từng dùng để gợi ý nhanh trong editor.
+  const knownAuthors = Array.from(
+    new Set(comics.map((c) => c.author?.trim()).filter(Boolean) as string[]),
+  ).sort((a, b) => a.localeCompare(b));
+  const knownGenres = Array.from(
+    new Set(comics.flatMap((c) => c.genres).map((g) => g.trim()).filter(Boolean)),
+  ).sort((a, b) => a.localeCompare(b));
+
   if (loading) {
     return (
       <div className="min-h-screen">
@@ -169,6 +177,8 @@ function AdminPage() {
       {editing && (
         <ComicEditor
           comic={editing}
+          knownAuthors={knownAuthors}
+          knownGenres={knownGenres}
           onClose={() => setEditing(null)}
           onSave={async (c) => {
             try {
@@ -187,10 +197,14 @@ function AdminPage() {
 
 function ComicEditor({
   comic,
+  knownAuthors,
+  knownGenres,
   onClose,
   onSave,
 }: {
   comic: Comic;
+  knownAuthors: string[];
+  knownGenres: string[];
   onClose: () => void;
   onSave: (c: Comic) => void;
 }) {
@@ -198,6 +212,11 @@ function ComicEditor({
 
   function patch(p: Partial<Comic>) {
     setDraft((d) => ({ ...d, ...p }));
+  }
+
+  function toggleGenre(g: string) {
+    const has = draft.genres.includes(g);
+    patch({ genres: has ? draft.genres.filter((x) => x !== g) : [...draft.genres, g] });
   }
 
   function addChapter() {
@@ -249,7 +268,33 @@ function ComicEditor({
                 value={draft.author}
                 onChange={(e) => patch({ author: e.target.value })}
                 className="input"
+                list="known-authors"
+                placeholder="Gõ hoặc chọn tác giả đã có"
               />
+              <datalist id="known-authors">
+                {knownAuthors.map((a) => (
+                  <option key={a} value={a} />
+                ))}
+              </datalist>
+              {knownAuthors.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {knownAuthors.slice(0, 12).map((a) => (
+                    <button
+                      key={a}
+                      type="button"
+                      onClick={() => patch({ author: a })}
+                      className={
+                        "rounded-full border px-2.5 py-0.5 text-xs transition " +
+                        (draft.author === a
+                          ? "border-primary bg-primary/15 text-primary"
+                          : "border-border text-muted-foreground hover:border-primary/60 hover:text-foreground")
+                      }
+                    >
+                      {a}
+                    </button>
+                  ))}
+                </div>
+              )}
             </Field>
           </div>
 
@@ -272,6 +317,30 @@ function ComicEditor({
                 className="input"
                 placeholder="Action, Romance"
               />
+              {knownGenres.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {knownGenres.map((g) => {
+                    const active = draft.genres.includes(g);
+                    return (
+                      <button
+                        key={g}
+                        type="button"
+                        onClick={() => toggleGenre(g)}
+                        className={
+                          "rounded-full border px-2.5 py-0.5 text-xs transition " +
+                          (active
+                            ? "border-primary bg-primary/15 text-primary"
+                            : "border-border text-muted-foreground hover:border-primary/60 hover:text-foreground")
+                        }
+                        aria-pressed={active}
+                      >
+                        {active ? "✓ " : "+ "}
+                        {g}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </Field>
             <Field label="Cover — File ID hoặc link Drive">
               <input
