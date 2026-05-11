@@ -199,6 +199,10 @@ function ComicPage() {
             <Layers className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-bold">Danh sách chương</h2>
             <span className="text-sm text-muted-foreground">({comic.chapters.length})</span>
+            <span className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <MessageCircle className="h-3.5 w-3.5" />
+              {Object.values(chapterCounts).reduce((a, b) => a + b, 0) + comicCount} bình luận
+            </span>
           </div>
           {comic.chapters.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">
@@ -220,6 +224,13 @@ function ComicPage() {
                       <span className="font-medium transition-colors group-hover:text-primary">{ch.title}</span>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-background/70 px-2 py-0.5"
+                        title="Số bình luận của chương"
+                      >
+                        <MessageCircle className="h-3 w-3" />
+                        {chapterCounts[ch.id] ?? 0}
+                      </span>
                       <span>{ch.pages.length} trang</span>
                       <ChevronRight className="h-4 w-4 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary" />
                     </div>
