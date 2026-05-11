@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, LogIn, LogOut, Settings, UserPlus, ShieldCheck } from "lucide-react";
+import { LogIn, LogOut, Settings, UserPlus, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import cucumberLogo from "@/assets/cucumber-logo.png";
 
 export function SiteHeader() {
   const { user, isContributor, isAdmin, profile, signOut } = useAuth();
@@ -9,10 +10,14 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <BookOpen className="h-4 w-4" />
-          </span>
-          <span className="text-lg font-bold tracking-tight">Lcucumber</span>
+          <img
+            src={cucumberLogo}
+            alt="Lcucumber"
+            width={32}
+            height={32}
+            className="h-8 w-8 object-contain drop-shadow-[0_2px_8px_oklch(0.72_0.19_142_/_0.45)]"
+          />
+          <span className="text-lg font-bold tracking-tight text-primary">Lcucumber</span>
           <span className="hidden text-xs text-muted-foreground sm:inline">/ Webtoon</span>
         </Link>
         <nav className="flex items-center gap-1 text-sm">
