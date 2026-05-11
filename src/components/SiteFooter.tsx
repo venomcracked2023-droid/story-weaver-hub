@@ -91,7 +91,45 @@ export function SiteFooter() {
   }
   const allGroups = [...navGroups, ...dynamicGroups];
 
-  // JSON-LD: WPFooter + SiteNavigationElement giúp Google hiểu cấu trúc liên kết.
+  // JSON-LD chuẩn schema.org:
+  // - SiteNavigationElement: chỉ cần `name` + `url` (description tuỳ chọn, vẫn hợp lệ).
+  // - URL phải tuyệt đối, dùng giao thức http/https; không đưa mailto, hash, sitemap.xml.
+  // - Khử trùng lặp theo URL chuẩn hoá.
+  // - Gói trong ItemList để thể hiện thứ tự điều hướng.
+  const toAbsoluteUrl = (raw: string): string | null => {
+    try {
+      const u = new URL(raw, SITE_URL);
+      if (u.protocol !== "http:" && u.protocol !== "https:") return null;
+      if (u.hash) return null;
+      if (/\.(xml|txt)$/i.test(u.pathname)) return null;
+      // Bỏ trailing slash thừa (trừ root) để khử trùng.
+      if (u.pathname.length > 1 && u.pathname.endsWith("/")) {
+        u.pathname = u.pathname.replace(/\/+$/, "");
+      }
+      return u.toString();
+    } catch {
+      return null;
+    }
+  };
+
+  type NavEntry = { name: string; url: string; description?: string };
+  const seen = new Set<string>();
+  const navItems: NavEntry[] = [];
+  const pushNav = (raw: string, name: string, description?: string) => {
+    const url = toAbsoluteUrl(raw);
+    if (!url || seen.has(url) || !name) return;
+    seen.add(url);
+    navItems.push(description ? { name, url, description } : { name, url });
+  };
+
+  for (const g of navGroups) {
+    for (const l of g.links) pushNav(l.to ?? l.href ?? "", l.label, l.desc);
+  }
+  for (const l of tocLinks) {
+    pushNav(`/comic/${l.params?.comicId ?? ""}`, l.label, l.desc);
+  }
+  for (const l of genreLinks) pushNav("/featured", l.label, l.desc);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -100,28 +138,18 @@ export function SiteFooter() {
         name: `${SITE_NAME} footer`,
         isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL },
       },
-      ...navGroups.flatMap((g) =>
-        g.links
-          .filter((l) => l.to || (l.href && l.href.startsWith("/")))
-          .map((l) => ({
-            "@type": "SiteNavigationElement",
-            name: l.label,
-            description: l.desc,
-            url: `${SITE_URL}${l.to ?? l.href}`,
-          })),
-      ),
-      ...tocLinks.map((l) => ({
-        "@type": "SiteNavigationElement",
-        name: l.label,
-        description: l.desc,
-        url: `${SITE_URL}/comic/${l.params?.comicId}`,
-      })),
-      ...genreLinks.map((l) => ({
-        "@type": "SiteNavigationElement",
-        name: l.label,
-        description: l.desc,
-        url: `${SITE_URL}/featured`,
-      })),
+      {
+        "@type": "ItemList",
+        name: `${SITE_NAME} — Điều hướng chân trang`,
+        numberOfItems: navItems.length,
+        itemListElement: navItems.map((n, i) => ({
+          "@type": "SiteNavigationElement",
+          position: i + 1,
+          name: n.name,
+          url: n.url,
+          ...(n.description ? { description: n.description } : {}),
+        })),
+      },
       {
         "@type": "Organization",
         name: SITE_NAME,
