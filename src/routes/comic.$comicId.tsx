@@ -5,6 +5,8 @@ import { useComics, useComicsLoaded } from "@/lib/comics-store";
 import { supabase } from "@/integrations/supabase/client";
 import { driveImageUrl } from "@/lib/drive";
 import { BookOpen, ChevronRight, Layers, User } from "lucide-react";
+import { CommentSection } from "@/components/CommentSection";
+import { RatingWidget } from "@/components/RatingWidget";
 
 export const Route = createFileRoute("/comic/$comicId")({
   component: ComicPage,
@@ -138,6 +140,7 @@ function ComicPage() {
                 <BookOpen className="h-3.5 w-3.5" /> {comic.chapters.length} chương
               </p>
               <p className="mt-5 leading-relaxed text-foreground/90">{comic.description}</p>
+              <RatingWidget comicId={comic.id} />
               {comic.chapters.length > 0 && (
                 <Link
                   to="/read/$comicId/$chapterId"
@@ -189,6 +192,8 @@ function ComicPage() {
             </ul>
           )}
         </section>
+
+        <CommentSection comicId={comic.id} />
       </main>
     </div>
   );
