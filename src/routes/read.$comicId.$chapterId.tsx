@@ -216,10 +216,12 @@ function Reader() {
           <Link
             to="/comic/$comicId"
             params={{ comicId: comic.id }}
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-foreground hover:text-primary"
+            className="group inline-flex items-center gap-1.5 text-sm font-bold text-foreground transition-colors hover:text-primary"
           >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="line-clamp-1">{comic.title}</span>
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+            <span className="line-clamp-1 underline-offset-4 group-hover:font-extrabold group-hover:underline group-hover:decoration-primary/60">
+              {comic.title}
+            </span>
           </Link>
           <span className="text-xs font-bold text-foreground">{chapter.title}</span>
         </div>
