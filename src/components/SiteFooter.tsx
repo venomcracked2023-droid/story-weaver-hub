@@ -1,56 +1,115 @@
 import { Link } from "@tanstack/react-router";
 import { Facebook, Github, Heart, Mail, Star } from "lucide-react";
 import cucumberLogo from "@/assets/cucumber-logo.png";
-import { SITE_NAME, SOCIAL_LINKS } from "@/lib/seo";
+import { SITE_LOGO, SITE_NAME, SITE_URL, SOCIAL_LINKS } from "@/lib/seo";
 
-const navGroups: Array<{
-  title: string;
-  links: Array<{ label: string; to?: string; href?: string }>;
-}> = [
+type FooterLink = {
+  label: string;
+  /** Tiêu đề mô tả cho thuộc tính title (ngữ cảnh thêm cho crawler & screen reader). */
+  desc: string;
+  to?: string;
+  href?: string;
+  external?: boolean;
+};
+
+const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }> = [
   {
     title: "Khám phá",
+    ariaLabel: "Liên kết khám phá nội dung",
     links: [
-      { label: "Trang chủ", to: "/" },
-      { label: "Truyện nổi bật", to: "/featured" },
+      { label: "Trang chủ", to: "/", desc: "Lcucumber — Webtoon cuộn dọc" },
+      { label: "Truyện nổi bật", to: "/featured", desc: "Danh sách truyện được tuyển chọn" },
     ],
   },
   {
     title: "Cộng đồng",
+    ariaLabel: "Liên kết cộng đồng và tài khoản",
     links: [
-      { label: "Ứng tuyển CTV", to: "/apply" },
-      { label: "Đăng nhập", to: "/login" },
+      { label: "Ứng tuyển CTV", to: "/apply", desc: "Trở thành cộng tác viên đăng truyện" },
+      { label: "Đăng nhập", to: "/login", desc: "Đăng nhập tài khoản Lcucumber" },
     ],
   },
   {
     title: "Hỗ trợ",
+    ariaLabel: "Liên kết hỗ trợ và pháp lý",
     links: [
-      { label: "Liên hệ", href: "mailto:hello@lcucumber.com" },
-      { label: "Báo lỗi", href: "mailto:hello@lcucumber.com?subject=Báo lỗi" },
+      { label: "Liên hệ", href: "mailto:hello@lcucumber.com", desc: "Gửi email cho đội Lcucumber" },
+      { label: "Báo lỗi", href: "mailto:hello@lcucumber.com?subject=Báo lỗi", desc: "Báo lỗi nội dung hoặc kỹ thuật" },
+      { label: "Sitemap", href: "/sitemap.xml", desc: "Sơ đồ trang cho công cụ tìm kiếm" },
+      { label: "Robots.txt", href: "/robots.txt", desc: "Hướng dẫn cho trình thu thập" },
     ],
   },
 ];
 
-function iconFor(url: string) {
-  if (url.includes("facebook")) return Facebook;
-  if (url.includes("github")) return Github;
-  return Mail;
+function socialMeta(url: string): { Icon: typeof Facebook; name: string } {
+  if (url.includes("facebook")) return { Icon: Facebook, name: "Facebook" };
+  if (url.includes("github")) return { Icon: Github, name: "GitHub" };
+  return { Icon: Mail, name: "Liên hệ" };
 }
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
+
+  // JSON-LD: WPFooter + SiteNavigationElement giúp Google hiểu cấu trúc liên kết.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WPFooter",
+        name: `${SITE_NAME} footer`,
+        isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL },
+      },
+      ...navGroups.flatMap((g) =>
+        g.links
+          .filter((l) => l.to || (l.href && l.href.startsWith("/")))
+          .map((l) => ({
+            "@type": "SiteNavigationElement",
+            name: l.label,
+            description: l.desc,
+            url: `${SITE_URL}${l.to ?? l.href}`,
+          })),
+      ),
+      {
+        "@type": "Organization",
+        name: SITE_NAME,
+        url: SITE_URL,
+        logo: SITE_LOGO,
+        sameAs: SOCIAL_LINKS,
+      },
+    ],
+  };
+
   return (
-    <footer className="relative mt-20 border-t border-border bg-card/40">
+    <footer
+      className="relative mt-20 border-t border-border bg-card/40"
+      role="contentinfo"
+      aria-labelledby="site-footer-heading"
+    >
+      <h2 id="site-footer-heading" className="sr-only">
+        Chân trang {SITE_NAME}
+      </h2>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div>
-            <Link to="/" className="group inline-flex items-center gap-2">
+            <Link
+              to="/"
+              className="group inline-flex items-center gap-2"
+              title={`${SITE_NAME} — Trang chủ`}
+              aria-label={`${SITE_NAME} — Về trang chủ`}
+            >
               <img
                 src={cucumberLogo}
-                alt={SITE_NAME}
+                alt={`Logo ${SITE_NAME} — webtoon cuộn dọc`}
                 width={32}
                 height={32}
                 className="h-8 w-8 object-contain transition group-hover:rotate-[-8deg]"
+                loading="lazy"
+                decoding="async"
               />
               <span className="text-lg font-bold tracking-tight text-gradient-brand">
                 {SITE_NAME}
@@ -61,28 +120,34 @@ export function SiteFooter() {
             </p>
 
             {SOCIAL_LINKS.length > 0 && (
-              <div className="mt-5 flex items-center gap-2">
+              <ul
+                className="mt-5 flex items-center gap-2"
+                aria-label={`${SITE_NAME} trên mạng xã hội`}
+              >
                 {SOCIAL_LINKS.map((url) => {
-                  const Icon = iconFor(url);
+                  const { Icon, name } = socialMeta(url);
                   return (
-                    <a
-                      key={url}
-                      href={url}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      aria-label="Mạng xã hội"
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background/40 text-muted-foreground transition hover:border-primary hover:text-primary"
-                    >
-                      <Icon className="h-4 w-4" />
-                    </a>
+                    <li key={url}>
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="me noopener noreferrer"
+                        aria-label={`${SITE_NAME} trên ${name} (mở tab mới)`}
+                        title={`${SITE_NAME} trên ${name}`}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background/40 text-muted-foreground transition hover:border-primary hover:text-primary"
+                      >
+                        <Icon className="h-4 w-4" aria-hidden="true" focusable="false" />
+                        <span className="sr-only">{name}</span>
+                      </a>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
             )}
           </div>
 
           {navGroups.map((g) => (
-            <div key={g.title}>
+            <nav key={g.title} aria-label={g.ariaLabel}>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/80">
                 {g.title}
               </h3>
@@ -92,6 +157,7 @@ export function SiteFooter() {
                     <li key={l.label}>
                       <Link
                         to={l.to}
+                        title={l.desc}
                         className="text-muted-foreground transition hover:text-primary"
                       >
                         {l.label}
@@ -101,6 +167,8 @@ export function SiteFooter() {
                     <li key={l.label}>
                       <a
                         href={l.href}
+                        title={l.desc}
+                        rel={l.href?.startsWith("mailto:") ? "nofollow" : undefined}
                         className="text-muted-foreground transition hover:text-primary"
                       >
                         {l.label}
@@ -109,18 +177,32 @@ export function SiteFooter() {
                   ),
                 )}
               </ul>
-            </div>
+            </nav>
           ))}
         </div>
 
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center">
           <p>
-            © {year} {SITE_NAME}. Mọi quyền được bảo lưu.
+            <small>
+              © <time dateTime={String(year)}>{year}</time>{" "}
+              <span itemProp="name">{SITE_NAME}</span>. Mọi quyền được bảo lưu.
+            </small>
           </p>
           <p className="inline-flex items-center gap-1.5">
-            Made with <Heart className="h-3.5 w-3.5 fill-primary text-primary" /> by team{" "}
+            Made with{" "}
+            <Heart
+              className="h-3.5 w-3.5 fill-primary text-primary"
+              aria-hidden="true"
+              focusable="false"
+            />{" "}
+            by team{" "}
             <span className="inline-flex items-center gap-1 font-medium text-foreground">
-              <Star className="h-3 w-3 fill-primary text-primary" /> {SITE_NAME}
+              <Star
+                className="h-3 w-3 fill-primary text-primary"
+                aria-hidden="true"
+                focusable="false"
+              />{" "}
+              {SITE_NAME}
             </span>
           </p>
         </div>
