@@ -49,7 +49,9 @@ function Index() {
                 <Star className="h-5 w-5 fill-primary text-primary" />
                 Truyện nổi bật
               </h2>
-              <span className="text-sm text-muted-foreground">{featured.length} tác phẩm</span>
+              <Link to="/featured" className="text-sm text-primary hover:underline">
+                Xem tất cả ({featured.length})
+              </Link>
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {featured.map((c) => (
