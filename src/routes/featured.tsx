@@ -25,18 +25,35 @@ function FeaturedPage() {
   const filtered = useMemo(() => {
     const q = query.trim();
     if (!q) return featured;
+    // Tên truyện là tín hiệu chính: giữ nguyên điểm.
+    // Tác giả là tín hiệu phụ: cộng phạt để luôn xếp sau khớp tên tương đương,
+    // và chỉ giữ khi khớp khá sát (tránh tác giả trùng kéo lệch kết quả).
+    const AUTHOR_PENALTY = 5;
+    const AUTHOR_MAX = 3; // chỉ chấp nhận khớp tác giả ở mức "chứa chuỗi/token"
     const scored = featured
       .map((c) => {
         const titleScore = fuzzyScoreVi(q, c.title);
-        const authorScore = fuzzyScoreVi(q, c.author ?? "");
+        const rawAuthor = fuzzyScoreVi(q, c.author ?? "");
+        const authorScore =
+          rawAuthor !== null && rawAuthor <= AUTHOR_MAX
+            ? rawAuthor + AUTHOR_PENALTY
+            : null;
         const candidates = [titleScore, authorScore].filter(
           (s): s is number => s !== null,
         );
         if (candidates.length === 0) return null;
-        return { comic: c, score: Math.min(...candidates) };
+        return {
+          comic: c,
+          score: Math.min(...candidates),
+          // tie-breaker: tên ngắn hơn → khớp gọn hơn → ưu tiên trước.
+          tiebreak: c.title.length,
+        };
       })
-      .filter((x): x is { comic: typeof featured[number]; score: number } => x !== null)
-      .sort((a, b) => a.score - b.score);
+      .filter(
+        (x): x is { comic: typeof featured[number]; score: number; tiebreak: number } =>
+          x !== null,
+      )
+      .sort((a, b) => a.score - b.score || a.tiebreak - b.tiebreak);
     return scored.map((s) => s.comic);
   }, [featured, query]);
 
