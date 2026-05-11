@@ -1,10 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
 import { useComics, useComicsLoaded } from "@/lib/comics-store";
 import { supabase } from "@/integrations/supabase/client";
 import { driveImageUrl } from "@/lib/drive";
-import { BookOpen, ChevronRight, Layers, User } from "lucide-react";
+import { BookOpen, ChevronRight, Layers, MessageCircle, User } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { RatingWidget } from "@/components/RatingWidget";
 
@@ -91,6 +92,42 @@ function ComicPage() {
   const comics = useComics();
   const loaded = useComicsLoaded();
   const comic = comics.find((c) => c.id === comicId);
+  const [chapterCounts, setChapterCounts] = useState<Record<string, number>>({});
+  const [comicCount, setComicCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    async function loadCounts() {
+      const { data, error } = await supabase
+        .from("comments")
+        .select("chapter_id")
+        .eq("comic_id", comicId)
+        .limit(5000);
+      if (error || !active) return;
+      const map: Record<string, number> = {};
+      let general = 0;
+      for (const row of data ?? []) {
+        if (row.chapter_id) map[row.chapter_id] = (map[row.chapter_id] ?? 0) + 1;
+        else general += 1;
+      }
+      setChapterCounts(map);
+      setComicCount(general);
+    }
+    loadCounts();
+    const ch = supabase
+      .channel(`comments-counts-${comicId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "comments", filter: `comic_id=eq.${comicId}` },
+        () => loadCounts(),
+      )
+      .subscribe();
+    return () => {
+      active = false;
+      supabase.removeChannel(ch);
+    };
+  }, [comicId]);
+
   if (!loaded) {
     return (
       <div className="min-h-screen">
