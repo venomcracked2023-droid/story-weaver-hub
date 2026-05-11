@@ -133,7 +133,7 @@ function Reader() {
 
   const StickyNav = () => (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/50"
       aria-label="Điều hướng chương"
     >
       <div className="h-1 w-full bg-secondary">
