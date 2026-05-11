@@ -5,17 +5,27 @@ import { useComics } from "@/lib/comics-store";
 import { Search, Star } from "lucide-react";
 import { useMemo, useState } from "react";
 import { fuzzyScoreVi } from "@/lib/fuzzy-search";
+import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/featured")({
   component: FeaturedPage,
-  head: () => ({
-    meta: [
-      { title: "Truyện nổi bật — Lcucumber" },
-      { name: "description", content: "Danh sách toàn bộ truyện được đánh dấu nổi bật trên Lcucumber." },
-      { property: "og:title", content: "Truyện nổi bật — Lcucumber" },
-      { property: "og:description", content: "Khám phá những webtoon nổi bật được tuyển chọn." },
-    ],
-  }),
+  head: () => {
+    const title = "Truyện nổi bật — Lcucumber";
+    const desc = "Danh sách webtoon nổi bật được Lcucumber tuyển chọn — đọc cuộn dọc miễn phí.";
+    const url = `${SITE_URL}/featured`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:url", content: url },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
 });
 
 function FeaturedPage() {
