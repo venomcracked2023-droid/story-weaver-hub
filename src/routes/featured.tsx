@@ -31,6 +31,25 @@ export const Route = createFileRoute("/featured")({
 function FeaturedPage() {
   const comics = useComics();
   const featured = comics.filter((c) => c.featured);
+  const listJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Truyện nổi bật — Lcucumber",
+    url: `${SITE_URL}/featured`,
+    inLanguage: "vi-VN",
+    isPartOf: { "@type": "WebSite", name: "Lcucumber", url: SITE_URL },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: featured.length,
+      itemListOrder: "https://schema.org/ItemListOrderAscending",
+      itemListElement: featured.map((c, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `${SITE_URL}/comic/${c.id}`,
+        name: c.title,
+      })),
+    },
+  };
   const [query, setQuery] = useState("");
   const filtered = useMemo(() => {
     const q = query.trim();
@@ -70,6 +89,10 @@ function FeaturedPage() {
   return (
     <div className="min-h-screen">
       <SiteHeader />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }}
+      />
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-6">
         <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
