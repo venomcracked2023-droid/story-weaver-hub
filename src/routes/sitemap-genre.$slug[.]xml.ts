@@ -7,7 +7,9 @@ export const Route = createFileRoute("/sitemap-genre/$slug.xml")({
     handlers: {
       GET: async ({ request, params }) => {
         const origin = new URL(request.url).origin;
-        const target = params.slug;
+        // TanStack đặt tên param là "slug.xml" do dấu chấm liền sau $slug.
+        const raw = (params as Record<string, string>)["slug.xml"] ?? "";
+        const target = raw.replace(/\.xml$/, "");
 
         const { data: comics } = await supabase
           .from("comics")
