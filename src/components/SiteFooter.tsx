@@ -121,8 +121,7 @@ export function SiteFooter() {
         name: l.label,
         description: l.desc,
         url: `${SITE_URL}/featured`,
-          })),
-      ),
+      })),
       {
         "@type": "Organization",
         name: SITE_NAME,
