@@ -90,12 +90,25 @@ export function CommentSection({
 
   async function remove(id: string) {
     if (!confirm("Xoá bình luận này?")) return;
-    const { error } = await supabase.from("comments").delete().eq("id", id);
+    if (!user) {
+      toast.error("Bạn cần đăng nhập lại");
+      return;
+    }
+    const { data, error } = await supabase
+      .from("comments")
+      .delete()
+      .eq("id", id)
+      .select("id");
     if (error) {
       toast.error(error.message);
       return;
     }
+    if (!data || data.length === 0) {
+      toast.error("Không có quyền xoá bình luận này");
+      return;
+    }
     setItems((arr) => arr.filter((x) => x.id !== id));
+    toast.success("Đã xoá bình luận");
   }
 
   return (
