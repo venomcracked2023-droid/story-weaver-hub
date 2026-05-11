@@ -117,99 +117,91 @@ function Reader() {
     });
 
   const Footer = () => (
-    <div className="mx-auto max-w-3xl px-4 pb-10 pt-6">
-      {/* Thanh trạng thái vị trí */}
-      <div className="rounded-2xl border border-border bg-card/70 p-4 shadow-glow backdrop-blur">
-        <div className="mb-3 flex items-center justify-between gap-3 text-xs">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 font-semibold text-primary">
-            Chương {idx + 1}<span className="text-primary/60">/{total}</span>
-          </span>
-          <span className="line-clamp-1 text-muted-foreground" title={chapter.title}>
-            {chapter.title}
-          </span>
-        </div>
-
-        {/* Progress bar */}
-        <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
-          <div
-            className="h-full bg-gradient-brand transition-[width] duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
-        {/* Pill controls */}
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5">
-            <button
-              disabled={!prev}
-              onClick={() => first && goToChapter(first.id)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-primary/60 hover:bg-secondary hover:text-foreground disabled:opacity-30 disabled:hover:bg-transparent"
-              aria-label="Chương đầu"
-              title="Chương đầu"
-            >
-              <ChevronsLeft className="h-4 w-4" />
-            </button>
-            <button
-              disabled={!prev}
-              onClick={() => prev && goToChapter(prev.id)}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm transition hover:border-primary/60 hover:bg-secondary disabled:opacity-30 disabled:hover:bg-transparent"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Trước</span>
-            </button>
-          </div>
-
-          {/* Chapter jumper */}
-          <div className="relative order-last w-full sm:order-none sm:w-auto">
-            <List className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <select
-              value={chapter.id}
-              onChange={(e) => goToChapter(e.target.value)}
-              className="w-full appearance-none rounded-full border border-border bg-background py-2 pl-9 pr-9 text-sm font-medium outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30 sm:w-64"
-              aria-label="Chuyển chương nhanh"
-            >
-              {comic.chapters.map((ch, i) => (
-                <option key={ch.id} value={ch.id}>
-                  {i + 1}. {ch.title}
-                </option>
-              ))}
-            </select>
-            <ChevronRight className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted-foreground" />
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              disabled={!next}
-              onClick={() => next && goToChapter(next.id)}
-              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
-            >
-              <span className="hidden sm:inline">Sau</span>
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            <button
-              disabled={!next}
-              onClick={() => last && goToChapter(last.id)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-primary/60 hover:bg-secondary hover:text-foreground disabled:opacity-30 disabled:hover:bg-transparent"
-              aria-label="Chương cuối"
-              title="Chương cuối"
-            >
-              <ChevronsRight className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-
-        <Link
-          to="/comic/$comicId"
-          params={{ comicId: comic.id }}
-          className="mt-3 inline-flex items-center gap-1.5 text-xs text-muted-foreground transition hover:text-primary"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Quay lại mục lục truyện
-        </Link>
-      </div>
+    <div className="mx-auto max-w-3xl px-4 pb-32 pt-6">
+      <Link
+        to="/comic/$comicId"
+        params={{ comicId: comic.id }}
+        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition hover:text-primary"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" /> Quay lại mục lục truyện
+      </Link>
       <div className="mt-6">
         <CommentSection comicId={comic.id} chapterId={chapter.id} />
       </div>
     </div>
+  );
+
+  const StickyNav = () => (
+    <nav
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70"
+      aria-label="Điều hướng chương"
+    >
+      <div className="h-1 w-full bg-secondary">
+        <div
+          className="h-full bg-gradient-brand transition-[width] duration-500"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+      <div className="mx-auto flex max-w-3xl items-center gap-2 px-3 py-2 sm:px-4">
+        <span className="hidden shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary sm:inline-flex">
+          {idx + 1}<span className="text-primary/60">/{total}</span>
+        </span>
+        <button
+          disabled={!prev}
+          onClick={() => first && goToChapter(first.id)}
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-primary/60 hover:bg-secondary hover:text-foreground disabled:opacity-30"
+          aria-label="Chương đầu"
+          title="Chương đầu"
+        >
+          <ChevronsLeft className="h-4 w-4" />
+        </button>
+        <button
+          disabled={!prev}
+          onClick={() => prev && goToChapter(prev.id)}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border px-3 py-2 text-sm transition hover:border-primary/60 hover:bg-secondary disabled:opacity-30"
+          aria-label="Chương trước"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          <span className="hidden sm:inline">Trước</span>
+        </button>
+
+        <div className="relative min-w-0 flex-1">
+          <List className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <select
+            value={chapter.id}
+            onChange={(e) => goToChapter(e.target.value)}
+            className="w-full appearance-none truncate rounded-full border border-border bg-background py-2 pl-9 pr-8 text-sm font-medium outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+            aria-label="Chuyển chương nhanh"
+          >
+            {comic.chapters.map((ch, i) => (
+              <option key={ch.id} value={ch.id}>
+                {i + 1}. {ch.title}
+              </option>
+            ))}
+          </select>
+          <ChevronRight className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted-foreground" />
+        </div>
+
+        <button
+          disabled={!next}
+          onClick={() => next && goToChapter(next.id)}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-brand px-3 py-2 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+          aria-label="Chương sau"
+        >
+          <span className="hidden sm:inline">Sau</span>
+          <ChevronRight className="h-4 w-4" />
+        </button>
+        <button
+          disabled={!next}
+          onClick={() => last && goToChapter(last.id)}
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-primary/60 hover:bg-secondary hover:text-foreground disabled:opacity-30"
+          aria-label="Chương cuối"
+          title="Chương cuối"
+        >
+          <ChevronsRight className="h-4 w-4" />
+        </button>
+      </div>
+    </nav>
   );
 
   return (
@@ -278,6 +270,7 @@ function Reader() {
           )}
         />
       )}
+      <StickyNav />
     </div>
   );
 }
