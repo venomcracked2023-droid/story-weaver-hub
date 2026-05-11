@@ -194,14 +194,20 @@ function ComicPage() {
       </div>
 
       <main className="mx-auto max-w-5xl px-4 pb-20">
-        <section className="mt-10">
-          <div className="mb-4 flex items-center gap-2">
-            <Layers className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-bold">Danh sách chương</h2>
-            <span className="text-sm text-muted-foreground">({comic.chapters.length})</span>
-            <span className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground">
+        <section className="mt-10 rounded-3xl border border-primary/30 bg-gradient-to-br from-card via-card to-secondary/40 p-5 shadow-glow ring-1 ring-primary/10 sm:p-7">
+          <div className="mb-5 flex items-center gap-3">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-primary/40 bg-primary/10 text-primary shadow-glow">
+              <Layers className="h-5 w-5" />
+            </span>
+            <div className="flex flex-col">
+              <h2 className="text-2xl font-extrabold tracking-tight">Danh sách chương</h2>
+              <span className="text-xs text-muted-foreground">
+                {comic.chapters.length} chương · cập nhật liên tục
+              </span>
+            </div>
+            <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-border/70 bg-background/60 px-2.5 py-1 text-xs text-muted-foreground backdrop-blur">
               <MessageCircle className="h-3.5 w-3.5" />
-              {Object.values(chapterCounts).reduce((a, b) => a + b, 0) + comicCount} bình luận
+              {Object.values(chapterCounts).reduce((a, b) => a + b, 0) + comicCount}
             </span>
           </div>
           {comic.chapters.length === 0 ? (
@@ -209,19 +215,22 @@ function ComicPage() {
               Chưa có chương nào. Vào <Link to="/admin" className="text-primary underline">Quản lý</Link> để thêm.
             </div>
           ) : (
-            <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+            <ul className="divide-y divide-border/60 overflow-hidden rounded-2xl border border-border bg-background/40 backdrop-blur">
               {comic.chapters.map((ch, i) => (
                 <li key={ch.id} className="group">
                   <Link
                     to="/read/$comicId/$chapterId"
                     params={{ comicId: comic.id, chapterId: ch.id }}
-                    className="flex items-center justify-between gap-3 px-5 py-3.5 transition hover:bg-secondary/70"
+                    className="relative flex items-center justify-between gap-3 px-5 py-4 transition hover:bg-primary/5"
                   >
+                    <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-gradient-brand opacity-0 transition group-hover:opacity-100" />
                     <div className="flex items-center gap-3">
-                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground tabular-nums transition group-hover:border-primary group-hover:bg-primary/10 group-hover:text-primary">
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-xs font-bold text-muted-foreground tabular-nums shadow-sm transition group-hover:border-primary group-hover:bg-gradient-brand group-hover:text-primary-foreground group-hover:shadow-glow">
                         {i + 1}
                       </span>
-                      <span className="font-medium transition-colors group-hover:text-primary">{ch.title}</span>
+                      <span className="font-semibold tracking-tight transition-colors group-hover:text-primary">
+                        {ch.title}
+                      </span>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <span
