@@ -1,10 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
 import { useComics, useComicsLoaded } from "@/lib/comics-store";
 import { supabase } from "@/integrations/supabase/client";
 import { driveImageUrl } from "@/lib/drive";
-import { BookOpen, ChevronRight, Layers, User } from "lucide-react";
+import { BookOpen, ChevronRight, Layers, MessageCircle, User } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { RatingWidget } from "@/components/RatingWidget";
 
@@ -91,6 +92,42 @@ function ComicPage() {
   const comics = useComics();
   const loaded = useComicsLoaded();
   const comic = comics.find((c) => c.id === comicId);
+  const [chapterCounts, setChapterCounts] = useState<Record<string, number>>({});
+  const [comicCount, setComicCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    async function loadCounts() {
+      const { data, error } = await supabase
+        .from("comments")
+        .select("chapter_id")
+        .eq("comic_id", comicId)
+        .limit(5000);
+      if (error || !active) return;
+      const map: Record<string, number> = {};
+      let general = 0;
+      for (const row of data ?? []) {
+        if (row.chapter_id) map[row.chapter_id] = (map[row.chapter_id] ?? 0) + 1;
+        else general += 1;
+      }
+      setChapterCounts(map);
+      setComicCount(general);
+    }
+    loadCounts();
+    const ch = supabase
+      .channel(`comments-counts-${comicId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "comments", filter: `comic_id=eq.${comicId}` },
+        () => loadCounts(),
+      )
+      .subscribe();
+    return () => {
+      active = false;
+      supabase.removeChannel(ch);
+    };
+  }, [comicId]);
+
   if (!loaded) {
     return (
       <div className="min-h-screen">
@@ -162,6 +199,10 @@ function ComicPage() {
             <Layers className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-bold">Danh sách chương</h2>
             <span className="text-sm text-muted-foreground">({comic.chapters.length})</span>
+            <span className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <MessageCircle className="h-3.5 w-3.5" />
+              {Object.values(chapterCounts).reduce((a, b) => a + b, 0) + comicCount} bình luận
+            </span>
           </div>
           {comic.chapters.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">
@@ -183,6 +224,13 @@ function ComicPage() {
                       <span className="font-medium transition-colors group-hover:text-primary">{ch.title}</span>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-background/70 px-2 py-0.5"
+                        title="Số bình luận của chương"
+                      >
+                        <MessageCircle className="h-3 w-3" />
+                        {chapterCounts[ch.id] ?? 0}
+                      </span>
                       <span>{ch.pages.length} trang</span>
                       <ChevronRight className="h-4 w-4 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary" />
                     </div>
