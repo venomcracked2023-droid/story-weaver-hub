@@ -18,6 +18,7 @@ export type Comic = {
   chapters: Chapter[];
   createdAt: number;
   createdBy?: string;
+  featured: boolean;
 };
 
 const listeners = new Set<() => void>();
@@ -61,6 +62,7 @@ async function fetchAll(): Promise<void> {
     chapters: chaptersByComic[c.id] ?? [],
     createdAt: new Date(c.created_at).getTime(),
     createdBy: c.created_by,
+    featured: (c as any).featured ?? false,
   }));
   loaded = true;
   emit();
@@ -86,6 +88,7 @@ export async function upsertComic(c: Comic): Promise<void> {
     description: c.description,
     cover_id: c.coverId,
     genres: c.genres,
+    featured: c.featured,
   };
 
   let comicId = c.id;
@@ -123,6 +126,14 @@ export async function deleteComic(id: string): Promise<void> {
   const { error } = await supabase.from("comics").delete().eq("id", id);
   if (error) throw error;
   await fetchAll();
+}
+
+export async function setFeatured(id: string, featured: boolean): Promise<void> {
+  const { error } = await supabase.from("comics").update({ featured }).eq("id", id);
+  if (error) throw error;
+  const c = cache.find((x) => x.id === id);
+  if (c) c.featured = featured;
+  emit();
 }
 
 export function useComics(): Comic[] {

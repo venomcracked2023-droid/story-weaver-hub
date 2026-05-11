@@ -56,6 +56,7 @@ export type Database = {
           created_at: string
           created_by: string
           description: string
+          featured: boolean
           genres: string[]
           id: string
           title: string
@@ -67,6 +68,7 @@ export type Database = {
           created_at?: string
           created_by: string
           description?: string
+          featured?: boolean
           genres?: string[]
           id?: string
           title: string
@@ -78,6 +80,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           description?: string
+          featured?: boolean
           genres?: string[]
           id?: string
           title?: string

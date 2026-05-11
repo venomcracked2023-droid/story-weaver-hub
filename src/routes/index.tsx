@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
 import { useComics } from "@/lib/comics-store";
-import { BookOpen, Sparkles } from "lucide-react";
+import { BookOpen, Sparkles, Star } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const comics = useComics();
+  const featured = comics.filter((c) => c.featured);
   return (
     <div className="min-h-screen">
       <SiteHeader />
@@ -40,6 +41,41 @@ function Index() {
             </div>
           </div>
         </section>
+
+        {featured.length > 0 && (
+          <section className="mt-12">
+            <div className="mb-6 flex items-end justify-between">
+              <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                <Star className="h-5 w-5 fill-primary text-primary" />
+                Truyện nổi bật
+              </h2>
+              <span className="text-sm text-muted-foreground">{featured.length} tác phẩm</span>
+            </div>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {featured.map((c) => (
+                <Link
+                  key={c.id}
+                  to="/comic/$comicId"
+                  params={{ comicId: c.id }}
+                  className="group flex flex-col gap-2"
+                >
+                  <div className="relative aspect-[3/4] overflow-hidden rounded-xl border border-primary/40 bg-card shadow-lg shadow-primary/10 transition group-hover:border-primary group-hover:shadow-primary/30">
+                    <ComicCover id={c.coverId} title={c.title} className="transition group-hover:scale-105" />
+                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-primary-foreground backdrop-blur">
+                      <Star className="h-3 w-3 fill-current" /> Nổi bật
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="line-clamp-1 text-sm font-semibold">{c.title}</h3>
+                    <p className="line-clamp-1 text-xs text-muted-foreground">
+                      {c.chapters.length} chương · {c.author || "Ẩn danh"}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section id="library" className="mt-12">
           <div className="mb-6 flex items-end justify-between">
