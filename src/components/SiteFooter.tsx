@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Facebook, Github, Heart, Mail, Star } from "lucide-react";
 import cucumberLogo from "@/assets/cucumber-logo.png";
 import { SITE_LOGO, SITE_NAME, SITE_URL, SOCIAL_LINKS } from "@/lib/seo";
+import { useComics } from "@/lib/comics-store";
 
 type FooterLink = {
   label: string;
@@ -10,6 +11,8 @@ type FooterLink = {
   to?: string;
   href?: string;
   external?: boolean;
+  /** Tham số động cho route TanStack (vd. comicId). */
+  params?: Record<string, string>;
 };
 
 const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }> = [
@@ -19,6 +22,8 @@ const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }
     links: [
       { label: "Trang chủ", to: "/", desc: "Lcucumber — Webtoon cuộn dọc" },
       { label: "Truyện nổi bật", to: "/featured", desc: "Danh sách truyện được tuyển chọn" },
+      { label: "Mới cập nhật", href: "/#latest", desc: "Truyện và chương mới cập nhật gần đây" },
+      { label: "Sơ đồ trang", href: "/sitemap.xml", desc: "Danh mục đầy đủ truyện và chương" },
     ],
   },
   {
@@ -35,7 +40,6 @@ const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }
     links: [
       { label: "Liên hệ", href: "mailto:hello@lcucumber.com", desc: "Gửi email cho đội Lcucumber" },
       { label: "Báo lỗi", href: "mailto:hello@lcucumber.com?subject=Báo lỗi", desc: "Báo lỗi nội dung hoặc kỹ thuật" },
-      { label: "Sitemap", href: "/sitemap.xml", desc: "Sơ đồ trang cho công cụ tìm kiếm" },
       { label: "Robots.txt", href: "/robots.txt", desc: "Hướng dẫn cho trình thu thập" },
     ],
   },
@@ -49,6 +53,43 @@ function socialMeta(url: string): { Icon: typeof Facebook; name: string } {
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
+  const comics = useComics();
+
+  // Mục lục: 6 truyện mới nhất → link tới trang chi tiết (chính là mục lục chương).
+  const tocLinks: FooterLink[] = comics.slice(0, 6).map((c) => ({
+    label: c.title,
+    to: "/comic/$comicId",
+    params: { comicId: c.id },
+    desc: `Mục lục ${c.chapters.length} chương — ${c.title}${c.author ? ` · ${c.author}` : ""}`,
+  }));
+
+  // Thể loại duy nhất → trỏ về /featured để crawler khám phá.
+  const genreLinks: FooterLink[] = Array.from(
+    new Set(comics.flatMap((c) => c.genres).filter(Boolean)),
+  )
+    .slice(0, 8)
+    .map((g) => ({
+      label: g,
+      to: "/featured",
+      desc: `Truyện thể loại ${g} trên ${SITE_NAME}`,
+    }));
+
+  const dynamicGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }> = [];
+  if (tocLinks.length) {
+    dynamicGroups.push({
+      title: "Mục lục truyện",
+      ariaLabel: "Mục lục truyện mới cập nhật",
+      links: tocLinks,
+    });
+  }
+  if (genreLinks.length) {
+    dynamicGroups.push({
+      title: "Thể loại",
+      ariaLabel: "Truyện theo thể loại",
+      links: genreLinks,
+    });
+  }
+  const allGroups = [...navGroups, ...dynamicGroups];
 
   // JSON-LD: WPFooter + SiteNavigationElement giúp Google hiểu cấu trúc liên kết.
   const jsonLd = {
@@ -69,6 +110,18 @@ export function SiteFooter() {
             url: `${SITE_URL}${l.to ?? l.href}`,
           })),
       ),
+      ...tocLinks.map((l) => ({
+        "@type": "SiteNavigationElement",
+        name: l.label,
+        description: l.desc,
+        url: `${SITE_URL}/comic/${l.params?.comicId}`,
+      })),
+      ...genreLinks.map((l) => ({
+        "@type": "SiteNavigationElement",
+        name: l.label,
+        description: l.desc,
+        url: `${SITE_URL}/featured`,
+      })),
       {
         "@type": "Organization",
         name: SITE_NAME,
@@ -94,7 +147,7 @@ export function SiteFooter() {
       />
       <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
       <div className="mx-auto max-w-6xl px-4 py-12">
-        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.3fr_repeat(3,1fr)]">
           <div>
             <Link
               to="/"
@@ -146,7 +199,7 @@ export function SiteFooter() {
             )}
           </div>
 
-          {navGroups.map((g) => (
+          {allGroups.map((g) => (
             <nav key={g.title} aria-label={g.ariaLabel}>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/80">
                 {g.title}
@@ -156,7 +209,8 @@ export function SiteFooter() {
                   l.to ? (
                     <li key={l.label}>
                       <Link
-                        to={l.to}
+                        to={l.to as any}
+                        params={l.params as any}
                         title={l.desc}
                         className="text-muted-foreground transition hover:text-primary"
                       >
