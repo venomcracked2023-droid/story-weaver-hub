@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FeaturedRouteImport } from './routes/featured'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminApplicationsRouteImport } from './routes/admin-applications'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -33,6 +34,11 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturedRoute = FeaturedRouteImport.update({
+  id: '/featured',
+  path: '/featured',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApplyRoute = ApplyRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
+  '/featured': typeof FeaturedRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
+  '/featured': typeof FeaturedRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
+  '/featured': typeof FeaturedRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-applications'
     | '/apply'
+    | '/featured'
     | '/login'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-applications'
     | '/apply'
+    | '/featured'
     | '/login'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-applications'
     | '/apply'
+    | '/featured'
     | '/login'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   ApplyRoute: typeof ApplyRoute
+  FeaturedRoute: typeof FeaturedRoute
   LoginRoute: typeof LoginRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -181,6 +194,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/featured': {
+      id: '/featured'
+      path: '/featured'
+      fullPath: '/featured'
+      preLoaderRoute: typeof FeaturedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apply': {
@@ -240,6 +260,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AdminApplicationsRoute: AdminApplicationsRoute,
   ApplyRoute: ApplyRoute,
+  FeaturedRoute: FeaturedRoute,
   LoginRoute: LoginRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
