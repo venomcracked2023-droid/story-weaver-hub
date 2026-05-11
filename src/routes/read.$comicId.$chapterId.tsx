@@ -208,7 +208,7 @@ function Reader() {
     <div className="min-h-screen bg-background">
       <header
         className={
-          "fixed inset-x-0 top-0 z-40 border-b border-border bg-background/85 backdrop-blur transition-transform " +
+          "fixed inset-x-0 top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/50 transition-transform " +
           (hideUI ? "-translate-y-full" : "translate-y-0")
         }
       >
