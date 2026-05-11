@@ -36,26 +36,26 @@ function Index() {
     <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto max-w-6xl px-4 pb-20">
-        <section className="relative mt-6 overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-secondary to-card px-6 py-14 sm:px-12 sm:py-20">
+        <section className="relative mt-6 overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-secondary to-card px-6 py-9 sm:px-12 sm:py-12">
           <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-primary/25 blur-3xl animate-pulse-glow" />
           <div className="pointer-events-none absolute -bottom-24 -left-10 h-80 w-80 rounded-full bg-accent/20 blur-3xl animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
           <img
             src={cucumberLogo}
             alt=""
             aria-hidden
-            className="pointer-events-none absolute right-6 top-6 hidden h-44 w-44 opacity-90 drop-shadow-[0_10px_30px_oklch(0.72_0.19_142_/_0.45)] animate-float-slow md:block"
+            className="pointer-events-none absolute right-6 top-6 hidden h-28 w-28 opacity-90 drop-shadow-[0_10px_30px_oklch(0.72_0.19_142_/_0.45)] animate-float-slow md:block"
           />
           <div className="relative max-w-2xl animate-fade-in-up">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-background/50 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
               <Sparkles className="h-3.5 w-3.5 text-primary" /> Webtoon — cuộn dọc, đọc liền mạch
             </span>
-            <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl">
+            <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
               Truyện hay, <span className="text-gradient-brand">cuộn không ngừng.</span>
             </h1>
-            <p className="mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
+            <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
               Khám phá thế giới webtoon cùng Lcucumber — mượt như lướt sóng, xanh như dưa leo.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               <a
                 href="#library"
                 className="inline-flex items-center gap-2 rounded-full bg-gradient-brand px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95"
@@ -70,18 +70,18 @@ function Index() {
               </Link>
             </div>
 
-            <dl className="mt-8 grid max-w-md grid-cols-3 gap-4 text-sm">
-              <div className="rounded-xl border border-border bg-background/40 px-4 py-3 backdrop-blur">
+            <dl className="mt-5 grid max-w-md grid-cols-3 gap-3 text-sm">
+              <div className="rounded-xl border border-border bg-background/40 px-3 py-2 backdrop-blur">
                 <dt className="text-xs text-muted-foreground">Truyện</dt>
-                <dd className="mt-1 text-xl font-bold text-foreground tabular-nums">{comics.length}</dd>
+                <dd className="mt-0.5 text-lg font-bold text-foreground tabular-nums">{comics.length}</dd>
               </div>
-              <div className="rounded-xl border border-border bg-background/40 px-4 py-3 backdrop-blur">
+              <div className="rounded-xl border border-border bg-background/40 px-3 py-2 backdrop-blur">
                 <dt className="text-xs text-muted-foreground">Chương</dt>
-                <dd className="mt-1 text-xl font-bold text-foreground tabular-nums">{totalChapters}</dd>
+                <dd className="mt-0.5 text-lg font-bold text-foreground tabular-nums">{totalChapters}</dd>
               </div>
-              <div className="rounded-xl border border-border bg-background/40 px-4 py-3 backdrop-blur">
+              <div className="rounded-xl border border-border bg-background/40 px-3 py-2 backdrop-blur">
                 <dt className="text-xs text-muted-foreground">Nổi bật</dt>
-                <dd className="mt-1 text-xl font-bold text-primary tabular-nums">{featured.length}</dd>
+                <dd className="mt-0.5 text-lg font-bold text-primary tabular-nums">{featured.length}</dd>
               </div>
             </dl>
           </div>
