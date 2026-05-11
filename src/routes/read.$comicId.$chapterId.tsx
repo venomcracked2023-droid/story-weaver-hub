@@ -7,23 +7,31 @@ import { Virtuoso } from "react-virtuoso";
 import { PdfReader } from "@/components/PdfReader";
 import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
+import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/read/$comicId/$chapterId")({
   component: Reader,
   ssr: false,
   loader: async ({ params }) => {
     const [{ data: comic }, { data: chapter }] = await Promise.all([
-      supabase.from("comics").select("title").eq("id", params.comicId).maybeSingle(),
+      supabase.from("comics").select("title,cover_id").eq("id", params.comicId).maybeSingle(),
       supabase.from("chapters").select("title").eq("id", params.chapterId).maybeSingle(),
     ]);
-    return { comicTitle: comic?.title ?? null, chapterTitle: chapter?.title ?? null };
+    return {
+      comicTitle: comic?.title ?? null,
+      coverId: comic?.cover_id ?? null,
+      chapterTitle: chapter?.title ?? null,
+    };
   },
   head: ({ loaderData, params }) => {
     const ct = loaderData?.comicTitle;
     const ch = loaderData?.chapterTitle;
+    const coverId = loaderData?.coverId;
     if (!ct || !ch) return { meta: [{ title: "Đang đọc — Lcucumber" }] };
     const title = `${ch} — ${ct} | Lcucumber`;
     const desc = `Đọc ${ch} của ${ct} online cuộn dọc miễn phí trên Lcucumber.`;
+    const url = `${SITE_URL}/read/${params.comicId}/${params.chapterId}`;
+    const img = coverId ? driveImageUrl(coverId, 1200) : `${SITE_URL}/og-default.jpg`;
     return {
       meta: [
         { title },
@@ -31,7 +39,14 @@ export const Route = createFileRoute("/read/$comicId/$chapterId")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
+        { property: "og:image", content: img },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: img },
+        { property: "article:section", content: ct },
       ],
+      links: [{ rel: "canonical", href: url }],
       scripts: [
         {
           type: "application/ld+json",
@@ -39,18 +54,18 @@ export const Route = createFileRoute("/read/$comicId/$chapterId")({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Trang chủ", item: "/" },
+              { "@type": "ListItem", position: 1, name: "Trang chủ", item: `${SITE_URL}/` },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: ct,
-                item: `/comic/${params.comicId}`,
+                item: `${SITE_URL}/comic/${params.comicId}`,
               },
               {
                 "@type": "ListItem",
                 position: 3,
                 name: ch,
-                item: `/read/${params.comicId}/${params.chapterId}`,
+                item: url,
               },
             ],
           }),

@@ -4,18 +4,31 @@ import { ComicCover } from "@/components/ComicCover";
 import { useComics } from "@/lib/comics-store";
 import { BookOpen, Library, Sparkles, Star } from "lucide-react";
 import cucumberLogo from "@/assets/cucumber-logo.png";
+import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   component: Index,
   validateSearch: (s: Record<string, unknown>) => ({
     q: typeof s.q === "string" ? s.q : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "Lcucumber — Đọc Webtoon cuộn dọc" },
-      { name: "description", content: "Khám phá webtoon mới, đọc cuộn dọc mượt mà. Ảnh nhúng từ Google Drive." },
-    ],
-  }),
+  head: () => {
+    const title = "Lcucumber — Đọc Webtoon cuộn dọc miễn phí";
+    const desc =
+      "Khám phá kho webtoon đa dạng tại Lcucumber: đọc cuộn dọc mượt mà, cập nhật chương mới mỗi ngày, miễn phí trên mọi thiết bị.";
+    const url = `${SITE_URL}/`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:url", content: url },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
 });
 
 function Index() {

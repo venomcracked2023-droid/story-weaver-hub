@@ -90,7 +90,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Lcucumber — Webtoon" },
       { name: "twitter:description", content: "Đọc webtoon cuộn dọc, mượt và đẹp." },
-      { property: "og:url", content: "https://lcucumber.com/" },
       { property: "og:image", content: "https://lcucumber.com/og-default.jpg" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
@@ -102,7 +101,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico" },
-      { rel: "canonical", href: "https://lcucumber.com/" },
+      { rel: "alternate", hrefLang: "vi", href: "https://lcucumber.com/" },
+      { rel: "alternate", hrefLang: "x-default", href: "https://lcucumber.com/" },
     ],
     scripts: [
       {
@@ -123,6 +123,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@type": "WebSite",
           name: SITE_NAME,
           url: SITE_URL,
+          inLanguage: "vi-VN",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: `${SITE_URL}/?q={search_term_string}`,
+            "query-input": "required name=search_term_string",
+          },
         }),
       },
     ],

@@ -8,6 +8,7 @@ import { driveImageUrl } from "@/lib/drive";
 import { BookOpen, ChevronRight, Layers, MessageCircle, User } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { RatingWidget } from "@/components/RatingWidget";
+import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/comic/$comicId")({
   component: ComicPage,
@@ -28,18 +29,23 @@ export const Route = createFileRoute("/comic/$comicId")({
     const desc = (m.description || `Đọc ${m.title} online cuộn dọc miễn phí trên Lcucumber.`).slice(0, 160);
     const img = m.cover_id
       ? driveImageUrl(m.cover_id, 1200)
-      : "https://lcucumber.com/og-default.jpg";
+      : `${SITE_URL}/og-default.jpg`;
+    const url = `${SITE_URL}/comic/${params.comicId}`;
     const meta: Array<Record<string, string>> = [
       { title },
       { name: "description", content: desc },
       { property: "og:title", content: title },
       { property: "og:description", content: desc },
       { property: "og:type", content: "book" },
+      { property: "og:url", content: url },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: desc },
     ];
     meta.push({ property: "og:image", content: img });
     meta.push({ name: "twitter:image", content: img });
     return {
       meta,
+      links: [{ rel: "canonical", href: url }],
       scripts: [
         {
           type: "application/ld+json",
@@ -51,7 +57,8 @@ export const Route = createFileRoute("/comic/$comicId")({
             description: desc,
             image: img,
             genre: m.genres,
-            url: `/comic/${params.comicId}`,
+            url,
+            inLanguage: "vi-VN",
           }),
         },
         {
@@ -60,12 +67,12 @@ export const Route = createFileRoute("/comic/$comicId")({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Trang chủ", item: "/" },
+              { "@type": "ListItem", position: 1, name: "Trang chủ", item: `${SITE_URL}/` },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: m.title,
-                item: `/comic/${params.comicId}`,
+                item: url,
               },
             ],
           }),
