@@ -19,6 +19,7 @@ export const Route = createFileRoute("/sitemap.xml")({
 
         const urls: string[] = [
           `<url><loc>${origin}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`,
+          `<url><loc>${origin}/featured</loc><changefreq>daily</changefreq><priority>0.9</priority></url>`,
         ];
         for (const c of comics ?? []) {
           urls.push(
