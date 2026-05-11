@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "InkScroll — Đọc Webtoon cuộn dọc" },
+      { title: "Lcucumber — Đọc Webtoon cuộn dọc" },
       { name: "description", content: "Khám phá webtoon mới, đọc cuộn dọc mượt mà. Ảnh nhúng từ Google Drive." },
     ],
   }),
@@ -31,7 +31,7 @@ function Index() {
               Truyện hay, <span className="text-primary">cuộn không ngừng.</span>
             </h1>
             <p className="mt-4 max-w-xl text-base text-muted-foreground">
-              Tải ảnh chương lên Google Drive, dán File ID vào trang quản lý — InkScroll sẽ tự nhúng và hiển thị đẹp như app webtoon thật.
+              Tải ảnh chương lên Google Drive, dán File ID vào trang quản lý — Lcucumber sẽ tự nhúng và hiển thị đẹp như app webtoon thật.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link to="/admin" className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90">

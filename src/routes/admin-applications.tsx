@@ -8,7 +8,7 @@ import { Check, X } from "lucide-react";
 
 export const Route = createFileRoute("/admin-applications")({
   component: Page,
-  head: () => ({ meta: [{ title: "Duyệt cộng tác viên — InkScroll" }] }),
+  head: () => ({ meta: [{ title: "Duyệt cộng tác viên — Lcucumber" }] }),
 });
 
 type App = {

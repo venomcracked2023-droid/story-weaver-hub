@@ -9,7 +9,7 @@ import { LogIn } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
-  head: () => ({ meta: [{ title: "Đăng nhập — InkScroll" }] }),
+  head: () => ({ meta: [{ title: "Đăng nhập — Lcucumber" }] }),
 });
 
 function LoginPage() {
@@ -81,7 +81,7 @@ function LoginPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             {mode === "signin"
               ? "Đăng nhập để đọc, theo dõi và đăng truyện."
-              : "Tham gia InkScroll trong vài giây."}
+              : "Tham gia Lcucumber trong vài giây."}
           </p>
 
           <button
