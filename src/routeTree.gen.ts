@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SitemapIndexDotxmlRouteImport } from './routes/sitemap-index[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeaturedRouteImport } from './routes/featured'
@@ -17,6 +18,7 @@ import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminApplicationsRouteImport } from './routes/admin-applications'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SitemapGenreSlugDotxmlRouteImport } from './routes/sitemap-genre.$slug[.]xml'
 import { Route as ComicComicIdRouteImport } from './routes/comic.$comicId'
 import { Route as ApiDriveFileRouteImport } from './routes/api/drive-file'
 import { Route as ReadComicIdChapterIdRouteImport } from './routes/read.$comicId.$chapterId'
@@ -24,6 +26,11 @@ import { Route as ReadComicIdChapterIdRouteImport } from './routes/read.$comicId
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapIndexDotxmlRoute = SitemapIndexDotxmlRouteImport.update({
+  id: '/sitemap-index.xml',
+  path: '/sitemap-index.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -61,6 +68,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapGenreSlugDotxmlRoute = SitemapGenreSlugDotxmlRouteImport.update({
+  id: '/sitemap-genre/$slug.xml',
+  path: '/sitemap-genre/$slug.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComicComicIdRoute = ComicComicIdRouteImport.update({
   id: '/comic/$comicId',
   path: '/comic/$comicId',
@@ -85,9 +97,11 @@ export interface FileRoutesByFullPath {
   '/featured': typeof FeaturedRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
   '/comic/$comicId': typeof ComicComicIdRoute
+  '/sitemap-genre/$slug.xml': typeof SitemapGenreSlugDotxmlRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
 export interface FileRoutesByTo {
@@ -98,9 +112,11 @@ export interface FileRoutesByTo {
   '/featured': typeof FeaturedRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
   '/comic/$comicId': typeof ComicComicIdRoute
+  '/sitemap-genre/$slug.xml': typeof SitemapGenreSlugDotxmlRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
 export interface FileRoutesById {
@@ -112,9 +128,11 @@ export interface FileRoutesById {
   '/featured': typeof FeaturedRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
   '/comic/$comicId': typeof ComicComicIdRoute
+  '/sitemap-genre/$slug.xml': typeof SitemapGenreSlugDotxmlRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
 export interface FileRouteTypes {
@@ -127,9 +145,11 @@ export interface FileRouteTypes {
     | '/featured'
     | '/login'
     | '/robots.txt'
+    | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/api/drive-file'
     | '/comic/$comicId'
+    | '/sitemap-genre/$slug.xml'
     | '/read/$comicId/$chapterId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -140,9 +160,11 @@ export interface FileRouteTypes {
     | '/featured'
     | '/login'
     | '/robots.txt'
+    | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/api/drive-file'
     | '/comic/$comicId'
+    | '/sitemap-genre/$slug.xml'
     | '/read/$comicId/$chapterId'
   id:
     | '__root__'
@@ -153,9 +175,11 @@ export interface FileRouteTypes {
     | '/featured'
     | '/login'
     | '/robots.txt'
+    | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/api/drive-file'
     | '/comic/$comicId'
+    | '/sitemap-genre/$slug.xml'
     | '/read/$comicId/$chapterId'
   fileRoutesById: FileRoutesById
 }
@@ -167,9 +191,11 @@ export interface RootRouteChildren {
   FeaturedRoute: typeof FeaturedRoute
   LoginRoute: typeof LoginRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapIndexDotxmlRoute: typeof SitemapIndexDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiDriveFileRoute: typeof ApiDriveFileRoute
   ComicComicIdRoute: typeof ComicComicIdRoute
+  SitemapGenreSlugDotxmlRoute: typeof SitemapGenreSlugDotxmlRoute
   ReadComicIdChapterIdRoute: typeof ReadComicIdChapterIdRoute
 }
 
@@ -180,6 +206,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-index.xml': {
+      id: '/sitemap-index.xml'
+      path: '/sitemap-index.xml'
+      fullPath: '/sitemap-index.xml'
+      preLoaderRoute: typeof SitemapIndexDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -231,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap-genre/$slug.xml': {
+      id: '/sitemap-genre/$slug.xml'
+      path: '/sitemap-genre/$slug.xml'
+      fullPath: '/sitemap-genre/$slug.xml'
+      preLoaderRoute: typeof SitemapGenreSlugDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/comic/$comicId': {
       id: '/comic/$comicId'
       path: '/comic/$comicId'
@@ -263,11 +303,23 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturedRoute: FeaturedRoute,
   LoginRoute: LoginRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapIndexDotxmlRoute: SitemapIndexDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiDriveFileRoute: ApiDriveFileRoute,
   ComicComicIdRoute: ComicComicIdRoute,
+  SitemapGenreSlugDotxmlRoute: SitemapGenreSlugDotxmlRoute,
   ReadComicIdChapterIdRoute: ReadComicIdChapterIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
