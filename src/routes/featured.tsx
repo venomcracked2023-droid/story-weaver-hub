@@ -4,6 +4,7 @@ import { ComicCover } from "@/components/ComicCover";
 import { useComics } from "@/lib/comics-store";
 import { Search, Star } from "lucide-react";
 import { useMemo, useState } from "react";
+import { fuzzyScoreVi } from "@/lib/fuzzy-search";
 
 export const Route = createFileRoute("/featured")({
   component: FeaturedPage,
@@ -22,13 +23,21 @@ function FeaturedPage() {
   const featured = comics.filter((c) => c.featured);
   const [query, setQuery] = useState("");
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = query.trim();
     if (!q) return featured;
-    return featured.filter(
-      (c) =>
-        c.title.toLowerCase().includes(q) ||
-        (c.author ?? "").toLowerCase().includes(q),
-    );
+    const scored = featured
+      .map((c) => {
+        const titleScore = fuzzyScoreVi(q, c.title);
+        const authorScore = fuzzyScoreVi(q, c.author ?? "");
+        const candidates = [titleScore, authorScore].filter(
+          (s): s is number => s !== null,
+        );
+        if (candidates.length === 0) return null;
+        return { comic: c, score: Math.min(...candidates) };
+      })
+      .filter((x): x is { comic: typeof featured[number]; score: number } => x !== null)
+      .sort((a, b) => a.score - b.score);
+    return scored.map((s) => s.comic);
   }, [featured, query]);
 
   return (
@@ -52,7 +61,7 @@ function FeaturedPage() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Tìm theo tên truyện…"
+                placeholder="Tìm truyện (không cần đúng dấu)…"
                 className="w-full min-w-[220px] rounded-full border border-border bg-card py-2 pl-9 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30 sm:w-72"
               />
             </div>
