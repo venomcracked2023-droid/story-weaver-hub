@@ -23,7 +23,6 @@ const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }
       { label: "Trang chủ", to: "/", desc: "Lcucumber — Webtoon cuộn dọc" },
       { label: "Truyện nổi bật", to: "/featured", desc: "Danh sách truyện được tuyển chọn" },
       { label: "Mới cập nhật", href: "/#latest", desc: "Truyện và chương mới cập nhật gần đây" },
-      { label: "Sơ đồ trang", href: "/sitemap.xml", desc: "Danh mục đầy đủ truyện và chương" },
     ],
   },
   {
@@ -40,7 +39,6 @@ const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }
     links: [
       { label: "Liên hệ", href: "mailto:hello@lcucumber.com", desc: "Gửi email cho đội Lcucumber" },
       { label: "Báo lỗi", href: "mailto:hello@lcucumber.com?subject=Báo lỗi", desc: "Báo lỗi nội dung hoặc kỹ thuật" },
-      { label: "Robots.txt", href: "/robots.txt", desc: "Hướng dẫn cho trình thu thập" },
     ],
   },
 ];
