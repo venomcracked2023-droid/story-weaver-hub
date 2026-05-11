@@ -19,10 +19,10 @@ export const Route = createFileRoute("/comic/$comicId")({
   head: ({ loaderData, params }) => {
     const m = loaderData?.meta;
     if (!m) {
-      return { meta: [{ title: "Truyện — InkScroll" }] };
+      return { meta: [{ title: "Truyện — Lcucumber" }] };
     }
-    const title = `${m.title}${m.author ? ` — ${m.author}` : ""} | InkScroll`;
-    const desc = (m.description || `Đọc ${m.title} online cuộn dọc miễn phí trên InkScroll.`).slice(0, 160);
+    const title = `${m.title}${m.author ? ` — ${m.author}` : ""} | Lcucumber`;
+    const desc = (m.description || `Đọc ${m.title} online cuộn dọc miễn phí trên Lcucumber.`).slice(0, 160);
     const img = m.cover_id
       ? driveImageUrl(m.cover_id, 1200)
       : "https://lcucumber.com/og-default.jpg";

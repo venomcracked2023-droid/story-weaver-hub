@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/apply")({
   component: ApplyPage,
-  head: () => ({ meta: [{ title: "Ứng tuyển cộng tác viên — InkScroll" }] }),
+  head: () => ({ meta: [{ title: "Ứng tuyển cộng tác viên — Lcucumber" }] }),
 });
 
 type Application = {
@@ -89,7 +89,7 @@ function ApplyPage() {
       <main className="mx-auto max-w-2xl px-4 py-12">
         <h1 className="text-3xl font-bold tracking-tight">Ứng tuyển cộng tác viên</h1>
         <p className="mt-2 text-muted-foreground">
-          Trở thành cộng tác viên để đăng truyện lên InkScroll. Admin sẽ duyệt đơn của bạn.
+          Trở thành cộng tác viên để đăng truyện lên Lcucumber. Admin sẽ duyệt đơn của bạn.
         </p>
 
         {isContributor && (

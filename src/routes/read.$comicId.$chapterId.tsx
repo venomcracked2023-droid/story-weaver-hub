@@ -20,9 +20,9 @@ export const Route = createFileRoute("/read/$comicId/$chapterId")({
   head: ({ loaderData, params }) => {
     const ct = loaderData?.comicTitle;
     const ch = loaderData?.chapterTitle;
-    if (!ct || !ch) return { meta: [{ title: "Đang đọc — InkScroll" }] };
-    const title = `${ch} — ${ct} | InkScroll`;
-    const desc = `Đọc ${ch} của ${ct} online cuộn dọc miễn phí trên InkScroll.`;
+    if (!ct || !ch) return { meta: [{ title: "Đang đọc — Lcucumber" }] };
+    const title = `${ch} — ${ct} | Lcucumber`;
+    const desc = `Đọc ${ch} của ${ct} online cuộn dọc miễn phí trên Lcucumber.`;
     return {
       meta: [
         { title },

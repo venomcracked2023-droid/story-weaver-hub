@@ -1,6 +1,6 @@
 // Cấu hình SEO/thương hiệu — chỉnh ở đây khi có thêm mạng xã hội mới.
 export const SITE_URL = "https://lcucumber.com";
-export const SITE_NAME = "InkScroll";
+export const SITE_NAME = "Lcucumber";
 export const SITE_LOGO = `${SITE_URL}/og-default.jpg`;
 
 // Thêm URL mạng xã hội vào đây — Google dùng sameAs để liên kết thương hiệu.
