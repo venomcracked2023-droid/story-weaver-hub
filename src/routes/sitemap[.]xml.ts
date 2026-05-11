@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { inferChangeFreq } from "@/lib/sitemap-freq";
+import { slugifyGenre } from "@/lib/slug";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const origin = new URL(request.url).origin;
         const { data: comics } = await supabase
           .from("comics")
-          .select("id,updated_at")
+          .select("id,updated_at,genres")
           .order("updated_at", { ascending: false })
           .limit(1000);
         const { data: chapters } = await supabase
@@ -48,7 +49,24 @@ export const Route = createFileRoute("/sitemap.xml")({
         const urls: string[] = [
           `<url><loc>${origin}/</loc><lastmod>${siteLastmod}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,
           `<url><loc>${origin}/featured</loc><lastmod>${siteLastmod}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,
+          `<url><loc>${origin}/latest</loc><lastmod>${siteLastmod}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,
         ];
+        // Trang duyệt theo thể loại — gom slug duy nhất từ tất cả truyện.
+        const genreLastmod = new Map<string, string>();
+        for (const c of comics ?? []) {
+          for (const g of ((c as { genres?: string[] }).genres ?? [])) {
+            const slug = slugifyGenre(g);
+            if (!slug) continue;
+            const prev = genreLastmod.get(slug);
+            const ts = iso(c.updated_at);
+            if (!prev || new Date(ts) > new Date(prev)) genreLastmod.set(slug, ts);
+          }
+        }
+        for (const [slug, lastmod] of genreLastmod) {
+          urls.push(
+            `<url><loc>${origin}/genre/${slug}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
+          );
+        }
         for (const c of comics ?? []) {
           const lastmod = maxIso(iso(c.updated_at), latestChapterByComic.get(c.id))!;
           const freq = freqByComic.get(c.id) ?? "monthly";
