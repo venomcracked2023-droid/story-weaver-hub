@@ -7,9 +7,10 @@ import {
   uid,
   upsertComic,
   useComics,
+  setFeatured,
 } from "@/lib/comics-store";
 import { extractDriveId, parseDriveIds } from "@/lib/drive";
-import { ChevronDown, ChevronUp, Plus, Save, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Save, Star, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -31,6 +32,7 @@ function emptyComic(): Comic {
     genres: [],
     chapters: [],
     createdAt: Date.now(),
+    featured: false,
   };
 }
 
@@ -123,6 +125,23 @@ function AdminPage() {
                 </p>
               </div>
               <div className="flex gap-2">
+                <button
+                  onClick={() =>
+                    setFeatured(c.id, !c.featured)
+                      .then(() => toast.success(c.featured ? "Đã bỏ nổi bật" : "Đã đánh dấu nổi bật"))
+                      .catch((e) => toast.error(e.message))
+                  }
+                  className={
+                    "inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs " +
+                    (c.featured
+                      ? "border-primary/60 bg-primary/10 text-primary"
+                      : "border-border hover:bg-secondary")
+                  }
+                  aria-label="Nổi bật"
+                >
+                  <Star className={"h-3.5 w-3.5 " + (c.featured ? "fill-current" : "")} />
+                  {c.featured ? "Nổi bật" : "Đánh dấu"}
+                </button>
                 <button
                   onClick={() => setEditing(JSON.parse(JSON.stringify(c)))}
                   className="rounded-md border border-border px-3 py-1.5 text-xs hover:bg-secondary"
