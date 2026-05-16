@@ -72,7 +72,7 @@ export type Database = {
           featured?: boolean
           genres?: string[]
           id?: string
-          slug: string
+          slug?: string
           title: string
           updated_at?: string
         }
