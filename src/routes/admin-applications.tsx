@@ -8,7 +8,22 @@ import { Check, X } from "lucide-react";
 
 export const Route = createFileRoute("/admin-applications")({
   component: Page,
-  head: () => ({ meta: [{ title: "Duyệt cộng tác viên — Lcucumber" }] }),
+  head: () => {
+    const title = "Duyệt cộng tác viên — Lcucumber";
+    const desc =
+      "Trang dành cho admin Lcucumber: xem xét, phê duyệt hoặc từ chối đơn xin trở thành cộng tác viên đăng truyện.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { name: "robots", content: "noindex,nofollow" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+      ],
+    };
+  },
 });
 
 type App = {

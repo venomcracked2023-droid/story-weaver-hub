@@ -83,21 +83,21 @@ export function SiteHeader() {
           </Link>
 
           {isContributor && (
-            <Link to="/admin" className={navClass} activeProps={{ className: activeClass }}>
+            <Link to="/admin" aria-label="Quản lý truyện" className={navClass} activeProps={{ className: activeClass }}>
               <Settings className="h-4 w-4" />
               <span className="hidden sm:inline">Quản lý</span>
             </Link>
           )}
 
           {isAdmin && (
-            <Link to="/admin-applications" className={navClass} activeProps={{ className: activeClass }}>
+            <Link to="/admin-applications" aria-label="Duyệt đơn cộng tác viên" className={navClass} activeProps={{ className: activeClass }}>
               <ShieldCheck className="h-4 w-4" />
               <span className="hidden sm:inline">Duyệt CTV</span>
             </Link>
           )}
 
           {user && !isContributor && (
-            <Link to="/apply" className={navClass} activeProps={{ className: activeClass }}>
+            <Link to="/apply" aria-label="Ứng tuyển cộng tác viên" className={navClass} activeProps={{ className: activeClass }}>
               <UserPlus className="h-4 w-4" />
               <span className="hidden sm:inline">Ứng tuyển</span>
             </Link>
@@ -119,6 +119,7 @@ export function SiteHeader() {
           ) : (
             <Link
               to="/login"
+              aria-label="Đăng nhập"
               className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-gradient-brand px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95"
             >
               <LogIn className="h-4 w-4" />

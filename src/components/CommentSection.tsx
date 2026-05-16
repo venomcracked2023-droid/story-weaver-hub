@@ -130,6 +130,7 @@ export function CommentSection({
             onChange={(e) => setText(e.target.value.slice(0, MAX))}
             rows={3}
             placeholder="Chia sẻ cảm nhận của bạn…"
+            aria-label="Nội dung bình luận"
             className="w-full resize-y rounded-lg border border-border bg-background/50 px-3 py-2 text-sm outline-none focus:border-primary/60"
             maxLength={MAX}
           />
