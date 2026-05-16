@@ -10,12 +10,12 @@ export const Route = createFileRoute("/sitemap.xml")({
         const origin = new URL(request.url).origin;
         const { data: comics } = await supabase
           .from("comics")
-          .select("id,updated_at,genres")
+          .select("id,slug,updated_at,genres")
           .order("updated_at", { ascending: false })
           .limit(1000);
         const { data: chapters } = await supabase
           .from("chapters")
-          .select("id,comic_id,created_at")
+          .select("id,comic_id,created_at,order_index")
           .order("created_at", { ascending: false })
           .limit(5000);
 
@@ -23,9 +23,9 @@ export const Route = createFileRoute("/sitemap.xml")({
         const maxIso = (a?: string, b?: string) =>
           !a ? b : !b ? a : new Date(a) > new Date(b) ? a : b;
 
-        // lastmod chương = thời điểm tạo chương (bảng chapters chưa có updated_at).
-        // lastmod truyện = max(comic.updated_at, chương mới nhất thuộc truyện đó).
-        // changefreq theo nhịp đăng trung bình của từng truyện.
+        const slugById = new Map<string, string>();
+        for (const c of comics ?? []) slugById.set(c.id, (c as { slug: string }).slug);
+
         const latestChapterByComic = new Map<string, string>();
         const chapterTsByComic = new Map<string, number[]>();
         let globalLatest: string | undefined;
@@ -64,20 +64,25 @@ export const Route = createFileRoute("/sitemap.xml")({
         }
         for (const [slug, lastmod] of genreLastmod) {
           urls.push(
-            `<url><loc>${origin}/genre/${slug}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
+            `<url><loc>${origin}/the-loai/${slug}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
           );
         }
         for (const c of comics ?? []) {
           const lastmod = maxIso(iso(c.updated_at), latestChapterByComic.get(c.id))!;
           const freq = freqByComic.get(c.id) ?? "monthly";
+          const cslug = (c as { slug: string }).slug;
+          if (!cslug) continue;
           urls.push(
-            `<url><loc>${origin}/comic/${c.id}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
+            `<url><loc>${origin}/truyen/${cslug}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
           );
         }
         for (const ch of chapters ?? []) {
           const freq = freqByComic.get(ch.comic_id) ?? "monthly";
+          const cslug = slugById.get(ch.comic_id);
+          if (!cslug) continue;
+          const num = ((ch as { order_index: number }).order_index ?? 0) + 1;
           urls.push(
-            `<url><loc>${origin}/read/${ch.comic_id}/${ch.id}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.6</priority></url>`,
+            `<url><loc>${origin}/truyen/${cslug}/chuong-${num}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.6</priority></url>`,
           );
         }
 
