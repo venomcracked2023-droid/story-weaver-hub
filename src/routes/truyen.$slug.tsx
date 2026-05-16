@@ -117,7 +117,7 @@ function ComicPage() {
       .channel(`comments-counts-${comicId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "comments", filter: `comic_id=eq.${comicId}` },
+        { event: "*", schema: "public", table: "comments", filter: `comic_id=eq.${comicId!}` },
         () => loadCounts(),
       )
       .subscribe();
