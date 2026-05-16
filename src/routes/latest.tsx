@@ -60,7 +60,7 @@ function LatestPage() {
       itemListElement: latest.map((c, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        url: `${SITE_URL}/comic/${c.id}`,
+        url: `${SITE_URL}/truyen/${c.slug}`,
         name: c.title,
       })),
     },
