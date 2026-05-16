@@ -32,7 +32,7 @@ export const Route = createFileRoute("/sitemap-index.xml")({
         ];
         for (const [slug, lastmod] of lastmodByGenre) {
           sitemaps.push(
-            `<sitemap><loc>${origin}/sitemap-genre/${slug}.xml</loc><lastmod>${new Date(lastmod).toISOString()}</lastmod></sitemap>`,
+            `<sitemap><loc>${origin}/sitemap-the-loai/${slug}.xml</loc><lastmod>${new Date(lastmod).toISOString()}</lastmod></sitemap>`,
           );
         }
 
