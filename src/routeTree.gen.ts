@@ -21,6 +21,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TruyenSlugRouteImport } from './routes/truyen.$slug'
 import { Route as TheLoaiSlugRouteImport } from './routes/the-loai.$slug'
+import { Route as SitemapTheLoaiSlugDotxmlRouteImport } from './routes/sitemap-the-loai.$slug[.]xml'
 import { Route as ApiDriveFileRouteImport } from './routes/api/drive-file'
 import { Route as TruyenSlugChuongChar123numChar125RouteImport } from './routes/truyen.$slug.chuong-{$num}'
 
@@ -84,6 +85,12 @@ const TheLoaiSlugRoute = TheLoaiSlugRouteImport.update({
   path: '/the-loai/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapTheLoaiSlugDotxmlRoute =
+  SitemapTheLoaiSlugDotxmlRouteImport.update({
+    id: '/sitemap-the-loai/$slug.xml',
+    path: '/sitemap-the-loai/$slug.xml',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiDriveFileRoute = ApiDriveFileRouteImport.update({
   id: '/api/drive-file',
   path: '/api/drive-file',
@@ -108,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
+  '/sitemap-the-loai/$slug.xml': typeof SitemapTheLoaiSlugDotxmlRoute
   '/the-loai/$slug': typeof TheLoaiSlugRoute
   '/truyen/$slug': typeof TruyenSlugRouteWithChildren
   '/truyen/$slug/chuong-{$num}': typeof TruyenSlugChuongChar123numChar125Route
@@ -124,6 +132,7 @@ export interface FileRoutesByTo {
   '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
+  '/sitemap-the-loai/$slug.xml': typeof SitemapTheLoaiSlugDotxmlRoute
   '/the-loai/$slug': typeof TheLoaiSlugRoute
   '/truyen/$slug': typeof TruyenSlugRouteWithChildren
   '/truyen/$slug/chuong-{$num}': typeof TruyenSlugChuongChar123numChar125Route
@@ -141,6 +150,7 @@ export interface FileRoutesById {
   '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
+  '/sitemap-the-loai/$slug.xml': typeof SitemapTheLoaiSlugDotxmlRoute
   '/the-loai/$slug': typeof TheLoaiSlugRoute
   '/truyen/$slug': typeof TruyenSlugRouteWithChildren
   '/truyen/$slug/chuong-{$num}': typeof TruyenSlugChuongChar123numChar125Route
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/api/drive-file'
+    | '/sitemap-the-loai/$slug.xml'
     | '/the-loai/$slug'
     | '/truyen/$slug'
     | '/truyen/$slug/chuong-{$num}'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/api/drive-file'
+    | '/sitemap-the-loai/$slug.xml'
     | '/the-loai/$slug'
     | '/truyen/$slug'
     | '/truyen/$slug/chuong-{$num}'
@@ -191,6 +203,7 @@ export interface FileRouteTypes {
     | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/api/drive-file'
+    | '/sitemap-the-loai/$slug.xml'
     | '/the-loai/$slug'
     | '/truyen/$slug'
     | '/truyen/$slug/chuong-{$num}'
@@ -208,6 +221,7 @@ export interface RootRouteChildren {
   SitemapIndexDotxmlRoute: typeof SitemapIndexDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiDriveFileRoute: typeof ApiDriveFileRoute
+  SitemapTheLoaiSlugDotxmlRoute: typeof SitemapTheLoaiSlugDotxmlRoute
   TheLoaiSlugRoute: typeof TheLoaiSlugRoute
   TruyenSlugRoute: typeof TruyenSlugRouteWithChildren
 }
@@ -298,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TheLoaiSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap-the-loai/$slug.xml': {
+      id: '/sitemap-the-loai/$slug.xml'
+      path: '/sitemap-the-loai/$slug.xml'
+      fullPath: '/sitemap-the-loai/$slug.xml'
+      preLoaderRoute: typeof SitemapTheLoaiSlugDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/drive-file': {
       id: '/api/drive-file'
       path: '/api/drive-file'
@@ -340,9 +361,20 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapIndexDotxmlRoute: SitemapIndexDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiDriveFileRoute: ApiDriveFileRoute,
+  SitemapTheLoaiSlugDotxmlRoute: SitemapTheLoaiSlugDotxmlRoute,
   TheLoaiSlugRoute: TheLoaiSlugRoute,
   TruyenSlugRoute: TruyenSlugRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
