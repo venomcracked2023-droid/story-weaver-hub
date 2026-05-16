@@ -1,0 +1,13 @@
+# Lcucumber
+
+> Lcucumber là nền tảng đọc webtoon online cuộn dọc miễn phí bằng tiếng Việt, cập nhật chương mới mỗi ngày.
+
+## Pages
+
+- [Trang chủ](/): Thư viện webtoon, tìm kiếm theo tên/tác giả/thể loại.
+- [Truyện nổi bật](/featured): Tuyển chọn các tác phẩm đáng đọc nhất trên Lcucumber.
+- [Mới cập nhật](/latest): Danh sách truyện vừa có chương mới nhất.
+
+## Optional
+
+- [Ứng tuyển cộng tác viên](/apply): Gửi đơn để được đăng truyện lên Lcucumber.

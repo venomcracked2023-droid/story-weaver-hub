@@ -244,19 +244,25 @@ function Reader() {
 
       {chapter.pages.length === 0 ? (
         <main className="mx-auto max-w-3xl pt-14">
+          <h1 className="sr-only">{chapter.title} — {comic.title}</h1>
           <div className="p-10 text-center text-muted-foreground">
             Chương này chưa có trang nào.
           </div>
           <Footer />
         </main>
       ) : singleId && !pdfFailed ? (
-        <PdfReader
+        <>
+          <h1 className="sr-only">{chapter.title} — {comic.title}</h1>
+          <PdfReader
           fileUrl={`/api/drive-file?id=${singleId}`}
           Footer={Footer}
           onFail={() => setPdfFailed(true)}
-        />
+          />
+        </>
       ) : (
-        <Virtuoso
+        <>
+          <h1 className="sr-only">{chapter.title} — {comic.title}</h1>
+          <Virtuoso
           useWindowScroll
           data={chapter.pages}
           increaseViewportBy={{ top: 1500, bottom: 2000 }}
@@ -285,7 +291,8 @@ function Reader() {
               />
             </div>
           )}
-        />
+          />
+        </>
       )}
       <StickyNav />
     </div>
