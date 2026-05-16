@@ -95,12 +95,13 @@ function ComicPage() {
 
   useEffect(() => {
     if (!comicId) return;
+    const cid = comicId;
     let active = true;
     async function loadCounts() {
       const { data, error } = await supabase
         .from("comments")
         .select("chapter_id")
-        .eq("comic_id", comicId)
+        .eq("comic_id", cid)
         .limit(5000);
       if (error || !active) return;
       const map: Record<string, number> = {};
@@ -117,7 +118,7 @@ function ComicPage() {
       .channel(`comments-counts-${comicId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "comments", filter: `comic_id=eq.${comicId!}` },
+        { event: "*", schema: "public", table: "comments", filter: `comic_id=eq.${cid}` },
         () => loadCounts(),
       )
       .subscribe();
