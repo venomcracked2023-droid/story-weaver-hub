@@ -10,36 +10,41 @@ import { CommentSection } from "@/components/CommentSection";
 import { RatingWidget } from "@/components/RatingWidget";
 import { SITE_URL } from "@/lib/seo";
 
-export const Route = createFileRoute("/truyen/$slug")({
+export const Route = createFileRoute("/comic/$comicId")({
   component: ComicPage,
   loader: async ({ params }) => {
     const { data } = await supabase
       .from("comics")
-      .select("id,title,author,description,cover_id,genres,slug")
-      .eq("slug", params.slug)
+      .select("title,author,description,cover_id,genres")
+      .eq("id", params.comicId)
       .maybeSingle();
     return { meta: data };
   },
   head: ({ loaderData, params }) => {
     const m = loaderData?.meta;
-    if (!m) return { meta: [{ title: "Truyện — Lcucumber" }] };
+    if (!m) {
+      return { meta: [{ title: "Truyện — Lcucumber" }] };
+    }
     const title = `${m.title}${m.author ? ` — ${m.author}` : ""} | Lcucumber`;
     const desc = (m.description || `Đọc ${m.title} online cuộn dọc miễn phí trên Lcucumber.`).slice(0, 160);
-    const img = m.cover_id ? driveImageUrl(m.cover_id, 1200) : `${SITE_URL}/og-default.jpg`;
-    const url = `${SITE_URL}/truyen/${params.slug}`;
+    const img = m.cover_id
+      ? driveImageUrl(m.cover_id, 1200)
+      : `${SITE_URL}/og-default.jpg`;
+    const url = `${SITE_URL}/comic/${params.comicId}`;
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: desc },
+      { property: "og:title", content: title },
+      { property: "og:description", content: desc },
+      { property: "og:type", content: "book" },
+      { property: "og:url", content: url },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: desc },
+    ];
+    meta.push({ property: "og:image", content: img });
+    meta.push({ name: "twitter:image", content: img });
     return {
-      meta: [
-        { title },
-        { name: "description", content: desc },
-        { property: "og:title", content: title },
-        { property: "og:description", content: desc },
-        { property: "og:type", content: "book" },
-        { property: "og:url", content: url },
-        { property: "og:image", content: img },
-        { name: "twitter:title", content: title },
-        { name: "twitter:description", content: desc },
-        { name: "twitter:image", content: img },
-      ],
+      meta,
       links: [{ rel: "canonical", href: url }],
       scripts: [
         {
@@ -63,7 +68,12 @@ export const Route = createFileRoute("/truyen/$slug")({
             "@type": "BreadcrumbList",
             itemListElement: [
               { "@type": "ListItem", position: 1, name: "Trang chủ", item: `${SITE_URL}/` },
-              { "@type": "ListItem", position: 2, name: m.title, item: url },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: m.title,
+                item: url,
+              },
             ],
           }),
         },
@@ -85,23 +95,20 @@ export const Route = createFileRoute("/truyen/$slug")({
 });
 
 function ComicPage() {
-  const { slug } = Route.useParams();
+  const { comicId } = Route.useParams();
   const comics = useComics();
   const loaded = useComicsLoaded();
-  const comic = comics.find((c) => c.slug === slug);
-  const comicId = comic?.id;
+  const comic = comics.find((c) => c.id === comicId);
   const [chapterCounts, setChapterCounts] = useState<Record<string, number>>({});
   const [comicCount, setComicCount] = useState(0);
 
   useEffect(() => {
-    if (!comicId) return;
-    const cid = comicId;
     let active = true;
     async function loadCounts() {
       const { data, error } = await supabase
         .from("comments")
         .select("chapter_id")
-        .eq("comic_id", cid)
+        .eq("comic_id", comicId)
         .limit(5000);
       if (error || !active) return;
       const map: Record<string, number> = {};
@@ -118,7 +125,7 @@ function ComicPage() {
       .channel(`comments-counts-${comicId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "comments", filter: `comic_id=eq.${cid}` },
+        { event: "*", schema: "public", table: "comments", filter: `comic_id=eq.${comicId}` },
         () => loadCounts(),
       )
       .subscribe();
@@ -180,8 +187,8 @@ function ComicPage() {
               <RatingWidget comicId={comic.id} />
               {comic.chapters.length > 0 && (
                 <Link
-                  to="/truyen/$slug/chuong-{$num}"
-                  params={{ slug: comic.slug, num: "1" }}
+                  to="/read/$comicId/$chapterId"
+                  params={{ comicId: comic.id, chapterId: comic.chapters[0].id }}
                   className="group mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-brand px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95"
                 >
                   Đọc từ đầu
@@ -219,8 +226,8 @@ function ComicPage() {
               {comic.chapters.map((ch, i) => (
                 <li key={ch.id} className="group">
                   <Link
-                    to="/truyen/$slug/chuong-{$num}"
-                    params={{ slug: comic.slug, num: String(i + 1) }}
+                    to="/read/$comicId/$chapterId"
+                    params={{ comicId: comic.id, chapterId: ch.id }}
                     className="relative flex items-center justify-between gap-3 px-5 py-4 transition hover:bg-primary/5"
                   >
                     <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-gradient-brand opacity-0 transition group-hover:opacity-100" />

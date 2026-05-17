@@ -56,8 +56,8 @@ export function SiteFooter() {
   // Mục lục: 6 truyện mới nhất → link tới trang chi tiết (chính là mục lục chương).
   const tocLinks: FooterLink[] = comics.slice(0, 6).map((c) => ({
     label: c.title,
-    to: "/truyen/$slug",
-    params: { slug: c.slug },
+    to: "/comic/$comicId",
+    params: { comicId: c.id },
     desc: `Mục lục ${c.chapters.length} chương — ${c.title}${c.author ? ` · ${c.author}` : ""}`,
   }));
 
@@ -143,7 +143,7 @@ export function SiteFooter() {
     for (const l of g.links) pushNav(l.to ?? l.href ?? "", l.label, l.desc);
   }
   for (const l of tocLinks) {
-    pushNav(`/truyen/${l.params?.slug ?? ""}`, l.label, l.desc);
+    pushNav(`/comic/${l.params?.comicId ?? ""}`, l.label, l.desc);
   }
   for (const l of genreLinks) pushNav("/featured", l.label, l.desc);
 

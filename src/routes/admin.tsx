@@ -38,7 +38,6 @@ export const Route = createFileRoute("/admin")({
 function emptyComic(): Comic {
   return {
     id: uid(),
-    slug: "",
     title: "",
     author: "",
     description: "",
@@ -136,8 +135,8 @@ function AdminPage() {
             <div key={c.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-4">
               <div className="min-w-0">
                 <Link
-                  to="/truyen/$slug"
-                  params={{ slug: c.slug }}
+                  to="/comic/$comicId"
+                  params={{ comicId: c.id }}
                   className="truncate font-semibold hover:text-primary"
                 >
                   {c.title || "(chưa có tên)"}

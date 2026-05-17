@@ -7,13 +7,13 @@ import { useMemo } from "react";
 import { SITE_URL } from "@/lib/seo";
 import { slugifyGenre } from "@/lib/slug";
 
-export const Route = createFileRoute("/the-loai/$slug")({
+export const Route = createFileRoute("/genre/$slug")({
   component: GenrePage,
   head: ({ params }) => {
     const slug = params.slug;
     const title = `Thể loại "${slug}" — Lcucumber`;
     const desc = `Tổng hợp các truyện thuộc thể loại ${slug} trên Lcucumber — đọc cuộn dọc miễn phí.`;
-    const url = `${SITE_URL}/the-loai/${slug}`;
+    const url = `${SITE_URL}/genre/${slug}`;
     return {
       meta: [
         { title },
@@ -44,6 +44,7 @@ function GenrePage() {
   const { slug } = Route.useParams();
   const comics = useComics();
 
+  // Tên thể loại hiển thị: lấy biến thể có dấu đầu tiên khớp slug.
   const { matched, displayName } = useMemo(() => {
     const list = comics.filter((c) =>
       (c.genres ?? []).some((g) => slugifyGenre(g) === slug),
@@ -59,7 +60,7 @@ function GenrePage() {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: `Thể loại ${displayName} — Lcucumber`,
-    url: `${SITE_URL}/the-loai/${slug}`,
+    url: `${SITE_URL}/genre/${slug}`,
     inLanguage: "vi-VN",
     isPartOf: { "@type": "WebSite", name: "Lcucumber", url: SITE_URL },
     about: { "@type": "Thing", name: displayName },
@@ -70,7 +71,7 @@ function GenrePage() {
       itemListElement: matched.map((c, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        url: `${SITE_URL}/truyen/${c.slug}`,
+        url: `${SITE_URL}/comic/${c.id}`,
         name: c.title,
       })),
     },
@@ -104,8 +105,8 @@ function GenrePage() {
             {matched.map((c, i) => (
               <Link
                 key={c.id}
-                to="/truyen/$slug"
-                params={{ slug: c.slug }}
+                to="/comic/$comicId"
+                params={{ comicId: c.id }}
                 className="group flex flex-col gap-2 animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}
               >

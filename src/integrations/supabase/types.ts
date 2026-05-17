@@ -59,7 +59,6 @@ export type Database = {
           featured: boolean
           genres: string[]
           id: string
-          slug: string
           title: string
           updated_at: string
         }
@@ -72,7 +71,6 @@ export type Database = {
           featured?: boolean
           genres?: string[]
           id?: string
-          slug?: string
           title: string
           updated_at?: string
         }
@@ -85,7 +83,6 @@ export type Database = {
           featured?: boolean
           genres?: string[]
           id?: string
-          slug?: string
           title?: string
           updated_at?: string
         }
@@ -241,7 +238,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "contributor" | "user"

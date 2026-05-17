@@ -60,7 +60,7 @@ function LatestPage() {
       itemListElement: latest.map((c, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        url: `${SITE_URL}/truyen/${c.slug}`,
+        url: `${SITE_URL}/comic/${c.id}`,
         name: c.title,
       })),
     },
@@ -93,8 +93,8 @@ function LatestPage() {
             {latest.map((c, i) => (
               <Link
                 key={c.id}
-                to="/truyen/$slug"
-                params={{ slug: c.slug }}
+                to="/comic/$comicId"
+                params={{ comicId: c.id }}
                 className="group flex flex-col gap-2 animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}
               >

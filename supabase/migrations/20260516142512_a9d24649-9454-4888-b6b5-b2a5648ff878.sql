@@ -1,1 +1,0 @@
-ALTER TABLE public.comics ALTER COLUMN slug SET DEFAULT '';

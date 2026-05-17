@@ -10,7 +10,6 @@ export type Chapter = {
 
 export type Comic = {
   id: string;
-  slug: string;
   title: string;
   author: string;
   description: string;
@@ -55,7 +54,6 @@ async function fetchAll(): Promise<void> {
   }
   cache = (comics ?? []).map((c) => ({
     id: c.id,
-    slug: (c as { slug?: string }).slug ?? "",
     title: c.title,
     author: c.author ?? "",
     description: c.description ?? "",
