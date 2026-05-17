@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { LogIn, AlertTriangle } from "lucide-react";
+import { LogIn } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -34,37 +34,10 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
-  const [oauthError, setOauthError] = useState<null | {
-    provider: string;
-    message: string;
-    status?: number | string;
-    code?: string;
-    authorizeUrl?: string;
-    supabaseUrl?: string;
-    raw?: unknown;
-  }>(null);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: "/" });
   }, [user, loading, navigate]);
-
-  // Capture OAuth errors returned via redirect (?error=...&error_description=...)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const qs = new URLSearchParams(window.location.search);
-    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-    const err = qs.get("error") || hash.get("error");
-    const desc = qs.get("error_description") || hash.get("error_description");
-    const code = qs.get("error_code") || hash.get("error_code");
-    if (err || desc) {
-      setOauthError({
-        provider: "google",
-        message: decodeURIComponent(desc || err || "Unknown OAuth error"),
-        code: code || err || undefined,
-        supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-      });
-    }
-  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -96,40 +69,18 @@ function LoginPage() {
 
   async function handleGoogle() {
     setBusy(true);
-    setOauthError(null);
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-    const redirectTo = window.location.origin + "/login";
-    const authorizeUrl = `${supabaseUrl}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`;
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo },
+        options: { redirectTo: window.location.origin },
       });
       if (error) {
         toast.error(error.message ?? "Lỗi Google đăng nhập");
-        setOauthError({
-          provider: "google",
-          message: error.message ?? "Unknown error",
-          status: (error as any).status,
-          code: (error as any).code ?? (error as any).name,
-          authorizeUrl,
-          supabaseUrl,
-          raw: error,
-        });
         setBusy(false);
       }
       // On success, Supabase redirects the browser to Google.
     } catch (e: any) {
       toast.error(e?.message ?? "Lỗi Google đăng nhập");
-      setOauthError({
-        provider: "google",
-        message: e?.message ?? String(e),
-        status: e?.status,
-        code: e?.code ?? e?.name,
-        authorizeUrl,
-        supabaseUrl,
-        raw: e,
-      });
       setBusy(false);
     }
   }
@@ -161,42 +112,6 @@ function LoginPage() {
             </svg>
             Tiếp tục với Google
           </button>
-
-          {oauthError && (
-            <div className="mt-4 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive">
-              <div className="mb-2 flex items-center gap-2 font-semibold">
-                <AlertTriangle className="h-4 w-4" />
-                Google OAuth lỗi
-              </div>
-              <dl className="space-y-1 font-mono leading-relaxed text-foreground">
-                <div><span className="text-muted-foreground">provider:</span> {oauthError.provider}</div>
-                <div><span className="text-muted-foreground">message:</span> {oauthError.message}</div>
-                {oauthError.code && <div><span className="text-muted-foreground">code:</span> {String(oauthError.code)}</div>}
-                {oauthError.status !== undefined && <div><span className="text-muted-foreground">status:</span> {String(oauthError.status)}</div>}
-                {oauthError.supabaseUrl && <div className="break-all"><span className="text-muted-foreground">supabaseUrl:</span> {oauthError.supabaseUrl}</div>}
-                {oauthError.authorizeUrl && (
-                  <div className="break-all">
-                    <span className="text-muted-foreground">authorizeUrl:</span>{" "}
-                    <a href={oauthError.authorizeUrl} target="_blank" rel="noreferrer" className="underline">
-                      {oauthError.authorizeUrl}
-                    </a>
-                  </div>
-                )}
-                <div className="break-all"><span className="text-muted-foreground">callback (Google phải có):</span> {oauthError.supabaseUrl}/auth/v1/callback</div>
-              </dl>
-              <button
-                type="button"
-                onClick={() => {
-                  const text = JSON.stringify(oauthError, null, 2);
-                  navigator.clipboard?.writeText(text);
-                  toast.success("Đã copy chi tiết lỗi");
-                }}
-                className="mt-2 rounded border border-border bg-background px-2 py-1 text-[11px] text-foreground hover:bg-secondary"
-              >
-                Copy chi tiết
-              </button>
-            </div>
-          )}
 
           <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
             <span className="h-px flex-1 bg-border" /> hoặc <span className="h-px flex-1 bg-border" />
