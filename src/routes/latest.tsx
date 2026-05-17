@@ -102,7 +102,7 @@ function LatestPage() {
                   <ComicCover id={c.coverId} title={c.title} className="transition duration-500 group-hover:scale-110" />
                 </div>
                 <div>
-                  <h2 className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">{c.title}</h2>
+                  <h3 className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">{c.title}</h3>
                   <p className="line-clamp-1 text-xs text-muted-foreground">
                     {c.chapters.length} chương · {c.author || "Ẩn danh"}
                   </p>

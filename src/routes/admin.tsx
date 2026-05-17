@@ -17,22 +17,9 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
-  head: () => {
-    const title = "Quản lý truyện — Lcucumber";
-    const desc =
-      "Bảng điều khiển cộng tác viên Lcucumber: thêm truyện mới, chỉnh sửa chương, đánh dấu nổi bật và quản lý thư viện webtoon.";
-    return {
-      meta: [
-        { title },
-        { name: "description", content: desc },
-        { name: "robots", content: "noindex,nofollow" },
-        { property: "og:title", content: title },
-        { property: "og:description", content: desc },
-        { name: "twitter:title", content: title },
-        { name: "twitter:description", content: desc },
-      ],
-    };
-  },
+  head: () => ({
+    meta: [{ title: "Quản lý truyện — Lcucumber" }],
+  }),
 });
 
 function emptyComic(): Comic {

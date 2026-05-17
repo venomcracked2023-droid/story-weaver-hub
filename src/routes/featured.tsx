@@ -113,7 +113,6 @@ function FeaturedPage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Tìm truyện (không cần đúng dấu)…"
-                aria-label="Tìm trong truyện nổi bật"
                 className="w-full min-w-[220px] rounded-full border border-border bg-card py-2 pl-9 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30 sm:w-72"
               />
             </div>
@@ -150,7 +149,7 @@ function FeaturedPage() {
                   </span>
                 </div>
                 <div>
-                  <h2 className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">{c.title}</h2>
+                  <h3 className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">{c.title}</h3>
                   <p className="line-clamp-1 text-xs text-muted-foreground">
                     {c.chapters.length} chương · {c.author || "Ẩn danh"}
                   </p>

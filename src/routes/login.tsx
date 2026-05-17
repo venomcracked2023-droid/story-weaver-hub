@@ -9,22 +9,7 @@ import { LogIn } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
-  head: () => {
-    const title = "Đăng nhập — Lcucumber";
-    const desc =
-      "Đăng nhập hoặc tạo tài khoản Lcucumber để theo dõi truyện yêu thích, bình luận và đăng webtoon mới.";
-    return {
-      meta: [
-        { title },
-        { name: "description", content: desc },
-        { name: "robots", content: "noindex,follow" },
-        { property: "og:title", content: title },
-        { property: "og:description", content: desc },
-        { name: "twitter:title", content: title },
-        { name: "twitter:description", content: desc },
-      ],
-    };
-  },
+  head: () => ({ meta: [{ title: "Đăng nhập — Lcucumber" }] }),
 });
 
 function LoginPage() {
@@ -123,7 +108,6 @@ function LoginPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Tên hiển thị"
-                aria-label="Tên hiển thị"
                 className="input w-full"
               />
             )}
@@ -133,7 +117,6 @@ function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
-              aria-label="Email"
               className="input w-full"
             />
             <input
@@ -143,7 +126,6 @@ function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mật khẩu"
-              aria-label="Mật khẩu"
               className="input w-full"
             />
             <button
