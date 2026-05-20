@@ -94,6 +94,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { name: "twitter:image", content: "https://lcucumber.com/og-default.jpg" },
+      { name: "google-site-verification", content: "nuznkezATkzuBsrNT1mC972T86bQZnZgH4LhasUO4qc" },
     ],
     links: [
       {
