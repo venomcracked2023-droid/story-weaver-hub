@@ -5,8 +5,7 @@ import "react-pdf/dist/Page/TextLayer.css";
 
 // Dùng đúng version của pdfjs-dist mà react-pdf đang bundle để tránh
 // "API version does not match the Worker version".
-// cdnjs nhanh & ổn định hơn unpkg (đặc biệt trên mạng 4G/mobile VN).
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 type Props = {
   fileUrl: string;

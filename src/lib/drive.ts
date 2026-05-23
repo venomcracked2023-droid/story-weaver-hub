@@ -20,14 +20,6 @@ export function extractDriveId(input: string): string | null {
 
 export function driveImageUrl(idOrUrl: string, width = 1600): string {
   const id = extractDriveId(idOrUrl) ?? idOrUrl;
-  // lh3.googleusercontent.com is significantly faster and more reliable
-  // on mobile networks than drive.google.com/thumbnail (which often
-  // times out on 4G). We keep drive.google.com only as a fallback.
-  return `https://lh3.googleusercontent.com/d/${id}=w${width}`;
-}
-
-export function driveImageFallbackUrl(idOrUrl: string, width = 1600): string {
-  const id = extractDriveId(idOrUrl) ?? idOrUrl;
   return `https://drive.google.com/thumbnail?id=${id}&sz=w${width}`;
 }
 

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useComics, useComicsLoaded } from "@/lib/comics-store";
-import { driveImageUrl, driveImageFallbackUrl, extractDriveId } from "@/lib/drive";
+import { driveImageUrl, extractDriveId } from "@/lib/drive";
 import { ArrowLeft, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, List } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Virtuoso } from "react-virtuoso";
@@ -92,22 +92,6 @@ function Reader() {
 
   const [hideUI, setHideUI] = useState(false);
   const [pdfFailed, setPdfFailed] = useState(false);
-  const [imgWidth, setImgWidth] = useState<number>(900);
-  useEffect(() => {
-    const calc = () => {
-      const w = window.innerWidth;
-      // pick a width close to actual display * DPR, but capped to keep
-      // mobile networks happy (smaller image = faster + fewer timeouts).
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const target = Math.min(Math.ceil(w * dpr), 1200);
-      // bucket so we don't request many different sizes
-      const buckets = [480, 720, 900, 1080, 1200];
-      setImgWidth(buckets.find((b) => b >= target) ?? 1200);
-    };
-    calc();
-    window.addEventListener("resize", calc);
-    return () => window.removeEventListener("resize", calc);
-  }, []);
   useEffect(() => {
     let last = 0;
     const onScroll = () => {
@@ -283,7 +267,7 @@ function Reader() {
           itemContent={(i, id) => (
             <div className="mx-auto max-w-3xl">
               <img
-                src={driveImageUrl(id, imgWidth)}
+                src={driveImageUrl(id, 1200)}
                 alt={`Trang ${i + 1}`}
                 loading="lazy"
                 decoding="async"
@@ -292,12 +276,8 @@ function Reader() {
                   const img = e.currentTarget as HTMLImageElement;
                   if (!img.dataset.fallback) {
                     img.dataset.fallback = "1";
-                    img.src = driveImageFallbackUrl(id, imgWidth);
-                  } else if (img.dataset.fallback === "1") {
-                    img.dataset.fallback = "2";
-                    // last resort: uc?export=view
-                    const did = extractDriveId(id) ?? id;
-                    img.src = `https://drive.google.com/uc?export=view&id=${did}`;
+                    const m = img.src.match(/[?&]id=([A-Za-z0-9_-]+)/);
+                    if (m) img.src = `https://lh3.googleusercontent.com/d/${m[1]}=w1200`;
                   } else {
                     img.style.opacity = "0.3";
                   }
