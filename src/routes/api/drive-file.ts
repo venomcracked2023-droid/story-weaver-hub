@@ -10,19 +10,32 @@ export const Route = createFileRoute("/api/drive-file")({
           return new Response("invalid id", { status: 400 });
         }
         const target = `https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t`;
+        const range = request.headers.get("range");
         const upstream = await fetch(target, {
-          headers: { "user-agent": "Mozilla/5.0" },
+          headers: {
+            "user-agent": "Mozilla/5.0",
+            ...(range ? { range } : {}),
+          },
         });
         if (!upstream.ok || !upstream.body) {
           return new Response(`upstream ${upstream.status}`, { status: 502 });
         }
         const ct = upstream.headers.get("content-type") || "application/octet-stream";
+        const headers: Record<string, string> = {
+          "content-type": ct,
+          // Drive IDs are content-addressed → safe to cache aggressively
+          "cache-control": "public, max-age=31536000, immutable",
+          "access-control-allow-origin": "*",
+          "access-control-expose-headers": "content-length, content-range, accept-ranges",
+          "accept-ranges": "bytes",
+        };
+        const len = upstream.headers.get("content-length");
+        const cr = upstream.headers.get("content-range");
+        if (len) headers["content-length"] = len;
+        if (cr) headers["content-range"] = cr;
         return new Response(upstream.body, {
-          headers: {
-            "content-type": ct,
-            "cache-control": "public, max-age=3600",
-            "access-control-allow-origin": "*",
-          },
+          status: upstream.status,
+          headers,
         });
       },
     },
