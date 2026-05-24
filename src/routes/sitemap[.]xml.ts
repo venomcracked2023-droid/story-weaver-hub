@@ -2,16 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { inferChangeFreq } from "@/lib/sitemap-freq";
 import { slugifyGenre } from "@/lib/slug";
-import { driveImageUrl } from "@/lib/drive";
-
-function xmlEscape(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
@@ -20,12 +10,12 @@ export const Route = createFileRoute("/sitemap.xml")({
         const origin = new URL(request.url).origin;
         const { data: comics } = await supabase
           .from("comics")
-          .select("id,title,updated_at,genres,cover_id")
+          .select("id,updated_at,genres")
           .order("updated_at", { ascending: false })
           .limit(1000);
         const { data: chapters } = await supabase
           .from("chapters")
-          .select("id,comic_id,title,pages,created_at")
+          .select("id,comic_id,created_at")
           .order("created_at", { ascending: false })
           .limit(5000);
 
@@ -77,45 +67,21 @@ export const Route = createFileRoute("/sitemap.xml")({
             `<url><loc>${origin}/genre/${slug}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
           );
         }
-        const coverByComic = new Map<string, { url: string; title: string }>();
         for (const c of comics ?? []) {
           const lastmod = maxIso(iso(c.updated_at), latestChapterByComic.get(c.id))!;
           const freq = freqByComic.get(c.id) ?? "monthly";
-          const coverId = (c as { cover_id?: string }).cover_id;
-          const title = (c as { title?: string }).title ?? "";
-          let imageTag = "";
-          if (coverId) {
-            const url = driveImageUrl(coverId, 1200);
-            coverByComic.set(c.id, { url, title });
-            imageTag = `<image:image><image:loc>${xmlEscape(url)}</image:loc><image:title>${xmlEscape(title)}</image:title></image:image>`;
-          }
           urls.push(
-            `<url><loc>${origin}/comic/${c.id}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority>${imageTag}</url>`,
+            `<url><loc>${origin}/comic/${c.id}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
           );
         }
         for (const ch of chapters ?? []) {
           const freq = freqByComic.get(ch.comic_id) ?? "monthly";
-          const pages = ((ch as { pages?: string[] }).pages ?? []).slice(0, 20);
-          const cover = coverByComic.get(ch.comic_id);
-          const chTitle = (ch as { title?: string }).title ?? "";
-          const imgs: string[] = [];
-          if (cover) {
-            imgs.push(
-              `<image:image><image:loc>${xmlEscape(cover.url)}</image:loc><image:title>${xmlEscape(cover.title)}</image:title></image:image>`,
-            );
-          }
-          for (const p of pages) {
-            const url = driveImageUrl(p, 1600);
-            imgs.push(
-              `<image:image><image:loc>${xmlEscape(url)}</image:loc><image:title>${xmlEscape(chTitle)}</image:title></image:image>`,
-            );
-          }
           urls.push(
-            `<url><loc>${origin}/read/${ch.comic_id}/${ch.id}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.6</priority>${imgs.join("")}</url>`,
+            `<url><loc>${origin}/read/${ch.comic_id}/${ch.id}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.6</priority></url>`,
           );
         }
 
-        const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${urls.join("\n")}\n</urlset>`;
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>`;
         return new Response(xml, {
           headers: {
             "content-type": "application/xml; charset=utf-8",
