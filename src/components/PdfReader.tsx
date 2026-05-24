@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
+import { Loader2 } from "lucide-react";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
@@ -38,10 +39,13 @@ export function PdfReader({ fileUrl, Footer, onFail }: Props) {
           onFail?.();
         }}
         loading={
-          <div className="p-10 text-center text-muted-foreground">Đang tải PDF…</div>
+          <div className="flex flex-col items-center justify-center gap-3 pt-40 pb-20 text-muted-foreground">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm font-medium">Đang tải PDF…</p>
+          </div>
         }
         error={
-          <div className="p-10 text-center text-destructive">Không tải được PDF.</div>
+          <div className="pt-40 pb-20 text-center text-destructive">Không tải được PDF.</div>
         }
       >
         {numPages && (
