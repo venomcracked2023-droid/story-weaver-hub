@@ -56,7 +56,7 @@ export function PdfReader({ fileUrl, Footer, onFail }: Props) {
             increaseViewportBy={{ top: 800, bottom: 1200 }}
             components={{
               Header: () => <div className="h-14" />,
-              Footer,
+              Footer: () => <Footer />,
             }}
             itemContent={(i) => (
               <div className="flex justify-center py-2">
