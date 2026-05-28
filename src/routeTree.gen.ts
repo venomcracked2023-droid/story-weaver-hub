@@ -20,6 +20,7 @@ import { Route as AdminApplicationsRouteImport } from './routes/admin-applicatio
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SitemapGenreSlugDotxmlRouteImport } from './routes/sitemap-genre.$slug[.]xml'
+import { Route as SitemapComicIdDotxmlRouteImport } from './routes/sitemap-comic.$id[.]xml'
 import { Route as GenreSlugRouteImport } from './routes/genre.$slug'
 import { Route as ComicComicIdRouteImport } from './routes/comic.$comicId'
 import { Route as ApiDriveFileRouteImport } from './routes/api/drive-file'
@@ -80,6 +81,11 @@ const SitemapGenreSlugDotxmlRoute = SitemapGenreSlugDotxmlRouteImport.update({
   path: '/sitemap-genre/$slug.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapComicIdDotxmlRoute = SitemapComicIdDotxmlRouteImport.update({
+  id: '/sitemap-comic/$id.xml',
+  path: '/sitemap-comic/$id.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GenreSlugRoute = GenreSlugRouteImport.update({
   id: '/genre/$slug',
   path: '/genre/$slug',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/api/drive-file': typeof ApiDriveFileRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/genre/$slug': typeof GenreSlugRoute
+  '/sitemap-comic/$id.xml': typeof SitemapComicIdDotxmlRoute
   '/sitemap-genre/$slug.xml': typeof SitemapGenreSlugDotxmlRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/api/drive-file': typeof ApiDriveFileRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/genre/$slug': typeof GenreSlugRoute
+  '/sitemap-comic/$id.xml': typeof SitemapComicIdDotxmlRoute
   '/sitemap-genre/$slug.xml': typeof SitemapGenreSlugDotxmlRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/api/drive-file': typeof ApiDriveFileRoute
   '/comic/$comicId': typeof ComicComicIdRoute
   '/genre/$slug': typeof GenreSlugRoute
+  '/sitemap-comic/$id.xml': typeof SitemapComicIdDotxmlRoute
   '/sitemap-genre/$slug.xml': typeof SitemapGenreSlugDotxmlRoute
   '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
 }
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/api/drive-file'
     | '/comic/$comicId'
     | '/genre/$slug'
+    | '/sitemap-comic/$id.xml'
     | '/sitemap-genre/$slug.xml'
     | '/read/$comicId/$chapterId'
   fileRoutesByTo: FileRoutesByTo
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/api/drive-file'
     | '/comic/$comicId'
     | '/genre/$slug'
+    | '/sitemap-comic/$id.xml'
     | '/sitemap-genre/$slug.xml'
     | '/read/$comicId/$chapterId'
   id:
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/api/drive-file'
     | '/comic/$comicId'
     | '/genre/$slug'
+    | '/sitemap-comic/$id.xml'
     | '/sitemap-genre/$slug.xml'
     | '/read/$comicId/$chapterId'
   fileRoutesById: FileRoutesById
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   ApiDriveFileRoute: typeof ApiDriveFileRoute
   ComicComicIdRoute: typeof ComicComicIdRoute
   GenreSlugRoute: typeof GenreSlugRoute
+  SitemapComicIdDotxmlRoute: typeof SitemapComicIdDotxmlRoute
   SitemapGenreSlugDotxmlRoute: typeof SitemapGenreSlugDotxmlRoute
   ReadComicIdChapterIdRoute: typeof ReadComicIdChapterIdRoute
 }
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapGenreSlugDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap-comic/$id.xml': {
+      id: '/sitemap-comic/$id.xml'
+      path: '/sitemap-comic/$id.xml'
+      fullPath: '/sitemap-comic/$id.xml'
+      preLoaderRoute: typeof SitemapComicIdDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/genre/$slug': {
       id: '/genre/$slug'
       path: '/genre/$slug'
@@ -349,6 +369,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiDriveFileRoute: ApiDriveFileRoute,
   ComicComicIdRoute: ComicComicIdRoute,
   GenreSlugRoute: GenreSlugRoute,
+  SitemapComicIdDotxmlRoute: SitemapComicIdDotxmlRoute,
   SitemapGenreSlugDotxmlRoute: SitemapGenreSlugDotxmlRoute,
   ReadComicIdChapterIdRoute: ReadComicIdChapterIdRoute,
 }
