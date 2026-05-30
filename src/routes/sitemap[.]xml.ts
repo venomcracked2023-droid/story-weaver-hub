@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { inferChangeFreq } from "@/lib/sitemap-freq";
 import { slugifyGenre } from "@/lib/slug";
+import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
-      GET: async ({ request }) => {
-        const origin = new URL(request.url).origin;
+      GET: async () => {
+        const origin = SITE_URL;
         const { data: comics } = await supabase
           .from("comics")
           .select("id,updated_at,genres")

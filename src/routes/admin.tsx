@@ -18,7 +18,21 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
   head: () => ({
-    meta: [{ title: "Quản lý truyện — Lcucumber" }],
+    meta: [
+      { title: "Quản lý truyện — Lcucumber" },
+      {
+        name: "description",
+        content:
+          "Trang quản lý nội dung dành cho cộng tác viên Lcucumber — thêm truyện mới, cập nhật chương và đánh dấu tác phẩm nổi bật.",
+      },
+      { name: "robots", content: "noindex,nofollow" },
+      { property: "og:title", content: "Quản lý truyện — Lcucumber" },
+      {
+        property: "og:description",
+        content:
+          "Khu vực quản trị nội dung dành cho cộng tác viên Lcucumber.",
+      },
+    ],
   }),
 });
 

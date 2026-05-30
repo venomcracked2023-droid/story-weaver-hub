@@ -7,7 +7,22 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/apply")({
   component: ApplyPage,
-  head: () => ({ meta: [{ title: "Ứng tuyển cộng tác viên — Lcucumber" }] }),
+  head: () => ({
+    meta: [
+      { title: "Ứng tuyển cộng tác viên — Lcucumber" },
+      {
+        name: "description",
+        content:
+          "Gửi đơn ứng tuyển cộng tác viên Lcucumber để đăng truyện lên nền tảng — điền bút danh, lý do tham gia và link mẫu để admin duyệt.",
+      },
+      { property: "og:title", content: "Ứng tuyển cộng tác viên — Lcucumber" },
+      {
+        property: "og:description",
+        content:
+          "Trở thành cộng tác viên Lcucumber: gửi đơn nhanh, chờ admin duyệt và bắt đầu đăng truyện của bạn.",
+      },
+    ],
+  }),
 });
 
 type Application = {
@@ -123,8 +138,9 @@ function ApplyPage() {
         {!isContributor && (!app || app.status === "rejected") && (
           <form onSubmit={submit} className="mt-6 space-y-3 rounded-2xl border border-border bg-card p-5">
             <div>
-              <label className="text-sm font-medium">Bút danh</label>
+              <label htmlFor="apply-pen-name" className="text-sm font-medium">Bút danh</label>
               <input
+                id="apply-pen-name"
                 required
                 value={penName}
                 onChange={(e) => setPenName(e.target.value)}
@@ -133,8 +149,9 @@ function ApplyPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Lý do tham gia</label>
+              <label htmlFor="apply-reason" className="text-sm font-medium">Lý do tham gia</label>
               <textarea
+                id="apply-reason"
                 required
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
@@ -144,8 +161,9 @@ function ApplyPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Link mẫu (tuỳ chọn)</label>
+              <label htmlFor="apply-sample" className="text-sm font-medium">Link mẫu (tuỳ chọn)</label>
               <input
+                id="apply-sample"
                 value={sample}
                 onChange={(e) => setSample(e.target.value)}
                 className="input mt-1 w-full"

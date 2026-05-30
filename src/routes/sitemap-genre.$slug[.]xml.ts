@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { slugifyGenre } from "@/lib/slug";
 import { inferChangeFreq } from "@/lib/sitemap-freq";
+import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/sitemap-genre/$slug.xml")({
   server: {
     handlers: {
-      GET: async ({ request, params }) => {
-        const origin = new URL(request.url).origin;
+      GET: async ({ params }) => {
+        const origin = SITE_URL;
         // `[.]xml` là literal đã escape, nên tên param thực sự là "slug".
         const p = params as Record<string, string>;
         const raw = p.slug ?? p["slug.xml"] ?? "";

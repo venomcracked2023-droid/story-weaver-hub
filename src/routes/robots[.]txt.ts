@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/robots.txt")({
   server: {
     handlers: {
-      GET: ({ request }) => {
-        const origin = new URL(request.url).origin;
+      GET: () => {
+        const origin = SITE_URL;
         const body = [
           "# robots.txt — Lcucumber",
           "",
