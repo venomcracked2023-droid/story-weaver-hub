@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type Chapter = {
   id: string;
+  slug: string;
   title: string;
   pages: string[];
   createdAt: number;
@@ -10,6 +11,7 @@ export type Chapter = {
 
 export type Comic = {
   id: string;
+  slug: string;
   title: string;
   author: string;
   description: string;
@@ -46,6 +48,7 @@ async function fetchAll(): Promise<void> {
     for (const ch of chapters ?? []) {
       (chaptersByComic[ch.comic_id] ||= []).push({
         id: ch.id,
+        slug: (ch as any).slug ?? "",
         title: ch.title,
         pages: ch.pages ?? [],
         createdAt: new Date(ch.created_at).getTime(),
@@ -54,6 +57,7 @@ async function fetchAll(): Promise<void> {
   }
   cache = (comics ?? []).map((c) => ({
     id: c.id,
+    slug: (c as any).slug ?? "",
     title: c.title,
     author: c.author ?? "",
     description: c.description ?? "",
