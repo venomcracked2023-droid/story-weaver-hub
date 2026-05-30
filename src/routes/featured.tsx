@@ -81,7 +81,7 @@ function FeaturedPage() {
       itemListElement: filtered.map((c, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        url: `${SITE_URL}/comic/${c.id}`,
+        url: `${SITE_URL}/truyen/${c.slug}`,
         name: c.title,
       })),
     },
@@ -137,8 +137,8 @@ function FeaturedPage() {
             {filtered.map((c, i) => (
               <Link
                 key={c.id}
-                to="/comic/$comicId"
-                params={{ comicId: c.id }}
+                to="/truyen/$slug"
+                params={{ slug: c.slug }}
                 className="group flex flex-col gap-2 animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i, 12) * 50}ms` }}
               >

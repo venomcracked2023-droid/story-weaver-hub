@@ -9,17 +9,27 @@ import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
 import { SITE_URL } from "@/lib/seo";
 
-export const Route = createFileRoute("/read/$comicId/$chapterId")({
+export const Route = createFileRoute("/truyen/$slug/$chapter")({
   component: Reader,
   ssr: false,
   loader: async ({ params }) => {
-    const [{ data: comic }, { data: chapter }] = await Promise.all([
-      supabase.from("comics").select("title,cover_id").eq("id", params.comicId).maybeSingle(),
-      supabase.from("chapters").select("title").eq("id", params.chapterId).maybeSingle(),
-    ]);
+    const { data: comic } = await supabase
+      .from("comics")
+      .select("id,title,cover_id,slug")
+      .eq("slug", params.slug)
+      .maybeSingle();
+    if (!comic) {
+      return { comicTitle: null, coverId: null, chapterTitle: null };
+    }
+    const { data: chapter } = await supabase
+      .from("chapters")
+      .select("title,slug")
+      .eq("comic_id", comic.id)
+      .eq("slug", params.chapter)
+      .maybeSingle();
     return {
-      comicTitle: comic?.title ?? null,
-      coverId: comic?.cover_id ?? null,
+      comicTitle: comic.title ?? null,
+      coverId: comic.cover_id ?? null,
       chapterTitle: chapter?.title ?? null,
     };
   },
@@ -30,7 +40,7 @@ export const Route = createFileRoute("/read/$comicId/$chapterId")({
     if (!ct || !ch) return { meta: [{ title: "Đang đọc — Lcucumber" }] };
     const title = `${ch} — ${ct} | Lcucumber`;
     const desc = `Đọc ${ch} của ${ct} online cuộn dọc miễn phí trên Lcucumber.`;
-    const url = `${SITE_URL}/read/${params.comicId}/${params.chapterId}`;
+    const url = `${SITE_URL}/truyen/${params.slug}/${params.chapter}`;
     const img = coverId ? driveImageUrl(coverId, 1200) : `${SITE_URL}/og-default.jpg`;
     return {
       meta: [
@@ -55,18 +65,8 @@ export const Route = createFileRoute("/read/$comicId/$chapterId")({
             "@type": "BreadcrumbList",
             itemListElement: [
               { "@type": "ListItem", position: 1, name: "Trang chủ", item: `${SITE_URL}/` },
-              {
-                "@type": "ListItem",
-                position: 2,
-                name: ct,
-                item: `${SITE_URL}/comic/${params.comicId}`,
-              },
-              {
-                "@type": "ListItem",
-                position: 3,
-                name: ch,
-                item: url,
-              },
+              { "@type": "ListItem", position: 2, name: ct, item: `${SITE_URL}/truyen/${params.slug}` },
+              { "@type": "ListItem", position: 3, name: ch, item: url },
             ],
           }),
         },
@@ -82,12 +82,12 @@ export const Route = createFileRoute("/read/$comicId/$chapterId")({
 });
 
 function Reader() {
-  const { comicId, chapterId } = Route.useParams();
+  const { slug, chapter: chapterSlug } = Route.useParams();
   const navigate = useNavigate();
   const comics = useComics();
   const loaded = useComicsLoaded();
-  const comic = comics.find((c) => c.id === comicId);
-  const idx = comic?.chapters.findIndex((c) => c.id === chapterId) ?? -1;
+  const comic = comics.find((c) => c.slug === slug);
+  const idx = comic?.chapters.findIndex((c) => c.slug === chapterSlug) ?? -1;
   const chapter = comic && idx >= 0 ? comic.chapters[idx] : null;
 
   const [hideUI, setHideUI] = useState(false);
@@ -106,7 +106,7 @@ function Reader() {
   useEffect(() => {
     window.scrollTo(0, 0);
     setPdfFailed(false);
-  }, [chapterId]);
+  }, [chapterSlug]);
 
   if (!loaded) {
     return <div className="p-10 text-center text-muted-foreground">Đang tải…</div>;
@@ -125,17 +125,17 @@ function Reader() {
       ? extractDriveId(chapter.pages[0]) ?? chapter.pages[0]
       : null;
 
-  const goToChapter = (id: string) =>
+  const goToChapter = (chSlug: string) =>
     navigate({
-      to: "/read/$comicId/$chapterId",
-      params: { comicId: comic.id, chapterId: id },
+      to: "/truyen/$slug/$chapter",
+      params: { slug: comic.slug, chapter: chSlug },
     });
 
   const Footer = () => (
     <div className="mx-auto max-w-3xl px-4 pb-32 pt-6">
       <Link
-        to="/comic/$comicId"
-        params={{ comicId: comic.id }}
+        to="/truyen/$slug"
+        params={{ slug: comic.slug }}
         className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition hover:text-primary"
       >
         <ArrowLeft className="h-3.5 w-3.5" /> Quay lại mục lục truyện
@@ -163,7 +163,7 @@ function Reader() {
         </span>
         <button
           disabled={!prev}
-          onClick={() => first && goToChapter(first.id)}
+          onClick={() => first && goToChapter(first.slug)}
           className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-primary/60 hover:bg-secondary hover:text-foreground disabled:opacity-30"
           aria-label="Chương đầu"
           title="Chương đầu"
@@ -172,7 +172,7 @@ function Reader() {
         </button>
         <button
           disabled={!prev}
-          onClick={() => prev && goToChapter(prev.id)}
+          onClick={() => prev && goToChapter(prev.slug)}
           className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border px-3 py-2 text-sm transition hover:border-primary/60 hover:bg-secondary disabled:opacity-30"
           aria-label="Chương trước"
         >
@@ -183,13 +183,13 @@ function Reader() {
         <div className="relative min-w-0 flex-1">
           <List className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <select
-            value={chapter.id}
+            value={chapter.slug}
             onChange={(e) => goToChapter(e.target.value)}
             className="w-full appearance-none truncate rounded-full border border-border bg-background py-2 pl-9 pr-8 text-sm font-medium outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
             aria-label="Chuyển chương nhanh"
           >
             {comic.chapters.map((ch, i) => (
-              <option key={ch.id} value={ch.id}>
+              <option key={ch.id} value={ch.slug}>
                 {i + 1}. {ch.title}
               </option>
             ))}
@@ -199,7 +199,7 @@ function Reader() {
 
         <button
           disabled={!next}
-          onClick={() => next && goToChapter(next.id)}
+          onClick={() => next && goToChapter(next.slug)}
           className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-brand px-3 py-2 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
           aria-label="Chương sau"
         >
@@ -208,7 +208,7 @@ function Reader() {
         </button>
         <button
           disabled={!next}
-          onClick={() => last && goToChapter(last.id)}
+          onClick={() => last && goToChapter(last.slug)}
           className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-primary/60 hover:bg-secondary hover:text-foreground disabled:opacity-30"
           aria-label="Chương cuối"
           title="Chương cuối"
@@ -229,8 +229,8 @@ function Reader() {
       >
         <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-3 px-4">
           <Link
-            to="/comic/$comicId"
-            params={{ comicId: comic.id }}
+            to="/truyen/$slug"
+            params={{ slug: comic.slug }}
             className="group inline-flex items-center gap-1.5 text-sm font-bold text-foreground transition-colors hover:text-primary"
           >
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />

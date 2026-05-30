@@ -3,19 +3,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { inferChangeFreq } from "@/lib/sitemap-freq";
 import { SITE_URL } from "@/lib/seo";
 
-export const Route = createFileRoute("/sitemap-comic/$id.xml")({
+export const Route = createFileRoute("/sitemap-comic/$slug.xml")({
   server: {
     handlers: {
       GET: async ({ params }) => {
         const origin = SITE_URL;
         const p = params as Record<string, string>;
-        const raw = p.id ?? p["id.xml"] ?? "";
-        const comicId = raw.replace(/\.xml$/, "");
+        const raw = p.slug ?? p["slug.xml"] ?? "";
+        const comicSlug = raw.replace(/\.xml$/, "");
 
         const { data: comic } = await supabase
           .from("comics")
-          .select("id,updated_at")
-          .eq("id", comicId)
+          .select("id,slug,updated_at")
+          .eq("slug", comicSlug)
           .maybeSingle();
 
         if (!comic) {
@@ -24,8 +24,8 @@ export const Route = createFileRoute("/sitemap-comic/$id.xml")({
 
         const { data: chapters } = await supabase
           .from("chapters")
-          .select("id,created_at")
-          .eq("comic_id", comicId)
+          .select("slug,created_at")
+          .eq("comic_id", comic.id)
           .order("created_at", { ascending: false })
           .limit(5000);
 
@@ -40,11 +40,12 @@ export const Route = createFileRoute("/sitemap-comic/$id.xml")({
           : iso(comic.updated_at as string);
 
         const urls: string[] = [
-          `<url><loc>${origin}/comic/${comicId}</loc><lastmod>${comicLastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
+          `<url><loc>${origin}/truyen/${comic.slug}</loc><lastmod>${comicLastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
         ];
         for (const ch of chapters ?? []) {
+          if (!ch.slug) continue;
           urls.push(
-            `<url><loc>${origin}/read/${comicId}/${ch.id}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.7</priority></url>`,
+            `<url><loc>${origin}/truyen/${comic.slug}/${ch.slug}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.7</priority></url>`,
           );
         }
 

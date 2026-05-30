@@ -39,6 +39,7 @@ export const Route = createFileRoute("/admin")({
 function emptyComic(): Comic {
   return {
     id: uid(),
+    slug: "",
     title: "",
     author: "",
     description: "",
@@ -136,8 +137,8 @@ function AdminPage() {
             <div key={c.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-4">
               <div className="min-w-0">
                 <Link
-                  to="/comic/$comicId"
-                  params={{ comicId: c.id }}
+                  to="/truyen/$slug"
+                  params={{ slug: c.slug }}
                   className="truncate font-semibold hover:text-primary"
                 >
                   {c.title || "(chưa có tên)"}
@@ -234,7 +235,7 @@ function ComicEditor({
   }
 
   function addChapter() {
-    const ch: Chapter = { id: uid(), title: `Chương ${draft.chapters.length + 1}`, pages: [], createdAt: Date.now() };
+    const ch: Chapter = { id: uid(), slug: "", title: `Chương ${draft.chapters.length + 1}`, pages: [], createdAt: Date.now() };
     patch({ chapters: [...draft.chapters, ch] });
   }
 

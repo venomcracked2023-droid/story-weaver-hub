@@ -11,12 +11,12 @@ export const Route = createFileRoute("/sitemap.xml")({
         const origin = SITE_URL;
         const { data: comics } = await supabase
           .from("comics")
-          .select("id,updated_at,genres")
+          .select("id,slug,updated_at,genres")
           .order("updated_at", { ascending: false })
           .limit(1000);
         const { data: chapters } = await supabase
           .from("chapters")
-          .select("id,comic_id,created_at")
+          .select("id,slug,comic_id,created_at")
           .order("created_at", { ascending: false })
           .limit(5000);
 
@@ -68,17 +68,24 @@ export const Route = createFileRoute("/sitemap.xml")({
             `<url><loc>${origin}/genre/${slug}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
           );
         }
+        // Map comic_id -> slug for chapter URL building.
+        const comicSlugById = new Map<string, string>();
+        for (const c of comics ?? []) comicSlugById.set(c.id, (c as any).slug ?? "");
+
         for (const c of comics ?? []) {
+          if (!(c as any).slug) continue;
           const lastmod = maxIso(iso(c.updated_at), latestChapterByComic.get(c.id))!;
           const freq = freqByComic.get(c.id) ?? "monthly";
           urls.push(
-            `<url><loc>${origin}/comic/${c.id}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
+            `<url><loc>${origin}/truyen/${(c as any).slug}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
           );
         }
         for (const ch of chapters ?? []) {
+          const cSlug = comicSlugById.get(ch.comic_id);
+          if (!cSlug || !(ch as any).slug) continue;
           const freq = freqByComic.get(ch.comic_id) ?? "monthly";
           urls.push(
-            `<url><loc>${origin}/read/${ch.comic_id}/${ch.id}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.6</priority></url>`,
+            `<url><loc>${origin}/truyen/${cSlug}/${(ch as any).slug}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.6</priority></url>`,
           );
         }
 

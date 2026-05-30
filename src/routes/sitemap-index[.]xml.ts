@@ -10,7 +10,7 @@ export const Route = createFileRoute("/sitemap-index.xml")({
         const origin = SITE_URL;
         const { data: comics } = await supabase
           .from("comics")
-          .select("id,genres,updated_at")
+          .select("id,slug,genres,updated_at")
           .order("updated_at", { ascending: false })
           .limit(2000);
 
@@ -38,8 +38,9 @@ export const Route = createFileRoute("/sitemap-index.xml")({
         }
         // Sitemap riêng cho từng truyện — chứa toàn bộ chương để Google crawl nhanh.
         for (const c of comics ?? []) {
+          if (!c.slug) continue;
           sitemaps.push(
-            `<sitemap><loc>${origin}/sitemap-comic/${c.id}.xml</loc><lastmod>${new Date(c.updated_at as string).toISOString()}</lastmod></sitemap>`,
+            `<sitemap><loc>${origin}/sitemap-comic/${c.slug}.xml</loc><lastmod>${new Date(c.updated_at as string).toISOString()}</lastmod></sitemap>`,
           );
         }
 

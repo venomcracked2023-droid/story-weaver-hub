@@ -21,6 +21,7 @@ export type Database = {
           id: string
           order_index: number
           pages: string[]
+          slug: string
           title: string
         }
         Insert: {
@@ -29,6 +30,7 @@ export type Database = {
           id?: string
           order_index?: number
           pages?: string[]
+          slug?: string
           title: string
         }
         Update: {
@@ -37,6 +39,7 @@ export type Database = {
           id?: string
           order_index?: number
           pages?: string[]
+          slug?: string
           title?: string
         }
         Relationships: [
@@ -241,6 +244,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      slugify_vn: { Args: { input: string }; Returns: string }
       unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {
