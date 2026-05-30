@@ -39,6 +39,7 @@ export const Route = createFileRoute("/admin")({
 function emptyComic(): Comic {
   return {
     id: uid(),
+    slug: "",
     title: "",
     author: "",
     description: "",
