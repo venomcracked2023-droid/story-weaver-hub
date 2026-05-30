@@ -21,12 +21,10 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TruyenSlugRouteImport } from './routes/truyen.$slug'
 import { Route as SitemapGenreSlugDotxmlRouteImport } from './routes/sitemap-genre.$slug[.]xml'
-import { Route as SitemapComicIdDotxmlRouteImport } from './routes/sitemap-comic.$id[.]xml'
+import { Route as SitemapComicSlugDotxmlRouteImport } from './routes/sitemap-comic.$slug[.]xml'
 import { Route as GenreSlugRouteImport } from './routes/genre.$slug'
-import { Route as ComicComicIdRouteImport } from './routes/comic.$comicId'
 import { Route as ApiDriveFileRouteImport } from './routes/api/drive-file'
 import { Route as TruyenSlugChapterRouteImport } from './routes/truyen.$slug.$chapter'
-import { Route as ReadComicIdChapterIdRouteImport } from './routes/read.$comicId.$chapterId'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -88,19 +86,14 @@ const SitemapGenreSlugDotxmlRoute = SitemapGenreSlugDotxmlRouteImport.update({
   path: '/sitemap-genre/$slug.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SitemapComicIdDotxmlRoute = SitemapComicIdDotxmlRouteImport.update({
-  id: '/sitemap-comic/$id.xml',
-  path: '/sitemap-comic/$id.xml',
+const SitemapComicSlugDotxmlRoute = SitemapComicSlugDotxmlRouteImport.update({
+  id: '/sitemap-comic/$slug.xml',
+  path: '/sitemap-comic/$slug.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GenreSlugRoute = GenreSlugRouteImport.update({
   id: '/genre/$slug',
   path: '/genre/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ComicComicIdRoute = ComicComicIdRouteImport.update({
-  id: '/comic/$comicId',
-  path: '/comic/$comicId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDriveFileRoute = ApiDriveFileRouteImport.update({
@@ -112,11 +105,6 @@ const TruyenSlugChapterRoute = TruyenSlugChapterRouteImport.update({
   id: '/$chapter',
   path: '/$chapter',
   getParentRoute: () => TruyenSlugRoute,
-} as any)
-const ReadComicIdChapterIdRoute = ReadComicIdChapterIdRouteImport.update({
-  id: '/read/$comicId/$chapterId',
-  path: '/read/$comicId/$chapterId',
-  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -131,12 +119,10 @@ export interface FileRoutesByFullPath {
   '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
-  '/comic/$comicId': typeof ComicComicIdRoute
   '/genre/$slug': typeof GenreSlugRoute
-  '/sitemap-comic/$id.xml': typeof SitemapComicIdDotxmlRoute
+  '/sitemap-comic/$slug.xml': typeof SitemapComicSlugDotxmlRoute
   '/sitemap-genre/$slug.xml': typeof SitemapGenreSlugDotxmlRoute
   '/truyen/$slug': typeof TruyenSlugRouteWithChildren
-  '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
 }
 export interface FileRoutesByTo {
@@ -151,12 +137,10 @@ export interface FileRoutesByTo {
   '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
-  '/comic/$comicId': typeof ComicComicIdRoute
   '/genre/$slug': typeof GenreSlugRoute
-  '/sitemap-comic/$id.xml': typeof SitemapComicIdDotxmlRoute
+  '/sitemap-comic/$slug.xml': typeof SitemapComicSlugDotxmlRoute
   '/sitemap-genre/$slug.xml': typeof SitemapGenreSlugDotxmlRoute
   '/truyen/$slug': typeof TruyenSlugRouteWithChildren
-  '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
 }
 export interface FileRoutesById {
@@ -172,12 +156,10 @@ export interface FileRoutesById {
   '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
-  '/comic/$comicId': typeof ComicComicIdRoute
   '/genre/$slug': typeof GenreSlugRoute
-  '/sitemap-comic/$id.xml': typeof SitemapComicIdDotxmlRoute
+  '/sitemap-comic/$slug.xml': typeof SitemapComicSlugDotxmlRoute
   '/sitemap-genre/$slug.xml': typeof SitemapGenreSlugDotxmlRoute
   '/truyen/$slug': typeof TruyenSlugRouteWithChildren
-  '/read/$comicId/$chapterId': typeof ReadComicIdChapterIdRoute
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
 }
 export interface FileRouteTypes {
@@ -194,12 +176,10 @@ export interface FileRouteTypes {
     | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/api/drive-file'
-    | '/comic/$comicId'
     | '/genre/$slug'
-    | '/sitemap-comic/$id.xml'
+    | '/sitemap-comic/$slug.xml'
     | '/sitemap-genre/$slug.xml'
     | '/truyen/$slug'
-    | '/read/$comicId/$chapterId'
     | '/truyen/$slug/$chapter'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -214,12 +194,10 @@ export interface FileRouteTypes {
     | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/api/drive-file'
-    | '/comic/$comicId'
     | '/genre/$slug'
-    | '/sitemap-comic/$id.xml'
+    | '/sitemap-comic/$slug.xml'
     | '/sitemap-genre/$slug.xml'
     | '/truyen/$slug'
-    | '/read/$comicId/$chapterId'
     | '/truyen/$slug/$chapter'
   id:
     | '__root__'
@@ -234,12 +212,10 @@ export interface FileRouteTypes {
     | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/api/drive-file'
-    | '/comic/$comicId'
     | '/genre/$slug'
-    | '/sitemap-comic/$id.xml'
+    | '/sitemap-comic/$slug.xml'
     | '/sitemap-genre/$slug.xml'
     | '/truyen/$slug'
-    | '/read/$comicId/$chapterId'
     | '/truyen/$slug/$chapter'
   fileRoutesById: FileRoutesById
 }
@@ -255,12 +231,10 @@ export interface RootRouteChildren {
   SitemapIndexDotxmlRoute: typeof SitemapIndexDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiDriveFileRoute: typeof ApiDriveFileRoute
-  ComicComicIdRoute: typeof ComicComicIdRoute
   GenreSlugRoute: typeof GenreSlugRoute
-  SitemapComicIdDotxmlRoute: typeof SitemapComicIdDotxmlRoute
+  SitemapComicSlugDotxmlRoute: typeof SitemapComicSlugDotxmlRoute
   SitemapGenreSlugDotxmlRoute: typeof SitemapGenreSlugDotxmlRoute
   TruyenSlugRoute: typeof TruyenSlugRouteWithChildren
-  ReadComicIdChapterIdRoute: typeof ReadComicIdChapterIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -349,11 +323,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapGenreSlugDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sitemap-comic/$id.xml': {
-      id: '/sitemap-comic/$id.xml'
-      path: '/sitemap-comic/$id.xml'
-      fullPath: '/sitemap-comic/$id.xml'
-      preLoaderRoute: typeof SitemapComicIdDotxmlRouteImport
+    '/sitemap-comic/$slug.xml': {
+      id: '/sitemap-comic/$slug.xml'
+      path: '/sitemap-comic/$slug.xml'
+      fullPath: '/sitemap-comic/$slug.xml'
+      preLoaderRoute: typeof SitemapComicSlugDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/genre/$slug': {
@@ -361,13 +335,6 @@ declare module '@tanstack/react-router' {
       path: '/genre/$slug'
       fullPath: '/genre/$slug'
       preLoaderRoute: typeof GenreSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/comic/$comicId': {
-      id: '/comic/$comicId'
-      path: '/comic/$comicId'
-      fullPath: '/comic/$comicId'
-      preLoaderRoute: typeof ComicComicIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/drive-file': {
@@ -383,13 +350,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/truyen/$slug/$chapter'
       preLoaderRoute: typeof TruyenSlugChapterRouteImport
       parentRoute: typeof TruyenSlugRoute
-    }
-    '/read/$comicId/$chapterId': {
-      id: '/read/$comicId/$chapterId'
-      path: '/read/$comicId/$chapterId'
-      fullPath: '/read/$comicId/$chapterId'
-      preLoaderRoute: typeof ReadComicIdChapterIdRouteImport
-      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -418,13 +378,21 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapIndexDotxmlRoute: SitemapIndexDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiDriveFileRoute: ApiDriveFileRoute,
-  ComicComicIdRoute: ComicComicIdRoute,
   GenreSlugRoute: GenreSlugRoute,
-  SitemapComicIdDotxmlRoute: SitemapComicIdDotxmlRoute,
+  SitemapComicSlugDotxmlRoute: SitemapComicSlugDotxmlRoute,
   SitemapGenreSlugDotxmlRoute: SitemapGenreSlugDotxmlRoute,
   TruyenSlugRoute: TruyenSlugRouteWithChildren,
-  ReadComicIdChapterIdRoute: ReadComicIdChapterIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
