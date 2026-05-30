@@ -235,7 +235,7 @@ function ComicEditor({
   }
 
   function addChapter() {
-    const ch: Chapter = { id: uid(), title: `Chương ${draft.chapters.length + 1}`, pages: [], createdAt: Date.now() };
+    const ch: Chapter = { id: uid(), slug: "", title: `Chương ${draft.chapters.length + 1}`, pages: [], createdAt: Date.now() };
     patch({ chapters: [...draft.chapters, ch] });
   }
 
