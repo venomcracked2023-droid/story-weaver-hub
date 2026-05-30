@@ -242,6 +242,8 @@ function Reader() {
         </div>
       </header>
 
+      <h1 className="sr-only">{`${chapter.title} — ${comic.title}`}</h1>
+
       {chapter.pages.length === 0 ? (
         <main className="mx-auto max-w-3xl pt-14">
           <div className="p-10 text-center text-muted-foreground">

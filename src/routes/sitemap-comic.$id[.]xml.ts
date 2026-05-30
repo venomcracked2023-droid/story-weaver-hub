@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { inferChangeFreq } from "@/lib/sitemap-freq";
+import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/sitemap-comic/$id.xml")({
   server: {
     handlers: {
-      GET: async ({ request, params }) => {
-        const origin = new URL(request.url).origin;
+      GET: async ({ params }) => {
+        const origin = SITE_URL;
         const p = params as Record<string, string>;
         const raw = p.id ?? p["id.xml"] ?? "";
         const comicId = raw.replace(/\.xml$/, "");

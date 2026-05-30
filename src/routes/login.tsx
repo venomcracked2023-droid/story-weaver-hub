@@ -9,7 +9,22 @@ import { LogIn } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
-  head: () => ({ meta: [{ title: "Đăng nhập — Lcucumber" }] }),
+  head: () => ({
+    meta: [
+      { title: "Đăng nhập — Lcucumber" },
+      {
+        name: "description",
+        content:
+          "Đăng nhập hoặc tạo tài khoản Lcucumber để theo dõi truyện yêu thích, bình luận và quản lý nội dung cộng tác viên.",
+      },
+      { property: "og:title", content: "Đăng nhập — Lcucumber" },
+      {
+        property: "og:description",
+        content:
+          "Đăng nhập Lcucumber bằng email hoặc Google để theo dõi truyện và tham gia cộng đồng đọc webtoon cuộn dọc.",
+      },
+    ],
+  }),
 });
 
 function LoginPage() {

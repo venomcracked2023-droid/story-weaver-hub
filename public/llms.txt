@@ -1,0 +1,16 @@
+# Lcucumber
+
+> Lcucumber là nền tảng đọc webtoon online cuộn dọc miễn phí, cập nhật chương mới mỗi ngày, giao diện nhẹ và mượt trên mọi thiết bị.
+
+Lcucumber tổng hợp các bộ truyện manhwa, manhua, manga và webtoon Việt hoá. Người đọc duyệt theo thể loại, xem danh sách nổi bật và mới cập nhật, đọc trực tiếp trên trình duyệt mà không cần cài ứng dụng.
+
+## Pages
+
+- [Trang chủ](/): Thư viện truyện, tìm kiếm theo tên/tác giả/thể loại.
+- [Truyện nổi bật](/featured): Tác phẩm được Lcucumber tuyển chọn.
+- [Mới cập nhật](/latest): Danh sách truyện vừa có chương mới.
+
+## Optional
+
+- [Sitemap chính](/sitemap.xml): Toàn bộ URL truyện và chương.
+- [Sitemap index](/sitemap-index.xml): Mục lục các sitemap con theo thể loại và theo từng truyện.

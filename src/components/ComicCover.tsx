@@ -16,7 +16,7 @@ export function ComicCover({ id, title, className }: { id?: string; title: strin
   return (
     <img
       src={driveImageUrl(id, 600)}
-      alt={title}
+      alt={`Bìa truyện ${title}`}
       loading="lazy"
       className={"h-full w-full object-cover " + (className ?? "")}
     />
