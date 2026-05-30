@@ -137,8 +137,8 @@ function AdminPage() {
             <div key={c.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-4">
               <div className="min-w-0">
                 <Link
-                  to="/comic/$comicId"
-                  params={{ comicId: c.id }}
+                  to="/truyen/$slug"
+                  params={{ slug: c.slug }}
                   className="truncate font-semibold hover:text-primary"
                 >
                   {c.title || "(chưa có tên)"}

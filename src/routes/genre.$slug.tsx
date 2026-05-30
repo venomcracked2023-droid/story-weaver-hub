@@ -105,8 +105,8 @@ function GenrePage() {
             {matched.map((c, i) => (
               <Link
                 key={c.id}
-                to="/comic/$comicId"
-                params={{ comicId: c.id }}
+                to="/truyen/$slug"
+                params={{ slug: c.slug }}
                 className="group flex flex-col gap-2 animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}
               >
