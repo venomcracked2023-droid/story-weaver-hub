@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { inferChangeFreq } from "@/lib/sitemap-freq";
 import { SITE_URL } from "@/lib/seo";
+import { xmlEscape } from "@/lib/xml";
 
 export const Route = createFileRoute("/sitemap-comic/$slug.xml")({
   server: {
@@ -40,12 +41,12 @@ export const Route = createFileRoute("/sitemap-comic/$slug.xml")({
           : iso(comic.updated_at as string);
 
         const urls: string[] = [
-          `<url><loc>${origin}/truyen/${comic.slug}</loc><lastmod>${comicLastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
+          `<url><loc>${origin}/truyen/${xmlEscape(comic.slug)}</loc><lastmod>${comicLastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
         ];
         for (const ch of chapters ?? []) {
           if (!ch.slug) continue;
           urls.push(
-            `<url><loc>${origin}/truyen/${comic.slug}/${ch.slug}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.7</priority></url>`,
+            `<url><loc>${origin}/truyen/${xmlEscape(comic.slug)}/${xmlEscape(ch.slug)}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.7</priority></url>`,
           );
         }
 
