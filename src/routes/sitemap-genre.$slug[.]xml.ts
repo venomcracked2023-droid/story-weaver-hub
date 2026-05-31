@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { slugifyGenre } from "@/lib/slug";
 import { inferChangeFreq } from "@/lib/sitemap-freq";
 import { SITE_URL } from "@/lib/seo";
+import { xmlEscape } from "@/lib/xml";
 
 export const Route = createFileRoute("/sitemap-genre/$slug.xml")({
   server: {
@@ -25,11 +26,13 @@ export const Route = createFileRoute("/sitemap-genre/$slug.xml")({
         );
         const ids = matched.map((c) => c.id as string);
 
-        let chapters: Array<{ id: string; slug: string; comic_id: string; created_at: string }> = [];
+        // Chỉ cần thời điểm chương mới nhất để tính lastmod cho trang truyện.
+        // Không liệt kê URL chương ở đây — đã có trong /sitemap-comic/{slug}.xml.
+        let chapters: Array<{ comic_id: string; created_at: string }> = [];
         if (ids.length) {
           const { data } = await supabase
             .from("chapters")
-            .select("id,slug,comic_id,created_at")
+            .select("comic_id,created_at")
             .in("comic_id", ids)
             .order("created_at", { ascending: false })
             .limit(5000);
@@ -55,24 +58,13 @@ export const Route = createFileRoute("/sitemap-genre/$slug.xml")({
         const freqByComic = new Map<string, string>();
         for (const [id, ts] of chapterTsByComic) freqByComic.set(id, inferChangeFreq(ts));
 
-        const comicSlugById = new Map<string, string>();
-        for (const c of matched) comicSlugById.set(c.id as string, (c as any).slug ?? "");
-
         const urls: string[] = [];
         for (const c of matched) {
           if (!(c as any).slug) continue;
           const lastmod = maxIso(iso(c.updated_at as string), latestChapterByComic.get(c.id as string))!;
           const freq = freqByComic.get(c.id as string) ?? "monthly";
           urls.push(
-            `<url><loc>${origin}/truyen/${(c as any).slug}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
-          );
-        }
-        for (const ch of chapters) {
-          const cSlug = comicSlugById.get(ch.comic_id);
-          if (!cSlug || !ch.slug) continue;
-          const freq = freqByComic.get(ch.comic_id) ?? "monthly";
-          urls.push(
-            `<url><loc>${origin}/truyen/${cSlug}/${ch.slug}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.6</priority></url>`,
+            `<url><loc>${origin}/truyen/${xmlEscape((c as any).slug)}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
           );
         }
 

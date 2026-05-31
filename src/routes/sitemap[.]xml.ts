@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { inferChangeFreq } from "@/lib/sitemap-freq";
 import { slugifyGenre } from "@/lib/slug";
 import { SITE_URL } from "@/lib/seo";
+import { xmlEscape } from "@/lib/xml";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
@@ -13,10 +14,13 @@ export const Route = createFileRoute("/sitemap.xml")({
           .from("comics")
           .select("id,slug,updated_at,genres")
           .order("updated_at", { ascending: false })
-          .limit(1000);
+          .limit(2000);
+        // Sitemap chính chỉ chứa trang tĩnh + trang truyện.
+        // Các chương được liệt kê riêng trong /sitemap-comic/{slug}.xml
+        // để tránh trùng lặp URL giữa nhiều sitemap.
         const { data: chapters } = await supabase
           .from("chapters")
-          .select("id,slug,comic_id,created_at")
+          .select("comic_id,created_at")
           .order("created_at", { ascending: false })
           .limit(5000);
 
@@ -65,27 +69,15 @@ export const Route = createFileRoute("/sitemap.xml")({
         }
         for (const [slug, lastmod] of genreLastmod) {
           urls.push(
-            `<url><loc>${origin}/genre/${slug}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
+            `<url><loc>${origin}/genre/${xmlEscape(slug)}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
           );
         }
-        // Map comic_id -> slug for chapter URL building.
-        const comicSlugById = new Map<string, string>();
-        for (const c of comics ?? []) comicSlugById.set(c.id, (c as any).slug ?? "");
-
         for (const c of comics ?? []) {
           if (!(c as any).slug) continue;
           const lastmod = maxIso(iso(c.updated_at), latestChapterByComic.get(c.id))!;
           const freq = freqByComic.get(c.id) ?? "monthly";
           urls.push(
-            `<url><loc>${origin}/truyen/${(c as any).slug}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
-          );
-        }
-        for (const ch of chapters ?? []) {
-          const cSlug = comicSlugById.get(ch.comic_id);
-          if (!cSlug || !(ch as any).slug) continue;
-          const freq = freqByComic.get(ch.comic_id) ?? "monthly";
-          urls.push(
-            `<url><loc>${origin}/truyen/${cSlug}/${(ch as any).slug}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.6</priority></url>`,
+            `<url><loc>${origin}/truyen/${xmlEscape((c as any).slug)}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
           );
         }
 
