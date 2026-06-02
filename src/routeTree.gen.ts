@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SitemapIndexDotxmlRouteImport } from './routes/sitemap-index[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LatestRouteImport } from './routes/latest'
@@ -29,11 +28,6 @@ import { Route as TruyenSlugChapterRouteImport } from './routes/truyen.$slug.$ch
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapIndexDotxmlRoute = SitemapIndexDotxmlRouteImport.update({
-  id: '/sitemap-index.xml',
-  path: '/sitemap-index.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -116,7 +110,6 @@ export interface FileRoutesByFullPath {
   '/latest': typeof LatestRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
-  '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
   '/genre/$slug': typeof GenreSlugRoute
@@ -134,7 +127,6 @@ export interface FileRoutesByTo {
   '/latest': typeof LatestRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
-  '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
   '/genre/$slug': typeof GenreSlugRoute
@@ -153,7 +145,6 @@ export interface FileRoutesById {
   '/latest': typeof LatestRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
-  '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/drive-file': typeof ApiDriveFileRoute
   '/genre/$slug': typeof GenreSlugRoute
@@ -173,7 +164,6 @@ export interface FileRouteTypes {
     | '/latest'
     | '/login'
     | '/robots.txt'
-    | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/api/drive-file'
     | '/genre/$slug'
@@ -191,7 +181,6 @@ export interface FileRouteTypes {
     | '/latest'
     | '/login'
     | '/robots.txt'
-    | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/api/drive-file'
     | '/genre/$slug'
@@ -209,7 +198,6 @@ export interface FileRouteTypes {
     | '/latest'
     | '/login'
     | '/robots.txt'
-    | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/api/drive-file'
     | '/genre/$slug'
@@ -228,7 +216,6 @@ export interface RootRouteChildren {
   LatestRoute: typeof LatestRoute
   LoginRoute: typeof LoginRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
-  SitemapIndexDotxmlRoute: typeof SitemapIndexDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiDriveFileRoute: typeof ApiDriveFileRoute
   GenreSlugRoute: typeof GenreSlugRoute
@@ -245,13 +232,6 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap-index.xml': {
-      id: '/sitemap-index.xml'
-      path: '/sitemap-index.xml'
-      fullPath: '/sitemap-index.xml'
-      preLoaderRoute: typeof SitemapIndexDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -364,7 +344,6 @@ const rootRouteChildren: RootRouteChildren = {
   LatestRoute: LatestRoute,
   LoginRoute: LoginRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
-  SitemapIndexDotxmlRoute: SitemapIndexDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiDriveFileRoute: ApiDriveFileRoute,
   GenreSlugRoute: GenreSlugRoute,
@@ -376,13 +355,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
