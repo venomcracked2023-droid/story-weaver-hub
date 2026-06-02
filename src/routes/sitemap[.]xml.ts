@@ -15,12 +15,11 @@ export const Route = createFileRoute("/sitemap.xml")({
           .select("id,slug,updated_at,genres")
           .order("updated_at", { ascending: false })
           .limit(2000);
-        // Sitemap chính chỉ chứa trang tĩnh + trang truyện.
-        // Các chương được liệt kê riêng trong /sitemap-comic/{slug}.xml
-        // để tránh trùng lặp URL giữa nhiều sitemap.
+        // Dùng 1 sitemap duy nhất: trang tĩnh + thể loại + truyện + chương.
+        // Với vài chục/trăm truyện thì 1 file là đủ và đơn giản nhất.
         const { data: chapters } = await supabase
           .from("chapters")
-          .select("comic_id,created_at")
+          .select("comic_id,slug,created_at")
           .order("created_at", { ascending: false })
           .limit(5000);
 
@@ -78,6 +77,20 @@ export const Route = createFileRoute("/sitemap.xml")({
           const freq = freqByComic.get(c.id) ?? "monthly";
           urls.push(
             `<url><loc>${origin}/truyen/${xmlEscape((c as any).slug)}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
+          );
+        }
+
+        // URL từng chương — gộp luôn vào sitemap chính.
+        const slugByComicId = new Map<string, string>();
+        for (const c of comics ?? []) {
+          if ((c as any).slug) slugByComicId.set(c.id as string, (c as any).slug as string);
+        }
+        for (const ch of chapters ?? []) {
+          const comicSlug = slugByComicId.get(ch.comic_id as string);
+          if (!comicSlug || !(ch as any).slug) continue;
+          const freq = freqByComic.get(ch.comic_id as string) ?? "monthly";
+          urls.push(
+            `<url><loc>${origin}/truyen/${xmlEscape(comicSlug)}/${xmlEscape((ch as any).slug)}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.7</priority></url>`,
           );
         }
 
