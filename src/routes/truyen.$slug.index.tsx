@@ -10,7 +10,7 @@ import { CommentSection } from "@/components/CommentSection";
 import { RatingWidget } from "@/components/RatingWidget";
 import { SITE_URL } from "@/lib/seo";
 
-export const Route = createFileRoute("/truyen/$slug")({
+export const Route = createFileRoute("/truyen/$slug/")({
   component: ComicPage,
   loader: async ({ params }) => {
     const { data } = await supabase
