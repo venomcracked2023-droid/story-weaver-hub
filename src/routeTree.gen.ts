@@ -102,9 +102,9 @@ const TruyenSlugIndexRoute = TruyenSlugIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const TruyenSlugChapterRoute = TruyenSlugChapterRouteImport.update({
-  id: '/$chapter',
-  path: '/$chapter',
-  getParentRoute: () => TruyenSlugRoute,
+  id: '/truyen/$slug/$chapter',
+  path: '/truyen/$slug/$chapter',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -234,6 +234,7 @@ export interface RootRouteChildren {
   GenreSlugRoute: typeof GenreSlugRoute
   SitemapComicSlugDotxmlRoute: typeof SitemapComicSlugDotxmlRoute
   SitemapGenreSlugDotxmlRoute: typeof SitemapGenreSlugDotxmlRoute
+  TruyenSlugChapterRoute: typeof TruyenSlugChapterRoute
   TruyenSlugIndexRoute: typeof TruyenSlugIndexRoute
 }
 
@@ -346,10 +347,10 @@ declare module '@tanstack/react-router' {
     }
     '/truyen/$slug/$chapter': {
       id: '/truyen/$slug/$chapter'
-      path: '/$chapter'
+      path: '/truyen/$slug/$chapter'
       fullPath: '/truyen/$slug/$chapter'
       preLoaderRoute: typeof TruyenSlugChapterRouteImport
-      parentRoute: typeof TruyenSlugRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -369,6 +370,7 @@ const rootRouteChildren: RootRouteChildren = {
   GenreSlugRoute: GenreSlugRoute,
   SitemapComicSlugDotxmlRoute: SitemapComicSlugDotxmlRoute,
   SitemapGenreSlugDotxmlRoute: SitemapGenreSlugDotxmlRoute,
+  TruyenSlugChapterRoute: TruyenSlugChapterRoute,
   TruyenSlugIndexRoute: TruyenSlugIndexRoute,
 }
 export const routeTree = rootRouteImport
