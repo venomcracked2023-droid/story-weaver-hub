@@ -19,11 +19,11 @@ import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminApplicationsRouteImport } from './routes/admin-applications'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TruyenSlugRouteImport } from './routes/truyen.$slug'
 import { Route as SitemapGenreSlugDotxmlRouteImport } from './routes/sitemap-genre.$slug[.]xml'
 import { Route as SitemapComicSlugDotxmlRouteImport } from './routes/sitemap-comic.$slug[.]xml'
 import { Route as GenreSlugRouteImport } from './routes/genre.$slug'
 import { Route as ApiDriveFileRouteImport } from './routes/api/drive-file'
+import { Route as TruyenSlugIndexRouteImport } from './routes/truyen.$slug.index'
 import { Route as TruyenSlugChapterRouteImport } from './routes/truyen.$slug.$chapter'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -76,11 +76,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TruyenSlugRoute = TruyenSlugRouteImport.update({
-  id: '/truyen/$slug',
-  path: '/truyen/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SitemapGenreSlugDotxmlRoute = SitemapGenreSlugDotxmlRouteImport.update({
   id: '/sitemap-genre/$slug.xml',
   path: '/sitemap-genre/$slug.xml',
@@ -99,6 +94,11 @@ const GenreSlugRoute = GenreSlugRouteImport.update({
 const ApiDriveFileRoute = ApiDriveFileRouteImport.update({
   id: '/api/drive-file',
   path: '/api/drive-file',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TruyenSlugIndexRoute = TruyenSlugIndexRouteImport.update({
+  id: '/truyen/$slug/',
+  path: '/truyen/$slug/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TruyenSlugChapterRoute = TruyenSlugChapterRouteImport.update({
@@ -122,8 +122,8 @@ export interface FileRoutesByFullPath {
   '/genre/$slug': typeof GenreSlugRoute
   '/sitemap-comic/$slug.xml': typeof SitemapComicSlugDotxmlRoute
   '/sitemap-genre/$slug.xml': typeof SitemapGenreSlugDotxmlRoute
-  '/truyen/$slug': typeof TruyenSlugRouteWithChildren
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
+  '/truyen/$slug/': typeof TruyenSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -140,8 +140,8 @@ export interface FileRoutesByTo {
   '/genre/$slug': typeof GenreSlugRoute
   '/sitemap-comic/$slug.xml': typeof SitemapComicSlugDotxmlRoute
   '/sitemap-genre/$slug.xml': typeof SitemapGenreSlugDotxmlRoute
-  '/truyen/$slug': typeof TruyenSlugRouteWithChildren
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
+  '/truyen/$slug': typeof TruyenSlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -159,8 +159,8 @@ export interface FileRoutesById {
   '/genre/$slug': typeof GenreSlugRoute
   '/sitemap-comic/$slug.xml': typeof SitemapComicSlugDotxmlRoute
   '/sitemap-genre/$slug.xml': typeof SitemapGenreSlugDotxmlRoute
-  '/truyen/$slug': typeof TruyenSlugRouteWithChildren
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
+  '/truyen/$slug/': typeof TruyenSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -179,8 +179,8 @@ export interface FileRouteTypes {
     | '/genre/$slug'
     | '/sitemap-comic/$slug.xml'
     | '/sitemap-genre/$slug.xml'
-    | '/truyen/$slug'
     | '/truyen/$slug/$chapter'
+    | '/truyen/$slug/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -197,8 +197,8 @@ export interface FileRouteTypes {
     | '/genre/$slug'
     | '/sitemap-comic/$slug.xml'
     | '/sitemap-genre/$slug.xml'
-    | '/truyen/$slug'
     | '/truyen/$slug/$chapter'
+    | '/truyen/$slug'
   id:
     | '__root__'
     | '/'
@@ -215,8 +215,8 @@ export interface FileRouteTypes {
     | '/genre/$slug'
     | '/sitemap-comic/$slug.xml'
     | '/sitemap-genre/$slug.xml'
-    | '/truyen/$slug'
     | '/truyen/$slug/$chapter'
+    | '/truyen/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -234,7 +234,7 @@ export interface RootRouteChildren {
   GenreSlugRoute: typeof GenreSlugRoute
   SitemapComicSlugDotxmlRoute: typeof SitemapComicSlugDotxmlRoute
   SitemapGenreSlugDotxmlRoute: typeof SitemapGenreSlugDotxmlRoute
-  TruyenSlugRoute: typeof TruyenSlugRouteWithChildren
+  TruyenSlugIndexRoute: typeof TruyenSlugIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -309,13 +309,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/truyen/$slug': {
-      id: '/truyen/$slug'
-      path: '/truyen/$slug'
-      fullPath: '/truyen/$slug'
-      preLoaderRoute: typeof TruyenSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/sitemap-genre/$slug.xml': {
       id: '/sitemap-genre/$slug.xml'
       path: '/sitemap-genre/$slug.xml'
@@ -344,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDriveFileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/truyen/$slug/': {
+      id: '/truyen/$slug/'
+      path: '/truyen/$slug'
+      fullPath: '/truyen/$slug/'
+      preLoaderRoute: typeof TruyenSlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/truyen/$slug/$chapter': {
       id: '/truyen/$slug/$chapter'
       path: '/$chapter'
@@ -353,18 +353,6 @@ declare module '@tanstack/react-router' {
     }
   }
 }
-
-interface TruyenSlugRouteChildren {
-  TruyenSlugChapterRoute: typeof TruyenSlugChapterRoute
-}
-
-const TruyenSlugRouteChildren: TruyenSlugRouteChildren = {
-  TruyenSlugChapterRoute: TruyenSlugChapterRoute,
-}
-
-const TruyenSlugRouteWithChildren = TruyenSlugRoute._addFileChildren(
-  TruyenSlugRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -381,7 +369,7 @@ const rootRouteChildren: RootRouteChildren = {
   GenreSlugRoute: GenreSlugRoute,
   SitemapComicSlugDotxmlRoute: SitemapComicSlugDotxmlRoute,
   SitemapGenreSlugDotxmlRoute: SitemapGenreSlugDotxmlRoute,
-  TruyenSlugRoute: TruyenSlugRouteWithChildren,
+  TruyenSlugIndexRoute: TruyenSlugIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
