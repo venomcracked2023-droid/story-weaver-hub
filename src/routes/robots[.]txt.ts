@@ -57,7 +57,6 @@ export const Route = createFileRoute("/robots.txt")({
           "Disallow: /",
           "",
           `Host: ${origin}`,
-          `Sitemap: ${origin}/sitemap-index.xml`,
           `Sitemap: ${origin}/sitemap.xml`,
           "",
         ].join("\n");
