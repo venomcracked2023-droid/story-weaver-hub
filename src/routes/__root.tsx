@@ -108,10 +108,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: [
       {
         async: true,
-        src: "https://www.googletagmanager.com/gtag/js?id=G-4F2S7SY0L6",
+        src: "https://www.googletagmanager.com/gtag/js?id=G-W7M4VB102V",
       },
       {
-        children: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-4F2S7SY0L6');`,
+        children: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-W7M4VB102V');`,
       },
       {
         type: "application/ld+json",
