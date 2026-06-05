@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
 import { useComics } from "@/lib/comics-store";
@@ -31,6 +32,78 @@ export const Route = createFileRoute("/")({
   },
 });
 
+function PaginationControls({
+  current,
+  total,
+  onChange,
+}: {
+  current: number;
+  total: number;
+  onChange: (page: number) => void;
+}) {
+  if (total <= 1) return null;
+
+  const getPages = () => {
+    const pages: (number | "...")[] = [];
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      if (current <= 4) {
+        for (let i = 1; i <= 5; i++) pages.push(i);
+        pages.push("...");
+        pages.push(total);
+      } else if (current >= total - 3) {
+        pages.push(1);
+        pages.push("...");
+        for (let i = total - 4; i <= total; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push("...");
+        for (let i = current - 1; i <= current + 1; i++) pages.push(i);
+        pages.push("...");
+        pages.push(total);
+      }
+    }
+    return pages;
+  };
+
+  return (
+    <div className="mt-6 flex items-center justify-center gap-2">
+      <button
+        onClick={() => onChange(current - 1)}
+        disabled={current === 1}
+        className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-secondary disabled:opacity-40"
+      >
+        Trước
+      </button>
+      {getPages().map((p, i) =>
+        p === "..." ? (
+          <span key={`ellipsis-${i}`} className="px-2 text-sm text-muted-foreground">...</span>
+        ) : (
+          <button
+            key={p}
+            onClick={() => onChange(p)}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+              p === current
+                ? "bg-primary text-primary-foreground"
+                : "border border-border bg-card text-foreground hover:bg-secondary"
+            }`}
+          >
+            {p}
+          </button>
+        )
+      )}
+      <button
+        onClick={() => onChange(current + 1)}
+        disabled={current === total}
+        className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-secondary disabled:opacity-40"
+      >
+        Tiếp
+      </button>
+    </div>
+  );
+}
+
 function Index() {
   const comics = useComics();
   const { q } = Route.useSearch();
@@ -45,6 +118,31 @@ function Index() {
     : comics;
   const featured = comics.filter((c) => c.featured);
   const totalChapters = comics.reduce((s, c) => s + c.chapters.length, 0);
+
+  const [featuredPage, setFeaturedPage] = useState(1);
+  const [libraryPage, setLibraryPage] = useState(1);
+
+  const featuredPerPage = 8;
+  const libraryPerPage = 16;
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setFeaturedPage(1);
+    setLibraryPage(1);
+  }, [term]);
+
+  const featuredTotalPages = Math.max(1, Math.ceil(featured.length / featuredPerPage));
+  const libraryTotalPages = Math.max(1, Math.ceil(filtered.length / libraryPerPage));
+
+  const featuredSlice = featured.slice(
+    (featuredPage - 1) * featuredPerPage,
+    featuredPage * featuredPerPage,
+  );
+  const filteredSlice = filtered.slice(
+    (libraryPage - 1) * libraryPerPage,
+    libraryPage * libraryPerPage,
+  );
+
   const libraryJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -64,6 +162,7 @@ function Index() {
       })),
     },
   };
+
   return (
     <div className="min-h-screen">
       <SiteHeader />
@@ -139,7 +238,7 @@ function Index() {
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {featured.map((c, i) => (
+              {featuredSlice.map((c, i) => (
                 <Link
                   key={c.id}
                   to="/truyen/$slug"
@@ -163,6 +262,7 @@ function Index() {
                 </Link>
               ))}
             </div>
+            <PaginationControls current={featuredPage} total={featuredTotalPages} onChange={setFeaturedPage} />
           </section>
         )}
 
@@ -189,28 +289,31 @@ function Index() {
               <p>Không tìm thấy truyện nào khớp với "{q}".</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {filtered.map((c, i) => (
-                <Link
-                  key={c.id}
-                  to="/truyen/$slug"
-                  params={{ slug: c.slug }}
-                  className="group flex flex-col gap-2 animate-fade-in-up"
-                  style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}
-                >
-                  <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-border bg-card group-hover:border-primary/60">
-                    <ComicCover id={c.coverId} title={c.title} className="transition duration-500 group-hover:scale-110" />
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                  </div>
-                  <div>
-                    <h3 className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">{c.title}</h3>
-                    <p className="line-clamp-1 text-xs text-muted-foreground">
-                      {c.chapters.length} chương · {c.author || "Ẩn danh"}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {filteredSlice.map((c, i) => (
+                  <Link
+                    key={c.id}
+                    to="/truyen/$slug"
+                    params={{ slug: c.slug }}
+                    className="group flex flex-col gap-2 animate-fade-in-up"
+                    style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}
+                  >
+                    <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-border bg-card group-hover:border-primary/60">
+                      <ComicCover id={c.coverId} title={c.title} className="transition duration-500 group-hover:scale-110" />
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                    </div>
+                    <div>
+                      <h3 className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">{c.title}</h3>
+                      <p className="line-clamp-1 text-xs text-muted-foreground">
+                        {c.chapters.length} chương · {c.author || "Ẩn danh"}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <PaginationControls current={libraryPage} total={libraryTotalPages} onChange={setLibraryPage} />
+            </>
           )}
         </section>
       </main>
