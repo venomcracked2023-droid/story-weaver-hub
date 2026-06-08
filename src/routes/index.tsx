@@ -247,7 +247,7 @@ function Index() {
                   style={{ animationDelay: `${i * 60}ms` }}
                 >
                   <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-primary/40 bg-card shadow-lg shadow-primary/10 group-hover:border-primary">
-                    <ComicCover id={c.coverId} title={c.title} className="transition duration-500 group-hover:scale-110" />
+                    <ComicCover id={c.coverId} title={c.title} priority={featuredPage === 1 && i < 4} className="transition duration-500 group-hover:scale-110" />
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-card/90 via-card/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                     <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-primary-foreground shadow-glow backdrop-blur">
                       <Star className="h-3 w-3 fill-current" /> Nổi bật
@@ -300,7 +300,7 @@ function Index() {
                     style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}
                   >
                     <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-border bg-card group-hover:border-primary/60">
-                      <ComicCover id={c.coverId} title={c.title} className="transition duration-500 group-hover:scale-110" />
+                      <ComicCover id={c.coverId} title={c.title} priority={libraryPage === 1 && i < 4 && featured.length === 0} className="transition duration-500 group-hover:scale-110" />
                       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                     </div>
                     <div>
