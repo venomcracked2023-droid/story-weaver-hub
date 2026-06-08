@@ -1,6 +1,16 @@
 import { driveImageUrl } from "@/lib/drive";
 
-export function ComicCover({ id, title, className }: { id?: string; title: string; className?: string }) {
+export function ComicCover({
+  id,
+  title,
+  className,
+  priority = false,
+}: {
+  id?: string;
+  title: string;
+  className?: string;
+  priority?: boolean;
+}) {
   if (!id) {
     return (
       <div
@@ -17,7 +27,11 @@ export function ComicCover({ id, title, className }: { id?: string; title: strin
     <img
       src={driveImageUrl(id, 600)}
       alt={`Bìa truyện ${title}`}
-      loading="lazy"
+      width={600}
+      height={800}
+      loading={priority ? "eager" : "lazy"}
+      decoding={priority ? "sync" : "async"}
+      fetchPriority={priority ? "high" : "auto"}
       className={"h-full w-full object-cover " + (className ?? "")}
     />
   );
