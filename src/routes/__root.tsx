@@ -89,12 +89,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:height", content: "630" },
       { name: "twitter:image", content: "https://lcucumber.com/og-default.jpg" },
       { name: "google-site-verification", content: "nuznkezATkzuBsrNT1mC972T86bQZnZgH4LhasUO4qc" },
-      { title: "Lovable App" },
-      { property: "og:title", content: "Lovable App" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "description", content: "Story Weaver Hub is a platform for creating and publishing webtoons, managing authors, genres, and reader engagement." },
-      { property: "og:description", content: "Story Weaver Hub is a platform for creating and publishing webtoons, managing authors, genres, and reader engagement." },
-      { name: "twitter:description", content: "Story Weaver Hub is a platform for creating and publishing webtoons, managing authors, genres, and reader engagement." },
+      { title: "Lcucumber — Đọc Webtoon cuộn dọc miễn phí" },
+      { property: "og:title", content: "Lcucumber — Đọc Webtoon cuộn dọc miễn phí" },
+      { name: "twitter:title", content: "Lcucumber — Đọc Webtoon cuộn dọc miễn phí" },
+      { name: "description", content: "Lcucumber là nền tảng đọc webtoon cuộn dọc miễn phí: manhwa, manhua, manga Việt hoá, cập nhật chương mới mỗi ngày, đọc mượt trên mọi thiết bị." },
+      { property: "og:description", content: "Lcucumber là nền tảng đọc webtoon cuộn dọc miễn phí: manhwa, manhua, manga Việt hoá, cập nhật chương mới mỗi ngày, đọc mượt trên mọi thiết bị." },
+      { name: "twitter:description", content: "Lcucumber là nền tảng đọc webtoon cuộn dọc miễn phí: manhwa, manhua, manga Việt hoá, cập nhật chương mới mỗi ngày, đọc mượt trên mọi thiết bị." },
     ],
     links: [
       {
