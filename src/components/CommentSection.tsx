@@ -181,7 +181,7 @@ export function CommentSection({
                   {p?.avatar_url ? (
                     <img
                       src={p.avatar_url}
-                      alt={name}
+                      alt={`Ảnh đại diện của ${name}`}
                       className="h-full w-full object-cover"
                       loading="lazy"
                     />
