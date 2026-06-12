@@ -185,7 +185,7 @@ function Index() {
               <Sparkles className="h-3.5 w-3.5 text-primary" /> Webtoon — cuộn dọc, đọc liền mạch
             </span>
             <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
-              Truyện hay, <span className="text-gradient-brand">cuộn không ngừng.</span>
+              Lcucumber — Đọc Webtoon cuộn dọc miễn phí
             </h1>
             <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
               Khám phá thế giới webtoon cùng Lcucumber — mượt như lướt sóng, xanh như dưa leo.
