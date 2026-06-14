@@ -30,7 +30,15 @@ export const Route = createFileRoute("/featured")({
 
 function FeaturedPage() {
   const comics = useComics();
-  const featured = comics.filter((c) => c.featured);
+  // Tự động: các truyện vừa được cập nhật chương mới nhất.
+  const featured = [...comics]
+    .filter((c) => c.chapters.length > 0)
+    .map((c) => ({
+      comic: c,
+      lastChapterAt: Math.max(...c.chapters.map((ch) => ch.createdAt)),
+    }))
+    .sort((a, b) => b.lastChapterAt - a.lastChapterAt)
+    .map((x) => x.comic);
   const [query, setQuery] = useState("");
   const filtered = useMemo(() => {
     const q = query.trim();
@@ -102,7 +110,7 @@ function FeaturedPage() {
               Truyện nổi bật
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Tuyển chọn những tác phẩm đáng đọc nhất trên Lcucumber.
+              Tự động cập nhật theo các truyện vừa có chương mới nhất.
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -125,8 +133,7 @@ function FeaturedPage() {
 
         {featured.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
-            Chưa có truyện nổi bật. Vào{" "}
-            <Link to="/admin" className="text-primary underline">Quản lý</Link> để đánh dấu.
+            Chưa có chương nào được đăng. Hãy quay lại sau khi có chương mới.
           </div>
         ) : filtered.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">

@@ -239,6 +239,10 @@
     0% { background-position: -400px 0; }
     100% { background-position: 400px 0; }
   }
+  @keyframes marquee-x {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
 
   .animate-fade-in-up {
     animation: fade-in-up 0.5s ease-out both;
@@ -248,6 +252,25 @@
   }
   .animate-pulse-glow {
     animation: pulse-glow 4s ease-in-out infinite;
+  }
+  .featured-marquee {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 48px,
+      #000 calc(100% - 48px),
+      transparent 100%
+    );
+  }
+  .featured-marquee-track {
+    animation: marquee-x var(--marquee-duration, 40s) linear infinite;
+  }
+  .featured-marquee:hover .featured-marquee-track,
+  .featured-marquee:focus-within .featured-marquee-track {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .featured-marquee-track { animation: none; }
   }
   .skeleton-shimmer {
     background: linear-gradient(
