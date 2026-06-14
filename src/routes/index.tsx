@@ -116,28 +116,29 @@ function Index() {
           .includes(term),
       )
     : comics;
-  const featured = comics.filter((c) => c.featured);
+  // "Nổi bật" = các truyện vừa có chương mới nhất (tự động, không cần admin chọn).
+  const featured = [...comics]
+    .filter((c) => c.chapters.length > 0)
+    .map((c) => ({
+      comic: c,
+      lastChapterAt: Math.max(...c.chapters.map((ch) => ch.createdAt)),
+    }))
+    .sort((a, b) => b.lastChapterAt - a.lastChapterAt)
+    .slice(0, 12)
+    .map((x) => x.comic);
   const totalChapters = comics.reduce((s, c) => s + c.chapters.length, 0);
 
-  const [featuredPage, setFeaturedPage] = useState(1);
   const [libraryPage, setLibraryPage] = useState(1);
 
-  const featuredPerPage = 8;
   const libraryPerPage = 16;
 
   // Reset to page 1 when search query changes
   useEffect(() => {
-    setFeaturedPage(1);
     setLibraryPage(1);
   }, [term]);
 
-  const featuredTotalPages = Math.max(1, Math.ceil(featured.length / featuredPerPage));
   const libraryTotalPages = Math.max(1, Math.ceil(filtered.length / libraryPerPage));
 
-  const featuredSlice = featured.slice(
-    (featuredPage - 1) * featuredPerPage,
-    featuredPage * featuredPerPage,
-  );
   const filteredSlice = filtered.slice(
     (libraryPage - 1) * libraryPerPage,
     libraryPage * libraryPerPage,
@@ -237,32 +238,37 @@ function Index() {
                 <span className="transition-transform group-hover:translate-x-1">→</span>
               </Link>
             </div>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {featuredSlice.map((c, i) => (
-                <Link
-                  key={c.id}
-                  to="/truyen/$slug"
-                  params={{ slug: c.slug }}
-                  className="group flex flex-col gap-2 animate-fade-in-up"
-                  style={{ animationDelay: `${i * 60}ms` }}
-                >
-                  <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-primary/40 bg-card shadow-lg shadow-primary/10 group-hover:border-primary">
-                    <ComicCover id={c.coverId} title={c.title} priority={featuredPage === 1 && i < 4} className="transition duration-500 group-hover:scale-110" />
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-card/90 via-card/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-primary-foreground shadow-glow backdrop-blur">
-                      <Star className="h-3 w-3 fill-current" /> Nổi bật
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">{c.title}</h3>
-                    <p className="line-clamp-1 text-xs text-muted-foreground">
-                      {c.chapters.length} chương · {c.author || "Ẩn danh"}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+            <div
+              className="featured-marquee group/marquee relative overflow-hidden"
+              style={{ ["--marquee-duration" as string]: `${Math.max(20, featured.length * 4)}s` }}
+            >
+              <div className="featured-marquee-track flex w-max gap-4">
+                {[...featured, ...featured].map((c, i) => (
+                  <Link
+                    key={`${c.id}-${i}`}
+                    to="/truyen/$slug"
+                    params={{ slug: c.slug }}
+                    aria-hidden={i >= featured.length ? true : undefined}
+                    tabIndex={i >= featured.length ? -1 : 0}
+                    className="group flex w-[160px] shrink-0 flex-col gap-2 sm:w-[180px]"
+                  >
+                    <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-primary/40 bg-card shadow-lg shadow-primary/10 group-hover:border-primary">
+                      <ComicCover id={c.coverId} title={c.title} priority={i < 4} className="transition duration-500 group-hover:scale-110" />
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-card/90 via-card/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                      <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-primary-foreground shadow-glow backdrop-blur">
+                        <Star className="h-3 w-3 fill-current" /> Mới
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">{c.title}</h3>
+                      <p className="line-clamp-1 text-xs text-muted-foreground">
+                        {c.chapters.length} chương · {c.author || "Ẩn danh"}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-            <PaginationControls current={featuredPage} total={featuredTotalPages} onChange={setFeaturedPage} />
           </section>
         )}
 
