@@ -2,13 +2,15 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
-import { useComics, useComicsLoaded } from "@/lib/comics-store";
+import { loadComics, useComics, useComicsLoaded } from "@/lib/comics-store";
 import { supabase } from "@/integrations/supabase/client";
-import { driveImageUrl } from "@/lib/drive";
-import { BookOpen, ChevronRight, Layers, MessageCircle, User } from "lucide-react";
+import { driveImageUrl, parseDriveIds } from "@/lib/drive";
+import { BookOpen, ChevronRight, Layers, MessageCircle, Plus, User, X } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { RatingWidget } from "@/components/RatingWidget";
 import { SITE_URL } from "@/lib/seo";
+import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/truyen/$slug/")({
   component: ComicPage,
@@ -93,6 +95,8 @@ function ComicPage() {
   const comic = comics.find((c) => c.slug === slug);
   const [chapterCounts, setChapterCounts] = useState<Record<string, number>>({});
   const [comicCount, setComicCount] = useState(0);
+  const { isAdmin } = useAuth();
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
 
   useEffect(() => {
     if (!comic) return;
@@ -206,10 +210,20 @@ function ComicPage() {
                 {comic.chapters.length} chương · cập nhật liên tục
               </span>
             </div>
-            <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-border/70 bg-background/60 px-2.5 py-1 text-xs text-muted-foreground backdrop-blur">
-              <MessageCircle className="h-3.5 w-3.5" />
-              {Object.values(chapterCounts).reduce((a, b) => a + b, 0) + comicCount}
-            </span>
+            <div className="ml-auto flex items-center gap-2">
+              {isAdmin && (
+                <button
+                  onClick={() => setQuickAddOpen(true)}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95"
+                >
+                  <Plus className="h-3.5 w-3.5" /> Thêm chương
+                </button>
+              )}
+              <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-background/60 px-2.5 py-1 text-xs text-muted-foreground backdrop-blur">
+                <MessageCircle className="h-3.5 w-3.5" />
+                {Object.values(chapterCounts).reduce((a, b) => a + b, 0) + comicCount}
+              </span>
+            </div>
           </div>
           {comic.chapters.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">
@@ -253,6 +267,98 @@ function ComicPage() {
 
         <CommentSection comicId={comic.id} />
       </main>
+      {isAdmin && quickAddOpen && (
+        <QuickAddChapter
+          comicId={comic.id}
+          defaultOrder={comic.chapters.length}
+          defaultTitle={`Chương ${comic.chapters.length + 1}`}
+          onClose={() => setQuickAddOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function QuickAddChapter({
+  comicId,
+  defaultOrder,
+  defaultTitle,
+  onClose,
+}: {
+  comicId: string;
+  defaultOrder: number;
+  defaultTitle: string;
+  onClose: () => void;
+}) {
+  const [title, setTitle] = useState(defaultTitle);
+  const [pagesText, setPagesText] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  async function submit() {
+    const pages = parseDriveIds(pagesText);
+    if (!title.trim()) return toast.error("Nhập tiêu đề chương");
+    setSaving(true);
+    const { error } = await supabase.from("chapters").insert({
+      comic_id: comicId,
+      title: title.trim(),
+      pages,
+      order_index: defaultOrder,
+    });
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Đã thêm chương");
+    await loadComics();
+    onClose();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur">
+      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+        <header className="flex items-center justify-between border-b border-border px-5 py-3">
+          <h3 className="font-semibold">Thêm chương nhanh</h3>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground" aria-label="Đóng">
+            <X className="h-4 w-4" />
+          </button>
+        </header>
+        <div className="space-y-4 p-5">
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Tiêu đề</span>
+            <input
+              autoFocus
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
+              Trang (mỗi dòng 1 File ID hoặc link Drive)
+            </span>
+            <textarea
+              value={pagesText}
+              onChange={(e) => setPagesText(e.target.value)}
+              rows={8}
+              placeholder="1AbC...&#10;https://drive.google.com/file/d/..."
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              {parseDriveIds(pagesText).length} trang
+            </p>
+          </label>
+        </div>
+        <footer className="flex justify-end gap-2 border-t border-border bg-background/40 px-5 py-3">
+          <button onClick={onClose} className="rounded-md border border-border px-4 py-2 text-sm hover:bg-secondary">
+            Huỷ
+          </button>
+          <button
+            onClick={submit}
+            disabled={saving || !title.trim()}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-40"
+          >
+            <Plus className="h-4 w-4" /> {saving ? "Đang lưu…" : "Lưu chương"}
+          </button>
+        </footer>
+      </div>
     </div>
   );
 }
