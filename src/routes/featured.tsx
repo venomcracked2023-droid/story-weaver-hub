@@ -30,7 +30,15 @@ export const Route = createFileRoute("/featured")({
 
 function FeaturedPage() {
   const comics = useComics();
-  const featured = comics.filter((c) => c.featured);
+  // Tự động: các truyện vừa được cập nhật chương mới nhất.
+  const featured = [...comics]
+    .filter((c) => c.chapters.length > 0)
+    .map((c) => ({
+      comic: c,
+      lastChapterAt: Math.max(...c.chapters.map((ch) => ch.createdAt)),
+    }))
+    .sort((a, b) => b.lastChapterAt - a.lastChapterAt)
+    .map((x) => x.comic);
   const [query, setQuery] = useState("");
   const filtered = useMemo(() => {
     const q = query.trim();
