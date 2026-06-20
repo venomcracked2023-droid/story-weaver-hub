@@ -89,6 +89,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:height", content: "630" },
       { name: "twitter:image", content: "https://lcucumber.com/og-default.jpg" },
       { name: "google-site-verification", content: "nuznkezATkzuBsrNT1mC972T86bQZnZgH4LhasUO4qc" },
+      { name: "google-site-verification", content: "FNyknghInTmMnKo0aS-FSjZDDGaAf1F_CbHeyzpLe6A" },
       { title: "Lcucumber — Đọc Webtoon cuộn dọc miễn phí" },
       { property: "og:title", content: "Lcucumber — Đọc Webtoon cuộn dọc miễn phí" },
       { name: "twitter:title", content: "Lcucumber — Đọc Webtoon cuộn dọc miễn phí" },
