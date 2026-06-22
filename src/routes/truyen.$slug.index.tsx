@@ -95,7 +95,6 @@ function ComicPage() {
   const comic = comics.find((c) => c.slug === slug);
   const [chapterCounts, setChapterCounts] = useState<Record<string, number>>({});
   const [comicCount, setComicCount] = useState(0);
-  const { isAdmin } = useAuth();
   const { isContributor } = useAuth();
   const [quickAddOpen, setQuickAddOpen] = useState(false);
 
