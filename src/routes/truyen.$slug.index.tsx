@@ -95,7 +95,7 @@ function ComicPage() {
   const comic = comics.find((c) => c.slug === slug);
   const [chapterCounts, setChapterCounts] = useState<Record<string, number>>({});
   const [comicCount, setComicCount] = useState(0);
-  const { isAdmin } = useAuth();
+  const { isContributor } = useAuth();
   const [quickAddOpen, setQuickAddOpen] = useState(false);
 
   useEffect(() => {
@@ -211,7 +211,7 @@ function ComicPage() {
               </span>
             </div>
             <div className="ml-auto flex items-center gap-2">
-              {isAdmin && (
+              {isContributor && (
                 <button
                   onClick={() => setQuickAddOpen(true)}
                   className="inline-flex items-center gap-1.5 rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95"
@@ -267,7 +267,7 @@ function ComicPage() {
 
         <CommentSection comicId={comic.id} />
       </main>
-      {isAdmin && quickAddOpen && (
+      {isContributor && quickAddOpen && (
         <QuickAddChapter
           comicId={comic.id}
           defaultOrder={comic.chapters.length}
