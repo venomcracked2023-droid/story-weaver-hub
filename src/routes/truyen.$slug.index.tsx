@@ -17,29 +17,59 @@ export const Route = createFileRoute("/truyen/$slug/")({
   loader: async ({ params }) => {
     const { data } = await supabase
       .from("comics")
-      .select("id,title,author,description,cover_id,genres,slug")
+      .select("id,title,author,description,cover_id,genres,slug,created_at,updated_at")
       .eq("slug", params.slug)
       .maybeSingle();
-    return { meta: data };
+    let chapters: { slug: string; title: string; created_at: string | null }[] = [];
+    if (data?.id) {
+      const { data: chs } = await supabase
+        .from("chapters")
+        .select("slug,title,created_at,order_index")
+        .eq("comic_id", data.id)
+        .order("order_index", { ascending: true });
+      chapters = (chs ?? []).map((c) => ({
+        slug: c.slug,
+        title: c.title,
+        created_at: c.created_at,
+      }));
+    }
+    return { meta: data, chapters };
   },
   head: ({ loaderData, params }) => {
     const m = loaderData?.meta;
     if (!m) return { meta: [{ title: "Truyện — Lcucumber" }] };
+    const chapters = loaderData?.chapters ?? [];
+    const chapterCount = chapters.length;
+    const genresText = Array.isArray(m.genres) && m.genres.length ? ` (${m.genres.join(", ")})` : "";
     const title = `${m.title}${m.author ? ` — ${m.author}` : ""} | Lcucumber`;
-    const desc = (m.description || `Đọc ${m.title} online cuộn dọc miễn phí trên Lcucumber.`).slice(0, 160);
+    const baseDesc = m.description
+      ? m.description
+      : `Đọc webtoon ${m.title}${genresText} cuộn dọc miễn phí trên Lcucumber. ${chapterCount} chương${m.author ? `, tác giả ${m.author}` : ""}, cập nhật liên tục.`;
+    const desc = baseDesc.slice(0, 160);
     const img = m.cover_id
       ? driveImageUrl(m.cover_id, 1200)
       : `${SITE_URL}/og-default.jpg`;
     const url = `${SITE_URL}/truyen/${params.slug}`;
+    const firstChapter = chapters[0];
+    const lastChapter = chapters[chapters.length - 1];
+    const startDate = (m as { created_at?: string | null }).created_at ?? undefined;
+    const dateModified =
+      lastChapter?.created_at ??
+      (m as { updated_at?: string | null }).updated_at ??
+      undefined;
     return {
       meta: [
         { title },
         { name: "description", content: desc },
+        { name: "keywords", content: [m.title, m.author, ...(m.genres ?? []), "webtoon", "manhwa", "đọc truyện online"].filter(Boolean).join(", ") },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "book" },
         { property: "og:url", content: url },
         { property: "og:image", content: img },
+        { property: "og:image:alt", content: `Bìa truyện ${m.title}` },
+        ...(m.author ? [{ property: "book:author", content: m.author }] : []),
+        ...((m.genres ?? []).map((g: string) => ({ property: "book:tag", content: g }))),
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
         { name: "twitter:image", content: img },
@@ -50,14 +80,45 @@ export const Route = createFileRoute("/truyen/$slug/")({
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Book",
+            "@type": ["ComicSeries", "Book"],
+            "@id": url,
             name: m.title,
+            alternateName: m.title,
+            headline: m.title,
             author: m.author ? { "@type": "Person", name: m.author } : undefined,
+            creator: m.author ? { "@type": "Person", name: m.author } : undefined,
             description: desc,
             image: img,
+            thumbnailUrl: img,
             genre: m.genres,
+            keywords: (m.genres ?? []).join(", "),
             url,
+            mainEntityOfPage: url,
             inLanguage: "vi-VN",
+            numberOfEpisodes: chapterCount,
+            issn: undefined,
+            datePublished: startDate,
+            dateModified,
+            publisher: {
+              "@type": "Organization",
+              name: "Lcucumber",
+              url: SITE_URL,
+              logo: `${SITE_URL}/og-default.jpg`,
+            },
+            startEpisode: firstChapter
+              ? { "@type": "ComicIssue", name: firstChapter.title, url: `${url}/${firstChapter.slug}` }
+              : undefined,
+            endEpisode: lastChapter
+              ? { "@type": "ComicIssue", name: lastChapter.title, url: `${url}/${lastChapter.slug}` }
+              : undefined,
+            hasPart: chapters.slice(0, 50).map((ch, i) => ({
+              "@type": "ComicIssue",
+              position: i + 1,
+              name: ch.title,
+              url: `${url}/${ch.slug}`,
+              datePublished: ch.created_at ?? undefined,
+              isPartOf: { "@type": "ComicSeries", "@id": url, name: m.title },
+            })),
           }),
         },
         {
