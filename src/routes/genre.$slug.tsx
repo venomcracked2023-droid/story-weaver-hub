@@ -25,6 +25,19 @@ export const Route = createFileRoute("/genre/$slug")({
         { name: "twitter:description", content: desc },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Trang chủ", item: `${SITE_URL}/` },
+              { "@type": "ListItem", position: 2, name: `Thể loại ${slug}`, item: url },
+            ],
+          }),
+        },
+      ],
     };
   },
   notFoundComponent: () => (
