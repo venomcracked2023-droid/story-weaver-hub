@@ -318,7 +318,7 @@ function Reader() {
             <div className="mx-auto max-w-3xl">
               <img
                 src={driveImageUrl(id, 1200)}
-                alt={`Trang ${i + 1}`}
+                alt={`${comic.title} — ${chapter.title} — trang ${i + 1}`}
                 loading="lazy"
                 decoding="async"
                 className="block w-full min-h-[60vh] bg-secondary/40 object-contain"
