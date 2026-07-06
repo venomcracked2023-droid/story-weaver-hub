@@ -287,7 +287,7 @@ function Index() {
             <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 p-12 text-center text-muted-foreground">
               <BookOpen className="h-10 w-10 text-primary/60" />
               <p>Chưa có truyện nào trong thư viện.</p>
-              <Link to="/admin" className="text-primary underline-offset-4 hover:underline">Vào Quản lý để thêm</Link>
+              <Link to="/admin" rel="nofollow" className="text-primary underline-offset-4 hover:underline">Vào Quản lý để thêm</Link>
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border bg-card/40 p-12 text-center text-muted-foreground">
