@@ -19,18 +19,34 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
       .eq("slug", params.slug)
       .maybeSingle();
     if (!comic) {
-      return { comicTitle: null, coverId: null, chapterTitle: null };
+      return { comicTitle: null, coverId: null, chapterTitle: null, prevSlug: null, nextSlug: null, chapterCreatedAt: null };
     }
     const { data: chapter } = await supabase
       .from("chapters")
-      .select("title,slug")
+      .select("title,slug,created_at,order_index")
       .eq("comic_id", comic.id)
       .eq("slug", params.chapter)
       .maybeSingle();
+    let prevSlug: string | null = null;
+    let nextSlug: string | null = null;
+    if (chapter) {
+      const { data: siblings } = await supabase
+        .from("chapters")
+        .select("slug,order_index")
+        .eq("comic_id", comic.id)
+        .order("order_index", { ascending: true });
+      const list = siblings ?? [];
+      const idx = list.findIndex((c) => c.slug === chapter.slug);
+      if (idx > 0) prevSlug = list[idx - 1].slug;
+      if (idx >= 0 && idx < list.length - 1) nextSlug = list[idx + 1].slug;
+    }
     return {
       comicTitle: comic.title ?? null,
       coverId: comic.cover_id ?? null,
       chapterTitle: chapter?.title ?? null,
+      chapterCreatedAt: chapter?.created_at ?? null,
+      prevSlug,
+      nextSlug,
     };
   },
   head: ({ loaderData, params }) => {
@@ -41,7 +57,10 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
     const title = `${ch} — ${ct} | Lcucumber`;
     const desc = `Đọc ${ch} của ${ct} online cuộn dọc miễn phí trên Lcucumber.`;
     const url = `${SITE_URL}/truyen/${params.slug}/${params.chapter}`;
+    const comicUrl = `${SITE_URL}/truyen/${params.slug}`;
     const img = coverId ? driveImageUrl(coverId, 1200) : `${SITE_URL}/og-default.jpg`;
+    const prevUrl = loaderData?.prevSlug ? `${comicUrl}/${loaderData.prevSlug}` : null;
+    const nextUrl = loaderData?.nextSlug ? `${comicUrl}/${loaderData.nextSlug}` : null;
     return {
       meta: [
         { title },
@@ -51,12 +70,17 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
         { property: "og:type", content: "article" },
         { property: "og:url", content: url },
         { property: "og:image", content: img },
+        { property: "og:image:alt", content: `Bìa truyện ${ct}` },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
         { name: "twitter:image", content: img },
         { property: "article:section", content: ct },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [
+        { rel: "canonical", href: url },
+        ...(prevUrl ? [{ rel: "prev", href: prevUrl }] : []),
+        ...(nextUrl ? [{ rel: "next", href: nextUrl }] : []),
+      ],
       scripts: [
         {
           type: "application/ld+json",
@@ -65,9 +89,33 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
             "@type": "BreadcrumbList",
             itemListElement: [
               { "@type": "ListItem", position: 1, name: "Trang chủ", item: `${SITE_URL}/` },
-              { "@type": "ListItem", position: 2, name: ct, item: `${SITE_URL}/truyen/${params.slug}` },
+              { "@type": "ListItem", position: 2, name: ct, item: comicUrl },
               { "@type": "ListItem", position: 3, name: ch, item: url },
             ],
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ComicIssue",
+            "@id": url,
+            name: ch,
+            headline: `${ch} — ${ct}`,
+            url,
+            mainEntityOfPage: url,
+            image: img,
+            inLanguage: "vi-VN",
+            datePublished: loaderData?.chapterCreatedAt ?? undefined,
+            isPartOf: { "@type": "ComicSeries", "@id": comicUrl, name: ct, url: comicUrl },
+            previousItem: prevUrl ? { "@type": "ComicIssue", url: prevUrl } : undefined,
+            nextItem: nextUrl ? { "@type": "ComicIssue", url: nextUrl } : undefined,
+            publisher: {
+              "@type": "Organization",
+              name: "Lcucumber",
+              url: SITE_URL,
+              logo: `${SITE_URL}/og-default.jpg`,
+            },
           }),
         },
       ],
