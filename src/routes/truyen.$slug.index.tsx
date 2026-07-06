@@ -288,7 +288,7 @@ function ComicPage() {
           </div>
           {comic.chapters.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">
-              Chưa có chương nào. Vào <Link to="/admin" className="text-primary underline">Quản lý</Link> để thêm.
+              Chưa có chương nào. Vào <Link to="/admin" rel="nofollow" className="text-primary underline">Quản lý</Link> để thêm.
             </div>
           ) : (
             <ul className="divide-y divide-border/60 overflow-hidden rounded-2xl border border-border bg-background/40 backdrop-blur">

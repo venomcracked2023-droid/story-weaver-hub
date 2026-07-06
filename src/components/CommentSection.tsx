@@ -149,7 +149,7 @@ export function CommentSection({
         </form>
       ) : (
         <div className="rounded-2xl border border-dashed border-border bg-card/30 p-4 text-sm text-muted-foreground">
-          <Link to="/login" className="text-primary underline-offset-4 hover:underline">
+          <Link to="/login" rel="nofollow" className="text-primary underline-offset-4 hover:underline">
             Đăng nhập
           </Link>{" "}
           để tham gia bình luận.
