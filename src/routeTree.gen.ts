@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TheLoaiRouteImport } from './routes/the-loai'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as LoginRouteImport } from './routes/login'
@@ -23,6 +24,11 @@ import { Route as ApiDriveFileRouteImport } from './routes/api/drive-file'
 import { Route as TruyenSlugIndexRouteImport } from './routes/truyen.$slug.index'
 import { Route as TruyenSlugChapterRouteImport } from './routes/truyen.$slug.$chapter'
 
+const TheLoaiRoute = TheLoaiRouteImport.update({
+  id: '/the-loai',
+  path: '/the-loai',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/the-loai': typeof TheLoaiRoute
   '/api/drive-file': typeof ApiDriveFileRoute
   '/genre/$slug': typeof GenreSlugRoute
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/the-loai': typeof TheLoaiRoute
   '/api/drive-file': typeof ApiDriveFileRoute
   '/genre/$slug': typeof GenreSlugRoute
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/the-loai': typeof TheLoaiRoute
   '/api/drive-file': typeof ApiDriveFileRoute
   '/genre/$slug': typeof GenreSlugRoute
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/the-loai'
     | '/api/drive-file'
     | '/genre/$slug'
     | '/truyen/$slug/$chapter'
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/the-loai'
     | '/api/drive-file'
     | '/genre/$slug'
     | '/truyen/$slug/$chapter'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/the-loai'
     | '/api/drive-file'
     | '/genre/$slug'
     | '/truyen/$slug/$chapter'
@@ -193,6 +205,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TheLoaiRoute: typeof TheLoaiRoute
   ApiDriveFileRoute: typeof ApiDriveFileRoute
   GenreSlugRoute: typeof GenreSlugRoute
   TruyenSlugChapterRoute: typeof TruyenSlugChapterRoute
@@ -201,6 +214,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/the-loai': {
+      id: '/the-loai'
+      path: '/the-loai'
+      fullPath: '/the-loai'
+      preLoaderRoute: typeof TheLoaiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -305,6 +325,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TheLoaiRoute: TheLoaiRoute,
   ApiDriveFileRoute: ApiDriveFileRoute,
   GenreSlugRoute: GenreSlugRoute,
   TruyenSlugChapterRoute: TruyenSlugChapterRoute,
@@ -313,13 +334,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
