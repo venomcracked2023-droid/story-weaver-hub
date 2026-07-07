@@ -14,6 +14,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LatestRouteImport } from './routes/latest'
+import { Route as GioiThieuRouteImport } from './routes/gioi-thieu'
 import { Route as FeaturedRouteImport } from './routes/featured'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminApplicationsRouteImport } from './routes/admin-applications'
@@ -47,6 +48,11 @@ const LoginRoute = LoginRouteImport.update({
 const LatestRoute = LatestRouteImport.update({
   id: '/latest',
   path: '/latest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GioiThieuRoute = GioiThieuRouteImport.update({
+  id: '/gioi-thieu',
+  path: '/gioi-thieu',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeaturedRoute = FeaturedRouteImport.update({
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/featured': typeof FeaturedRoute
+  '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/featured': typeof FeaturedRoute
+  '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/featured': typeof FeaturedRoute
+  '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/featured'
+    | '/gioi-thieu'
     | '/latest'
     | '/login'
     | '/robots.txt'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/featured'
+    | '/gioi-thieu'
     | '/latest'
     | '/login'
     | '/robots.txt'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/featured'
+    | '/gioi-thieu'
     | '/latest'
     | '/login'
     | '/robots.txt'
@@ -201,6 +213,7 @@ export interface RootRouteChildren {
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   ApplyRoute: typeof ApplyRoute
   FeaturedRoute: typeof FeaturedRoute
+  GioiThieuRoute: typeof GioiThieuRoute
   LatestRoute: typeof LatestRoute
   LoginRoute: typeof LoginRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
@@ -247,6 +260,13 @@ declare module '@tanstack/react-router' {
       path: '/latest'
       fullPath: '/latest'
       preLoaderRoute: typeof LatestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gioi-thieu': {
+      id: '/gioi-thieu'
+      path: '/gioi-thieu'
+      fullPath: '/gioi-thieu'
+      preLoaderRoute: typeof GioiThieuRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/featured': {
@@ -321,6 +341,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminApplicationsRoute: AdminApplicationsRoute,
   ApplyRoute: ApplyRoute,
   FeaturedRoute: FeaturedRoute,
+  GioiThieuRoute: GioiThieuRoute,
   LatestRoute: LatestRoute,
   LoginRoute: LoginRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
