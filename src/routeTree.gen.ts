@@ -13,6 +13,7 @@ import { Route as TheLoaiRouteImport } from './routes/the-loai'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LienHeRouteImport } from './routes/lien-he'
 import { Route as LatestRouteImport } from './routes/latest'
 import { Route as GioiThieuRouteImport } from './routes/gioi-thieu'
 import { Route as FeaturedRouteImport } from './routes/featured'
@@ -43,6 +44,11 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LienHeRoute = LienHeRouteImport.update({
+  id: '/lien-he',
+  path: '/lien-he',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LatestRoute = LatestRouteImport.update({
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/featured': typeof FeaturedRoute
   '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
+  '/lien-he': typeof LienHeRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/featured': typeof FeaturedRoute
   '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
+  '/lien-he': typeof LienHeRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/featured': typeof FeaturedRoute
   '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
+  '/lien-he': typeof LienHeRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/featured'
     | '/gioi-thieu'
     | '/latest'
+    | '/lien-he'
     | '/login'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/featured'
     | '/gioi-thieu'
     | '/latest'
+    | '/lien-he'
     | '/login'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/featured'
     | '/gioi-thieu'
     | '/latest'
+    | '/lien-he'
     | '/login'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -215,6 +227,7 @@ export interface RootRouteChildren {
   FeaturedRoute: typeof FeaturedRoute
   GioiThieuRoute: typeof GioiThieuRoute
   LatestRoute: typeof LatestRoute
+  LienHeRoute: typeof LienHeRoute
   LoginRoute: typeof LoginRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -253,6 +266,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lien-he': {
+      id: '/lien-he'
+      path: '/lien-he'
+      fullPath: '/lien-he'
+      preLoaderRoute: typeof LienHeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/latest': {
@@ -343,6 +363,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturedRoute: FeaturedRoute,
   GioiThieuRoute: GioiThieuRoute,
   LatestRoute: LatestRoute,
+  LienHeRoute: LienHeRoute,
   LoginRoute: LoginRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
