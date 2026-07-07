@@ -54,6 +54,10 @@ export const Route = createFileRoute("/sitemap.xml")({
           `<url><loc>${origin}/</loc><lastmod>${siteLastmod}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,
           `<url><loc>${origin}/featured</loc><lastmod>${siteLastmod}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,
           `<url><loc>${origin}/latest</loc><lastmod>${siteLastmod}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,
+          `<url><loc>${origin}/the-loai</loc><lastmod>${siteLastmod}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`,
+          `<url><loc>${origin}/gioi-thieu</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
+          `<url><loc>${origin}/lien-he</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
+          `<url><loc>${origin}/dieu-khoan</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>`,
         ];
         // Trang duyệt theo thể loại — gom slug duy nhất từ tất cả truyện.
         const genreLastmod = new Map<string, string>();
