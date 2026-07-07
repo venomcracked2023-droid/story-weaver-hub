@@ -17,6 +17,7 @@ import { Route as LienHeRouteImport } from './routes/lien-he'
 import { Route as LatestRouteImport } from './routes/latest'
 import { Route as GioiThieuRouteImport } from './routes/gioi-thieu'
 import { Route as FeaturedRouteImport } from './routes/featured'
+import { Route as DieuKhoanRouteImport } from './routes/dieu-khoan'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminApplicationsRouteImport } from './routes/admin-applications'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -66,6 +67,11 @@ const FeaturedRoute = FeaturedRouteImport.update({
   path: '/featured',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DieuKhoanRoute = DieuKhoanRouteImport.update({
+  id: '/dieu-khoan',
+  path: '/dieu-khoan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApplyRoute = ApplyRouteImport.update({
   id: '/apply',
   path: '/apply',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
+  '/dieu-khoan': typeof DieuKhoanRoute
   '/featured': typeof FeaturedRoute
   '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
+  '/dieu-khoan': typeof DieuKhoanRoute
   '/featured': typeof FeaturedRoute
   '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
+  '/dieu-khoan': typeof DieuKhoanRoute
   '/featured': typeof FeaturedRoute
   '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-applications'
     | '/apply'
+    | '/dieu-khoan'
     | '/featured'
     | '/gioi-thieu'
     | '/latest'
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-applications'
     | '/apply'
+    | '/dieu-khoan'
     | '/featured'
     | '/gioi-thieu'
     | '/latest'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-applications'
     | '/apply'
+    | '/dieu-khoan'
     | '/featured'
     | '/gioi-thieu'
     | '/latest'
@@ -224,6 +236,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   ApplyRoute: typeof ApplyRoute
+  DieuKhoanRoute: typeof DieuKhoanRoute
   FeaturedRoute: typeof FeaturedRoute
   GioiThieuRoute: typeof GioiThieuRoute
   LatestRoute: typeof LatestRoute
@@ -296,6 +309,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeaturedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dieu-khoan': {
+      id: '/dieu-khoan'
+      path: '/dieu-khoan'
+      fullPath: '/dieu-khoan'
+      preLoaderRoute: typeof DieuKhoanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apply': {
       id: '/apply'
       path: '/apply'
@@ -360,6 +380,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AdminApplicationsRoute: AdminApplicationsRoute,
   ApplyRoute: ApplyRoute,
+  DieuKhoanRoute: DieuKhoanRoute,
   FeaturedRoute: FeaturedRoute,
   GioiThieuRoute: GioiThieuRoute,
   LatestRoute: LatestRoute,
