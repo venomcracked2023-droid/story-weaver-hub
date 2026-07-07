@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LogIn, LogOut, Search, Settings, UserPlus, ShieldCheck, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { LogIn, LogOut, Search, Settings, UserPlus, ShieldCheck, X, Info, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import cucumberLogo from "@/assets/cucumber-logo.png";
 
