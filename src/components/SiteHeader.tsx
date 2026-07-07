@@ -7,6 +7,20 @@ import cucumberLogo from "@/assets/cucumber-logo.png";
 export function SiteHeader() {
   const { user, isContributor, isAdmin, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const [infoOpen, setInfoOpen] = useState(false);
+  const infoRef = useRef<HTMLDivElement>(null);
+
+  // Đóng dropdown khi click ra ngoài.
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (infoRef.current && !infoRef.current.contains(e.target as Node)) {
+        setInfoOpen(false);
+      }
+    }
+    if (infoOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [infoOpen]);
+
   // Đồng bộ ô tìm kiếm với ?q= trên URL.
   const search = useRouterState({ select: (s) => s.location.search as { q?: string } });
   const [q, setQ] = useState(search?.q ?? "");
