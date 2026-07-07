@@ -13,8 +13,11 @@ import { Route as TheLoaiRouteImport } from './routes/the-loai'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LienHeRouteImport } from './routes/lien-he'
 import { Route as LatestRouteImport } from './routes/latest'
+import { Route as GioiThieuRouteImport } from './routes/gioi-thieu'
 import { Route as FeaturedRouteImport } from './routes/featured'
+import { Route as DieuKhoanRouteImport } from './routes/dieu-khoan'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminApplicationsRouteImport } from './routes/admin-applications'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -44,14 +47,29 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LienHeRoute = LienHeRouteImport.update({
+  id: '/lien-he',
+  path: '/lien-he',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LatestRoute = LatestRouteImport.update({
   id: '/latest',
   path: '/latest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GioiThieuRoute = GioiThieuRouteImport.update({
+  id: '/gioi-thieu',
+  path: '/gioi-thieu',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FeaturedRoute = FeaturedRouteImport.update({
   id: '/featured',
   path: '/featured',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DieuKhoanRoute = DieuKhoanRouteImport.update({
+  id: '/dieu-khoan',
+  path: '/dieu-khoan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApplyRoute = ApplyRouteImport.update({
@@ -100,8 +118,11 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
+  '/dieu-khoan': typeof DieuKhoanRoute
   '/featured': typeof FeaturedRoute
+  '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
+  '/lien-he': typeof LienHeRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -116,8 +137,11 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
+  '/dieu-khoan': typeof DieuKhoanRoute
   '/featured': typeof FeaturedRoute
+  '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
+  '/lien-he': typeof LienHeRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -133,8 +157,11 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
+  '/dieu-khoan': typeof DieuKhoanRoute
   '/featured': typeof FeaturedRoute
+  '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
+  '/lien-he': typeof LienHeRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -151,8 +178,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-applications'
     | '/apply'
+    | '/dieu-khoan'
     | '/featured'
+    | '/gioi-thieu'
     | '/latest'
+    | '/lien-he'
     | '/login'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -167,8 +197,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-applications'
     | '/apply'
+    | '/dieu-khoan'
     | '/featured'
+    | '/gioi-thieu'
     | '/latest'
+    | '/lien-he'
     | '/login'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -183,8 +216,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-applications'
     | '/apply'
+    | '/dieu-khoan'
     | '/featured'
+    | '/gioi-thieu'
     | '/latest'
+    | '/lien-he'
     | '/login'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -200,8 +236,11 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   ApplyRoute: typeof ApplyRoute
+  DieuKhoanRoute: typeof DieuKhoanRoute
   FeaturedRoute: typeof FeaturedRoute
+  GioiThieuRoute: typeof GioiThieuRoute
   LatestRoute: typeof LatestRoute
+  LienHeRoute: typeof LienHeRoute
   LoginRoute: typeof LoginRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -242,6 +281,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lien-he': {
+      id: '/lien-he'
+      path: '/lien-he'
+      fullPath: '/lien-he'
+      preLoaderRoute: typeof LienHeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/latest': {
       id: '/latest'
       path: '/latest'
@@ -249,11 +295,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LatestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gioi-thieu': {
+      id: '/gioi-thieu'
+      path: '/gioi-thieu'
+      fullPath: '/gioi-thieu'
+      preLoaderRoute: typeof GioiThieuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/featured': {
       id: '/featured'
       path: '/featured'
       fullPath: '/featured'
       preLoaderRoute: typeof FeaturedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dieu-khoan': {
+      id: '/dieu-khoan'
+      path: '/dieu-khoan'
+      fullPath: '/dieu-khoan'
+      preLoaderRoute: typeof DieuKhoanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apply': {
@@ -320,8 +380,11 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AdminApplicationsRoute: AdminApplicationsRoute,
   ApplyRoute: ApplyRoute,
+  DieuKhoanRoute: DieuKhoanRoute,
   FeaturedRoute: FeaturedRoute,
+  GioiThieuRoute: GioiThieuRoute,
   LatestRoute: LatestRoute,
+  LienHeRoute: LienHeRoute,
   LoginRoute: LoginRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

@@ -3,6 +3,7 @@ import { Facebook, Github, Heart, Mail, Star } from "lucide-react";
 import cucumberLogo from "@/assets/cucumber-logo.png";
 import { SITE_LOGO, SITE_NAME, SITE_URL, SOCIAL_LINKS } from "@/lib/seo";
 import { useComics } from "@/lib/comics-store";
+import { slugifyGenre } from "@/lib/slug";
 
 type FooterLink = {
   label: string;
@@ -23,6 +24,7 @@ const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }
       { label: "Trang chủ", to: "/", desc: "Lcucumber — Webtoon cuộn dọc" },
       { label: "Truyện nổi bật", to: "/featured", desc: "Danh sách truyện được tuyển chọn" },
       { label: "Mới cập nhật", href: "/#latest", desc: "Truyện và chương mới cập nhật gần đây" },
+      { label: "Thể loại", to: "/the-loai", desc: "Duyệt truyện theo thể loại" },
     ],
   },
   {
@@ -37,7 +39,9 @@ const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }
     title: "Hỗ trợ",
     ariaLabel: "Liên kết hỗ trợ và pháp lý",
     links: [
-      { label: "Liên hệ", href: "mailto:hello@lcucumber.com", desc: "Gửi email cho đội Lcucumber" },
+      { label: "Giới thiệu", to: "/gioi-thieu", desc: "Về nền tảng Lcucumber" },
+      { label: "Liên hệ", to: "/lien-he", desc: "Liên hệ đội ngũ Lcucumber" },
+      { label: "Điều khoản", to: "/dieu-khoan", desc: "Điều khoản sử dụng dịch vụ" },
       { label: "Báo lỗi", href: "mailto:hello@lcucumber.com?subject=Báo lỗi", desc: "Báo lỗi nội dung hoặc kỹ thuật" },
     ],
   },
@@ -68,7 +72,8 @@ export function SiteFooter() {
     .slice(0, 8)
     .map((g) => ({
       label: g,
-      to: "/featured",
+      to: "/genre/$slug",
+      params: { slug: slugifyGenre(g) },
       desc: `Truyện thể loại ${g} trên ${SITE_NAME}`,
     }));
 
@@ -145,7 +150,9 @@ export function SiteFooter() {
   for (const l of tocLinks) {
     pushNav(`/truyen/${l.params?.slug ?? ""}`, l.label, l.desc);
   }
-  for (const l of genreLinks) pushNav("/featured", l.label, l.desc);
+  for (const l of genreLinks) {
+    pushNav(`/genre/${l.params?.slug ?? ""}`, l.label, l.desc);
+  }
 
   const jsonLd = {
     "@context": "https://schema.org",
