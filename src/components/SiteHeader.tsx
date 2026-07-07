@@ -1,12 +1,26 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LogIn, LogOut, Search, Settings, UserPlus, ShieldCheck, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { LogIn, LogOut, Search, Settings, UserPlus, ShieldCheck, X, Info, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import cucumberLogo from "@/assets/cucumber-logo.png";
 
 export function SiteHeader() {
   const { user, isContributor, isAdmin, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const [infoOpen, setInfoOpen] = useState(false);
+  const infoRef = useRef<HTMLDivElement>(null);
+
+  // Đóng dropdown khi click ra ngoài.
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (infoRef.current && !infoRef.current.contains(e.target as Node)) {
+        setInfoOpen(false);
+      }
+    }
+    if (infoOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [infoOpen]);
+
   // Đồng bộ ô tìm kiếm với ?q= trên URL.
   const search = useRouterState({ select: (s) => s.location.search as { q?: string } });
   const [q, setQ] = useState(search?.q ?? "");
@@ -81,6 +95,61 @@ export function SiteHeader() {
           >
             Khám phá
           </Link>
+
+          <div ref={infoRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setInfoOpen((v) => !v)}
+              aria-expanded={infoOpen}
+              aria-haspopup="menu"
+              aria-label="Thông tin và trang pháp lý"
+              className={`${navClass} gap-1`}
+            >
+              <Info className="h-4 w-4" aria-hidden />
+              <span className="hidden sm:inline">Thông tin</span>
+              <ChevronDown
+                className={`h-3.5 w-3.5 transition-transform ${infoOpen ? "rotate-180" : ""}`}
+                aria-hidden
+              />
+            </button>
+            {infoOpen && (
+              <ul
+                role="menu"
+                className="absolute right-0 top-full z-50 mt-2 w-52 rounded-xl border border-border bg-background/95 p-1.5 shadow-lg backdrop-blur"
+              >
+                <li role="none">
+                  <Link
+                    to="/gioi-thieu"
+                    role="menuitem"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                    onClick={() => setInfoOpen(false)}
+                  >
+                    Giới thiệu
+                  </Link>
+                </li>
+                <li role="none">
+                  <Link
+                    to="/lien-he"
+                    role="menuitem"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                    onClick={() => setInfoOpen(false)}
+                  >
+                    Liên hệ
+                  </Link>
+                </li>
+                <li role="none">
+                  <Link
+                    to="/dieu-khoan"
+                    role="menuitem"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                    onClick={() => setInfoOpen(false)}
+                  >
+                    Điều khoản
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </div>
 
           {isContributor && (
             <Link to="/admin" rel="nofollow" className={navClass} activeProps={{ className: activeClass }}>

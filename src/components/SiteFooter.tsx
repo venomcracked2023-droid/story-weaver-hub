@@ -294,6 +294,37 @@ export function SiteFooter() {
               <span itemProp="name">{SITE_NAME}</span>. Mọi quyền được bảo lưu.
             </small>
           </p>
+          <nav aria-label="Liên kết pháp lý nhanh">
+            <ul className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <li>
+                <Link
+                  to="/gioi-thieu"
+                  className="transition hover:text-primary"
+                  title="Về nền tảng Lcucumber"
+                >
+                  Giới thiệu
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/lien-he"
+                  className="transition hover:text-primary"
+                  title="Liên hệ đội ngũ Lcucumber"
+                >
+                  Liên hệ
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/dieu-khoan"
+                  className="transition hover:text-primary"
+                  title="Điều khoản sử dụng dịch vụ"
+                >
+                  Điều khoản
+                </Link>
+              </li>
+            </ul>
+          </nav>
           <p className="inline-flex items-center gap-1.5">
             Made with{" "}
             <Heart
