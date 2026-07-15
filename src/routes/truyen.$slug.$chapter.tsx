@@ -145,10 +145,11 @@ function Reader() {
   const { slug, chapter: chapterSlug } = Route.useParams();
   const loaderData = Route.useLoaderData();
   const navigate = useNavigate();
+  type ChapterNav = { id: string; slug: string; title: string };
   const comic = loaderData?.comic ?? null;
   const chapter = loaderData?.chapter ?? null;
-  const chapters = loaderData?.chapters ?? [];
-  const idx = chapters.findIndex((c) => c.slug === chapterSlug);
+  const chapters: ChapterNav[] = loaderData?.chapters ?? [];
+  const idx = chapters.findIndex((c: ChapterNav) => c.slug === chapterSlug);
 
   const [hideUI, setHideUI] = useState(false);
   const [pdfFailed, setPdfFailed] = useState(false);
@@ -245,7 +246,7 @@ function Reader() {
             className="w-full appearance-none truncate rounded-full border border-border bg-background py-2 pl-9 pr-8 text-sm font-medium outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
             aria-label="Chuyển chương nhanh"
           >
-            {comic.chapters.map((ch, i) => (
+            {chapters.map((ch: ChapterNav, i: number) => (
               <option key={ch.id} value={ch.slug}>
                 {i + 1}. {ch.title}
               </option>
@@ -336,7 +337,7 @@ function Reader() {
         </>
       ) : (
         <main className="mx-auto max-w-3xl pt-14">
-          {chapter.pages.map((id, i) => (
+          {chapter.pages.map((id: string, i: number) => (
             <img
               key={`${id}-${i}`}
               src={driveImageUrl(id, 1200)}
