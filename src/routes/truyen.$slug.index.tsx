@@ -221,6 +221,11 @@ function ComicPage() {
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/70 via-background/85 to-background" aria-hidden />
         <main className="mx-auto max-w-5xl px-4 pb-10 pt-10 sm:pt-14">
+          <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Link to="/" className="transition hover:text-primary">Trang chủ</Link>
+            <ChevronRight className="h-3 w-3" />
+            <span className="line-clamp-1 text-foreground/80">{comic.title}</span>
+          </nav>
           <div className="grid gap-8 md:grid-cols-[240px_1fr]">
             <div className="hover-lift mx-auto aspect-[3/4] w-full max-w-[240px] overflow-hidden rounded-2xl border border-primary/30 bg-card shadow-glow">
               <ComicCover id={comic.coverId} title={comic.title} />
