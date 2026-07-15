@@ -6,6 +6,8 @@ export const Route = createFileRoute("/robots.txt")({
     handlers: {
       GET: () => {
         const origin = SITE_URL;
+        // Host directive theo chuẩn không có scheme.
+        const host = origin.replace(/^https?:\/\//, "");
         const body = [
           "# robots.txt — Lcucumber",
           "",
@@ -35,7 +37,6 @@ export const Route = createFileRoute("/robots.txt")({
           "Disallow: /apply",
           "Disallow: /login",
           "Disallow: /api/",
-          "Disallow: /*?*",
           "",
           "# Chặn các AI crawler tham lam (tiết kiệm băng thông)",
           "User-agent: GPTBot",
@@ -56,7 +57,7 @@ export const Route = createFileRoute("/robots.txt")({
           "User-agent: PerplexityBot",
           "Disallow: /",
           "",
-          `Host: ${origin}`,
+          `Host: ${host}`,
           `Sitemap: ${origin}/sitemap.xml`,
           "",
         ].join("\n");
