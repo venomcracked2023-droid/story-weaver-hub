@@ -84,10 +84,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "vi_VN" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:image", content: "https://lcucumber.com/og-default.jpg" },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { name: "twitter:image", content: "https://lcucumber.com/og-default.jpg" },
       { name: "google-site-verification", content: "nuznkezATkzuBsrNT1mC972T86bQZnZgH4LhasUO4qc" },
       { name: "google-site-verification", content: "FNyknghInTmMnKo0aS-FSjZDDGaAf1F_CbHeyzpLe6A" },
       { title: "Lcucumber — Đọc Webtoon cuộn dọc miễn phí" },
@@ -103,8 +99,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico" },
-      { rel: "alternate", hrefLang: "vi", href: "https://lcucumber.com/" },
-      { rel: "alternate", hrefLang: "x-default", href: "https://lcucumber.com/" },
+      { rel: "alternate", hrefLang: "vi", href: `${SITE_URL}/` },
+      { rel: "alternate", hrefLang: "x-default", href: `${SITE_URL}/` },
     ],
     scripts: [
       {
