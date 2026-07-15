@@ -49,10 +49,11 @@ export function CommentSection({
     const ids = Array.from(new Set(rows.map((r) => r.user_id)));
     if (ids.length) {
       const { data: pr } = await supabase
-        .from("profiles")
+        .from("public_profiles" as any)
         .select("id,display_name,avatar_url")
         .in("id", ids);
-      setProfiles(Object.fromEntries((pr ?? []).map((p) => [p.id, p as ProfileRow])));
+      const rowsPr = (pr ?? []) as unknown as ProfileRow[];
+      setProfiles(Object.fromEntries(rowsPr.map((p) => [p.id, p])));
     }
     setLoading(false);
   }
