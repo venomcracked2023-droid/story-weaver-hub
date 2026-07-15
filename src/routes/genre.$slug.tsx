@@ -11,8 +11,8 @@ export const Route = createFileRoute("/genre/$slug")({
   component: GenrePage,
   head: ({ params }) => {
     const slug = params.slug;
-    const title = `Thể loại "${slug}" — Lcucumber`;
-    const desc = `Tổng hợp các truyện thuộc thể loại ${slug} trên Lcucumber — đọc cuộn dọc miễn phí.`;
+    const title = `Truyện ${slug} — Đọc Webtoon miễn phí | Lcucumber`;
+    const desc = `Tổng hợp truyện thể loại ${slug} trên Lcucumber — đọc webtoon cuộn dọc miễn phí, cập nhật liên tục, không quảng cáo.`.slice(0, 160);
     const url = `${SITE_URL}/genre/${slug}`;
     return {
       meta: [
