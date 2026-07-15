@@ -14,26 +14,35 @@ import { ChevronDown, ChevronUp, Plus, Save, Star, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
-  head: () => ({
-    meta: [
-      { title: "Quản lý truyện — Lcucumber" },
+  head: () => {
+    const title = "Quản lý truyện — Lcucumber";
+    const desc = "Trang quản lý nội dung dành cho cộng tác viên Lcucumber: thêm truyện mới, cập nhật chương và đánh dấu tác phẩm nổi bật.";
+    const url = `${SITE_URL}/admin`;
+    return {
+      meta: [
+      { title },
       {
         name: "description",
-        content:
-          "Trang quản lý nội dung dành cho cộng tác viên Lcucumber — thêm truyện mới, cập nhật chương và đánh dấu tác phẩm nổi bật.",
+        content: desc,
       },
       { name: "robots", content: "noindex,nofollow" },
-      { property: "og:title", content: "Quản lý truyện — Lcucumber" },
+      { property: "og:title", content: title },
       {
         property: "og:description",
-        content:
-          "Khu vực quản trị nội dung dành cho cộng tác viên Lcucumber.",
+        content: desc,
       },
+      { property: "og:url", content: url },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: desc },
     ],
-  }),
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
 });
 
 function emptyComic(): Comic {
