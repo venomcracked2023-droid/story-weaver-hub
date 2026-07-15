@@ -17,6 +17,7 @@ import { Route as LienHeRouteImport } from './routes/lien-he'
 import { Route as LatestRouteImport } from './routes/latest'
 import { Route as GioiThieuRouteImport } from './routes/gioi-thieu'
 import { Route as FeaturedRouteImport } from './routes/featured'
+import { Route as DmcaRouteImport } from './routes/dmca'
 import { Route as DieuKhoanRouteImport } from './routes/dieu-khoan'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminApplicationsRouteImport } from './routes/admin-applications'
@@ -65,6 +66,11 @@ const GioiThieuRoute = GioiThieuRouteImport.update({
 const FeaturedRoute = FeaturedRouteImport.update({
   id: '/featured',
   path: '/featured',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DmcaRoute = DmcaRouteImport.update({
+  id: '/dmca',
+  path: '/dmca',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DieuKhoanRoute = DieuKhoanRouteImport.update({
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/dieu-khoan': typeof DieuKhoanRoute
+  '/dmca': typeof DmcaRoute
   '/featured': typeof FeaturedRoute
   '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/dieu-khoan': typeof DieuKhoanRoute
+  '/dmca': typeof DmcaRoute
   '/featured': typeof FeaturedRoute
   '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/dieu-khoan': typeof DieuKhoanRoute
+  '/dmca': typeof DmcaRoute
   '/featured': typeof FeaturedRoute
   '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/dieu-khoan'
+    | '/dmca'
     | '/featured'
     | '/gioi-thieu'
     | '/latest'
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/dieu-khoan'
+    | '/dmca'
     | '/featured'
     | '/gioi-thieu'
     | '/latest'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/admin-applications'
     | '/apply'
     | '/dieu-khoan'
+    | '/dmca'
     | '/featured'
     | '/gioi-thieu'
     | '/latest'
@@ -237,6 +249,7 @@ export interface RootRouteChildren {
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   ApplyRoute: typeof ApplyRoute
   DieuKhoanRoute: typeof DieuKhoanRoute
+  DmcaRoute: typeof DmcaRoute
   FeaturedRoute: typeof FeaturedRoute
   GioiThieuRoute: typeof GioiThieuRoute
   LatestRoute: typeof LatestRoute
@@ -307,6 +320,13 @@ declare module '@tanstack/react-router' {
       path: '/featured'
       fullPath: '/featured'
       preLoaderRoute: typeof FeaturedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dmca': {
+      id: '/dmca'
+      path: '/dmca'
+      fullPath: '/dmca'
+      preLoaderRoute: typeof DmcaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dieu-khoan': {
@@ -381,6 +401,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminApplicationsRoute: AdminApplicationsRoute,
   ApplyRoute: ApplyRoute,
   DieuKhoanRoute: DieuKhoanRoute,
+  DmcaRoute: DmcaRoute,
   FeaturedRoute: FeaturedRoute,
   GioiThieuRoute: GioiThieuRoute,
   LatestRoute: LatestRoute,
@@ -397,13 +418,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

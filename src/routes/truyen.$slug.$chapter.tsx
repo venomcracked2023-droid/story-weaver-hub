@@ -7,6 +7,8 @@ import { Virtuoso } from "react-virtuoso";
 import { PdfReader } from "@/components/PdfReader";
 import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
+import { AgeWarning } from "@/components/AgeWarning";
+import { isMatureComic } from "@/lib/content-rating";
 import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/truyen/$slug/$chapter")({
@@ -291,6 +293,12 @@ function Reader() {
       </header>
 
       <h1 className="sr-only">{`${chapter.title} — ${comic.title}`}</h1>
+
+      {isMatureComic(comic.genres) && (
+        <div className="mx-auto max-w-3xl px-4 pt-16">
+          <AgeWarning comicTitle={comic.title} />
+        </div>
+      )}
 
       {chapter.pages.length === 0 ? (
         <main className="mx-auto max-w-3xl pt-14">

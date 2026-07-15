@@ -42,6 +42,7 @@ const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }
       { label: "Giới thiệu", to: "/gioi-thieu", desc: "Về nền tảng Lcucumber" },
       { label: "Liên hệ", to: "/lien-he", desc: "Liên hệ đội ngũ Lcucumber" },
       { label: "Điều khoản", to: "/dieu-khoan", desc: "Điều khoản sử dụng dịch vụ" },
+      { label: "DMCA", to: "/dmca", desc: "Yêu cầu gỡ nội dung vi phạm bản quyền" },
       { label: "Báo lỗi", href: "mailto:hello@lcucumber.com?subject=Báo lỗi", desc: "Báo lỗi nội dung hoặc kỹ thuật" },
     ],
   },

@@ -8,6 +8,8 @@ import { driveImageUrl, parseDriveIds } from "@/lib/drive";
 import { BookOpen, ChevronRight, Layers, MessageCircle, Plus, User, X } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { RatingWidget } from "@/components/RatingWidget";
+import { AgeWarning } from "@/components/AgeWarning";
+import { isMatureComic } from "@/lib/content-rating";
 import { SITE_URL } from "@/lib/seo";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -224,6 +226,7 @@ function ComicPage() {
               <ComicCover id={comic.coverId} title={comic.title} />
             </div>
             <div className="animate-fade-in-up">
+              {isMatureComic(comic.genres) && <AgeWarning comicTitle={comic.title} />}
               <div className="flex flex-wrap gap-2">
                 {comic.genres.map((g) => (
                   <span
