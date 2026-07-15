@@ -230,7 +230,12 @@ function ComicPage() {
           </nav>
           <div className="grid gap-8 md:grid-cols-[240px_1fr]">
             <div className="hover-lift mx-auto aspect-[3/4] w-full max-w-[240px] overflow-hidden rounded-2xl border border-primary/30 bg-card shadow-glow">
-              <ComicCover id={comic.coverId} title={comic.title} />
+              <ComicCover
+                id={comic.coverId}
+                title={comic.title}
+                genres={comic.genres}
+                chapterCount={comic.chapters.length}
+              />
             </div>
             <div className="animate-fade-in-up">
               {isMatureComic(comic.genres) && <AgeWarning comicTitle={comic.title} />}
@@ -355,7 +360,12 @@ function ComicPage() {
                       title={r.title}
                     >
                       <div className="aspect-[3/4] overflow-hidden rounded-xl border border-border bg-card">
-                        <ComicCover id={r.coverId} title={r.title} />
+                        <ComicCover
+                          id={r.coverId}
+                          title={r.title}
+                          genres={r.genres}
+                          chapterCount={r.chapters.length}
+                        />
                       </div>
                       <span className="mt-2 line-clamp-2 block text-xs font-semibold transition-colors hover:text-primary">
                         {r.title}
