@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SITE_URL, SITE_NAME } from "@/lib/seo";
 
-const UPDATED_AT = "2026-07-07";
+const UPDATED_AT = "2026-07-15";
 
 export const Route = createFileRoute("/dieu-khoan")({
   component: TermsPage,
@@ -84,18 +84,34 @@ function TermsPage() {
               quyền phân phối cho các tác phẩm này.
             </p>
             <p className="mt-2">
-              Nếu bạn là chủ sở hữu bản quyền và muốn gỡ nội dung, hãy liên hệ
-              theo hướng dẫn tại{" "}
-              <Link to="/lien-he" className="text-primary underline">
-                trang Liên hệ
+              Nếu bạn là chủ sở hữu bản quyền và muốn gỡ nội dung, vui lòng gửi
+              yêu cầu qua trang{" "}
+              <Link to="/dmca" className="text-primary underline">
+                DMCA & Gỡ nội dung
               </Link>
-              . Chúng tôi xử lý trong vòng 72 giờ kể từ khi nhận được yêu cầu
-              hợp lệ.
+              . Chúng tôi cam kết xử lý trong vòng <strong>48 giờ</strong> kể từ
+              khi nhận được yêu cầu hợp lệ.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold">3. Tài khoản người dùng</h2>
+            <h2 className="text-xl font-bold">3. Độ tuổi & nội dung nhạy cảm</h2>
+            <p className="mt-2">
+              Một số tác phẩm trên Lcucumber được gắn nhãn <strong>18+</strong>,{" "}
+              <strong>BL/GL</strong>, <strong>Mature</strong> hoặc chứa yếu tố tình
+              cảm đồng tính, bạo lực, ngôn tình dành cho người trưởng thành. Khi
+              truy cập các truyện này, hệ thống sẽ hiển thị cảnh báo và yêu cầu
+              bạn xác nhận đã đủ <strong>18 tuổi</strong>.
+            </p>
+            <p className="mt-2">
+              Bằng việc tiếp tục đọc, bạn xác nhận rằng bạn đã đủ tuổi theo pháp
+              luật nơi cư trú và tự chịu trách nhiệm về việc lựa chọn nội dung
+              phù hợp với bản thân.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold">4. Tài khoản người dùng</h2>
             <p className="mt-2">
               Bạn chịu trách nhiệm bảo mật thông tin đăng nhập của mình. Mọi
               hoạt động dưới tài khoản của bạn được xem là do bạn thực hiện.
@@ -103,7 +119,7 @@ function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold">4. Hành vi bị cấm</h2>
+            <h2 className="text-xl font-bold">5. Hành vi bị cấm</h2>
             <ul className="mt-2 list-disc space-y-1 pl-6">
               <li>Đăng tải nội dung vi phạm pháp luật Việt Nam.</li>
               <li>Đăng nội dung khiêu dâm trẻ em, bạo lực cực đoan, thù ghét.</li>
@@ -113,7 +129,7 @@ function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold">5. Cộng tác viên</h2>
+            <h2 className="text-xl font-bold">6. Cộng tác viên</h2>
             <p className="mt-2">
               Cộng tác viên tự chịu trách nhiệm về nội dung mình đăng và cam kết
               đã có quyền/được phép chia sẻ. Lcucumber có quyền gỡ nội dung
@@ -122,7 +138,7 @@ function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold">6. Bình luận</h2>
+            <h2 className="text-xl font-bold">7. Bình luận</h2>
             <p className="mt-2">
               Bình luận do độc giả gửi; Lcucumber không chịu trách nhiệm cho
               quan điểm cá nhân của người bình luận nhưng có quyền ẩn/xoá bình
@@ -131,7 +147,7 @@ function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold">7. Miễn trừ trách nhiệm</h2>
+            <h2 className="text-xl font-bold">8. Miễn trừ trách nhiệm</h2>
             <p className="mt-2">
               Dịch vụ được cung cấp "nguyên trạng" (as-is). Chúng tôi không đảm
               bảo dịch vụ luôn không gián đoạn, không lỗi, hoặc phù hợp với
@@ -140,7 +156,7 @@ function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold">8. Thay đổi điều khoản</h2>
+            <h2 className="text-xl font-bold">9. Thay đổi điều khoản</h2>
             <p className="mt-2">
               Chúng tôi có thể cập nhật điều khoản này. Phiên bản mới có hiệu
               lực ngay khi đăng tải. Việc bạn tiếp tục sử dụng dịch vụ đồng
@@ -149,11 +165,15 @@ function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold">9. Liên hệ</h2>
+            <h2 className="text-xl font-bold">10. Liên hệ</h2>
             <p className="mt-2">
               Mọi thắc mắc về điều khoản, vui lòng liên hệ qua{" "}
               <Link to="/lien-he" className="text-primary underline">
                 trang Liên hệ
+              </Link>
+              . Yêu cầu gỡ nội dung xin gửi qua{" "}
+              <Link to="/dmca" className="text-primary underline">
+                DMCA
               </Link>
               .
             </p>
