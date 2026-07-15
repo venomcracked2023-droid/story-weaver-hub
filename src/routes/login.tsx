@@ -6,25 +6,34 @@ import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { LogIn } from "lucide-react";
+import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
-  head: () => ({
-    meta: [
-      { title: "Đăng nhập — Lcucumber" },
+  head: () => {
+    const title = "Đăng nhập — Lcucumber";
+    const desc = "Đăng nhập hoặc tạo tài khoản Lcucumber để theo dõi truyện yêu thích, bình luận và quản lý nội dung cộng tác viên.";
+    const url = `${SITE_URL}/login`;
+    return {
+      meta: [
+      { title },
       {
         name: "description",
-        content:
-          "Đăng nhập hoặc tạo tài khoản Lcucumber để theo dõi truyện yêu thích, bình luận và quản lý nội dung cộng tác viên.",
+        content: desc,
       },
-      { property: "og:title", content: "Đăng nhập — Lcucumber" },
+      { property: "og:title", content: title },
       {
         property: "og:description",
-        content:
-          "Đăng nhập Lcucumber bằng email hoặc Google để theo dõi truyện và tham gia cộng đồng đọc webtoon cuộn dọc.",
+        content: desc,
       },
+      { property: "og:url", content: url },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: desc },
     ],
-  }),
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
 });
 
 function LoginPage() {

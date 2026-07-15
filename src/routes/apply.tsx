@@ -4,25 +4,34 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/apply")({
   component: ApplyPage,
-  head: () => ({
-    meta: [
-      { title: "Ứng tuyển cộng tác viên — Lcucumber" },
+  head: () => {
+    const title = "Ứng tuyển cộng tác viên — Lcucumber";
+    const desc = "Gửi đơn ứng tuyển cộng tác viên Lcucumber để đăng truyện lên nền tảng: bút danh, lý do tham gia và link mẫu để duyệt.";
+    const url = `${SITE_URL}/apply`;
+    return {
+      meta: [
+      { title },
       {
         name: "description",
-        content:
-          "Gửi đơn ứng tuyển cộng tác viên Lcucumber để đăng truyện lên nền tảng — điền bút danh, lý do tham gia và link mẫu để admin duyệt.",
+        content: desc,
       },
-      { property: "og:title", content: "Ứng tuyển cộng tác viên — Lcucumber" },
+      { property: "og:title", content: title },
       {
         property: "og:description",
-        content:
-          "Trở thành cộng tác viên Lcucumber: gửi đơn nhanh, chờ admin duyệt và bắt đầu đăng truyện của bạn.",
+        content: desc,
       },
+      { property: "og:url", content: url },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: desc },
     ],
-  }),
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
 });
 
 type Application = {

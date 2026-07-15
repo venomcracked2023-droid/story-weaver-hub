@@ -1,13 +1,28 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { driveImageUrl, extractDriveId } from "@/lib/drive";
 import { ArrowLeft, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, List } from "lucide-react";
-import { useEffect, useState } from "react";
-import { PdfReader } from "@/components/PdfReader";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
 import { AgeWarning } from "@/components/AgeWarning";
 import { isMatureComic } from "@/lib/content-rating";
 import { SITE_URL } from "@/lib/seo";
+
+const PdfReader = lazy(() =>
+  import("@/components/PdfReader").then((module) => ({ default: module.PdfReader })),
+);
+
+function chapterSummary(comicTitle: string, chapterTitle: string, description?: string, genres: string[] = []) {
+  const base = (description ?? "").trim();
+  const genreText = genres.length ? ` Thuộc thể loại ${genres.join(", ")}.` : "";
+  return base
+    ? `Đọc ${chapterTitle} của ${comicTitle} trên Lcucumber. ${base}${genreText} Chương được tối ưu để crawler đọc được tiêu đề, mô tả, liên kết chương trước và chương sau ngay trong HTML.`
+    : `Đọc ${chapterTitle} của ${comicTitle} online miễn phí trên Lcucumber với trải nghiệm webtoon cuộn dọc mượt trên mọi thiết bị.${genreText} Nội dung chương có tóm tắt, breadcrumb và liên kết điều hướng trong HTML để người đọc và công cụ tìm kiếm dễ khám phá.`;
+}
+
+function truncateMeta(text: string) {
+  return text.length > 160 ? `${text.slice(0, 157).trimEnd()}…` : text;
+}
 
 export const Route = createFileRoute("/truyen/$slug/$chapter")({
   component: Reader,
@@ -67,16 +82,15 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
     const coverId = loaderData?.comic?.coverId;
     if (!ct || !ch) return { meta: [{ title: "Đang đọc — Lcucumber" }] };
     const title = `${ch} — ${ct} | Lcucumber`;
-    const cdesc = (loaderData?.comic?.description ?? "").trim();
-    const rawDesc = cdesc
-      ? `Đọc ${ch} của ${ct} miễn phí trên Lcucumber — ${cdesc}`
-      : `Đọc ${ch} của ${ct} online cuộn dọc miễn phí trên Lcucumber. Cập nhật chương mới liên tục, đọc mượt trên mọi thiết bị.`;
-    const desc = rawDesc.length > 160 ? rawDesc.slice(0, 157).trimEnd() + "…" : rawDesc;
+    const summary = chapterSummary(ct, ch, loaderData?.comic?.description, loaderData?.comic?.genres);
+    const desc = truncateMeta(summary);
     const url = `${SITE_URL}/truyen/${params.slug}/${params.chapter}`;
     const comicUrl = `${SITE_URL}/truyen/${params.slug}`;
     const img = coverId ? driveImageUrl(coverId, 1200) : `${SITE_URL}/og-default.jpg`;
     const prevUrl = loaderData?.prevSlug ? `${comicUrl}/${loaderData.prevSlug}` : null;
     const nextUrl = loaderData?.nextSlug ? `${comicUrl}/${loaderData.nextSlug}` : null;
+    const pdfId = loaderData?.chapter?.pages?.length === 1 ? extractDriveId(loaderData.chapter.pages[0]) ?? loaderData.chapter.pages[0] : null;
+    const pdfUrl = pdfId ? `${SITE_URL}/api/drive-file?id=${encodeURIComponent(pdfId)}` : null;
     return {
       meta: [
         { title },
@@ -118,14 +132,25 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
             "@id": url,
             name: ch,
             headline: `${ch} — ${ct}`,
+            description: summary,
             url,
             mainEntityOfPage: url,
             image: img,
+            genre: loaderData?.comic?.genres ?? undefined,
             inLanguage: "vi-VN",
+            isAccessibleForFree: true,
             datePublished: loaderData?.chapter?.createdAt ?? undefined,
             isPartOf: { "@type": "ComicSeries", "@id": comicUrl, name: ct, url: comicUrl },
             previousItem: prevUrl ? { "@type": "ComicIssue", url: prevUrl } : undefined,
             nextItem: nextUrl ? { "@type": "ComicIssue", url: nextUrl } : undefined,
+            associatedMedia: pdfUrl
+              ? {
+                  "@type": "MediaObject",
+                  encodingFormat: "application/pdf",
+                  contentUrl: pdfUrl,
+                  name: `${ch} — ${ct}`,
+                }
+              : undefined,
             publisher: {
               "@type": "Organization",
               name: "Lcucumber",
@@ -181,6 +206,7 @@ function Reader() {
   const last = chapters[chapters.length - 1];
   const total = chapters.length;
   const progress = total > 0 ? ((idx + 1) / total) * 100 : 0;
+  const summary = chapterSummary(comic.title, chapter.title, comic.description, comic.genres);
 
   const singleId =
     chapter.pages.length === 1
@@ -329,6 +355,17 @@ function Reader() {
       </header>
 
       <h1 className="sr-only">{`${chapter.title} — ${comic.title}`}</h1>
+      <section className="sr-only" aria-label="Tóm tắt chương cho SEO">
+        <h2>{chapter.title} — {comic.title}</h2>
+        <p>{summary}</p>
+        <nav aria-label="Breadcrumb chương">
+          <a href="/">Trang chủ</a> / <a href={`/truyen/${comic.slug}`}>{comic.title}</a> / <span>{chapter.title}</span>
+        </nav>
+        <nav aria-label="Liên kết chương liên quan">
+          {prev && <a href={`/truyen/${comic.slug}/${prev.slug}`} rel="prev">Chương trước: {prev.title}</a>}
+          {next && <a href={`/truyen/${comic.slug}/${next.slug}`} rel="next">Chương sau: {next.title}</a>}
+        </nav>
+      </section>
 
       {isMatureComic(comic.genres) && (
         <div className="mx-auto max-w-3xl px-4 pt-16">
@@ -352,10 +389,7 @@ function Reader() {
                 <a href={`/truyen/${comic.slug}`}>{comic.title}</a> › {chapter.title}
               </nav>
               <h2>{chapter.title} — {comic.title}</h2>
-              <p>
-                {comic.description ||
-                  `Đọc ${chapter.title} của ${comic.title} trên Lcucumber, webtoon cuộn dọc miễn phí, cập nhật chương mới liên tục.`}
-              </p>
+              <p>{summary}</p>
               <p>
                 <a href={`/api/drive-file?id=${singleId}`}>Tải chương dạng PDF</a>
               </p>
@@ -377,11 +411,13 @@ function Reader() {
               </ul>
             </div>
           </noscript>
-          <PdfReader
-            fileUrl={`/api/drive-file?id=${singleId}`}
-            Footer={Footer}
-            onFail={() => setPdfFailed(true)}
-          />
+          <Suspense fallback={<main className="mx-auto max-w-3xl px-4 pt-24 text-center text-muted-foreground">Đang tải trình đọc…</main>}>
+            <PdfReader
+              fileUrl={`/api/drive-file?id=${singleId}`}
+              Footer={Footer}
+              onFail={() => setPdfFailed(true)}
+            />
+          </Suspense>
         </>
       ) : (
         <main className="mx-auto max-w-3xl pt-14">
