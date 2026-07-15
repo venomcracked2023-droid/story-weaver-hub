@@ -334,6 +334,38 @@ function ComicPage() {
           )}
         </section>
 
+        {(() => {
+          const genreSet = new Set(comic.genres);
+          const related = comics
+            .filter((c) => c.id !== comic.id && c.genres.some((g) => genreSet.has(g)))
+            .slice(0, 6);
+          if (related.length === 0) return null;
+          return (
+            <section className="mt-10">
+              <h2 className="mb-4 text-xl font-bold tracking-tight">Truyện liên quan</h2>
+              <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+                {related.map((r) => (
+                  <li key={r.id}>
+                    <Link
+                      to="/truyen/$slug"
+                      params={{ slug: r.slug }}
+                      className="hover-lift block"
+                      title={r.title}
+                    >
+                      <div className="aspect-[3/4] overflow-hidden rounded-xl border border-border bg-card">
+                        <ComicCover id={r.coverId} title={r.title} />
+                      </div>
+                      <span className="mt-2 line-clamp-2 block text-xs font-semibold transition-colors hover:text-primary">
+                        {r.title}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })()}
+
         <CommentSection comicId={comic.id} />
       </main>
       {isContributor && quickAddOpen && (
