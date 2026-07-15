@@ -67,7 +67,11 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
     const coverId = loaderData?.comic?.coverId;
     if (!ct || !ch) return { meta: [{ title: "Đang đọc — Lcucumber" }] };
     const title = `${ch} — ${ct} | Lcucumber`;
-    const desc = `Đọc ${ch} của ${ct} online cuộn dọc miễn phí trên Lcucumber.`;
+    const cdesc = (loaderData?.comic?.description ?? "").trim();
+    const rawDesc = cdesc
+      ? `Đọc ${ch} của ${ct} miễn phí trên Lcucumber — ${cdesc}`
+      : `Đọc ${ch} của ${ct} online cuộn dọc miễn phí trên Lcucumber. Cập nhật chương mới liên tục, đọc mượt trên mọi thiết bị.`;
+    const desc = rawDesc.length > 160 ? rawDesc.slice(0, 157).trimEnd() + "…" : rawDesc;
     const url = `${SITE_URL}/truyen/${params.slug}/${params.chapter}`;
     const comicUrl = `${SITE_URL}/truyen/${params.slug}`;
     const img = coverId ? driveImageUrl(coverId, 1200) : `${SITE_URL}/og-default.jpg`;
@@ -191,13 +195,37 @@ function Reader() {
 
   const Footer = () => (
     <div className="mx-auto max-w-3xl px-4 pb-32 pt-6">
-      <Link
-        to="/truyen/$slug"
-        params={{ slug: comic.slug }}
-        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition hover:text-primary"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" /> Quay lại mục lục truyện
-      </Link>
+      <nav aria-label="Điều hướng chương" className="flex flex-wrap items-center justify-between gap-3">
+        <Link
+          to="/truyen/$slug"
+          params={{ slug: comic.slug }}
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition hover:text-primary"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Mục lục {comic.title}
+        </Link>
+        <div className="flex items-center gap-2 text-sm">
+          {prev && (
+            <Link
+              to="/truyen/$slug/$chapter"
+              params={{ slug: comic.slug, chapter: prev.slug }}
+              rel="prev"
+              className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 transition hover:border-primary/60 hover:text-primary"
+            >
+              <ChevronLeft className="h-4 w-4" /> {prev.title}
+            </Link>
+          )}
+          {next && (
+            <Link
+              to="/truyen/$slug/$chapter"
+              params={{ slug: comic.slug, chapter: next.slug }}
+              rel="next"
+              className="inline-flex items-center gap-1 rounded-full bg-gradient-brand px-3 py-1.5 font-semibold text-primary-foreground shadow-glow transition hover:scale-105"
+            >
+              Đọc chương sau: {next.title} <ChevronRight className="h-4 w-4" />
+            </Link>
+          )}
+        </div>
+      </nav>
       <div className="mt-6">
         <CommentSection comicId={comic.id} chapterId={chapter.id} />
       </div>
@@ -319,14 +347,34 @@ function Reader() {
         <>
           <noscript>
             <div className="mx-auto max-w-3xl px-4 pt-16">
+              <nav aria-label="Breadcrumb">
+                <a href="/">Trang chủ</a> ›{" "}
+                <a href={`/truyen/${comic.slug}`}>{comic.title}</a> › {chapter.title}
+              </nav>
+              <h2>{chapter.title} — {comic.title}</h2>
               <p>
-                {chapter.title} — {comic.title}.{" "}
                 {comic.description ||
-                  `Đọc ${chapter.title} của ${comic.title} trên Lcucumber, webtoon cuộn dọc miễn phí.`}
+                  `Đọc ${chapter.title} của ${comic.title} trên Lcucumber, webtoon cuộn dọc miễn phí, cập nhật chương mới liên tục.`}
               </p>
               <p>
                 <a href={`/api/drive-file?id=${singleId}`}>Tải chương dạng PDF</a>
               </p>
+              <ul>
+                {prev && (
+                  <li>
+                    <a href={`/truyen/${comic.slug}/${prev.slug}`} rel="prev">
+                      ← {prev.title}
+                    </a>
+                  </li>
+                )}
+                {next && (
+                  <li>
+                    <a href={`/truyen/${comic.slug}/${next.slug}`} rel="next">
+                      {next.title} →
+                    </a>
+                  </li>
+                )}
+              </ul>
             </div>
           </noscript>
           <PdfReader

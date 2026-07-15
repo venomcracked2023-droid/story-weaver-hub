@@ -221,6 +221,11 @@ function ComicPage() {
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/70 via-background/85 to-background" aria-hidden />
         <main className="mx-auto max-w-5xl px-4 pb-10 pt-10 sm:pt-14">
+          <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Link to="/" className="transition hover:text-primary">Trang chủ</Link>
+            <ChevronRight className="h-3 w-3" />
+            <span className="line-clamp-1 text-foreground/80">{comic.title}</span>
+          </nav>
           <div className="grid gap-8 md:grid-cols-[240px_1fr]">
             <div className="hover-lift mx-auto aspect-[3/4] w-full max-w-[240px] overflow-hidden rounded-2xl border border-primary/30 bg-card shadow-glow">
               <ComicCover id={comic.coverId} title={comic.title} />
@@ -328,6 +333,38 @@ function ComicPage() {
             </ul>
           )}
         </section>
+
+        {(() => {
+          const genreSet = new Set(comic.genres);
+          const related = comics
+            .filter((c) => c.id !== comic.id && c.genres.some((g) => genreSet.has(g)))
+            .slice(0, 6);
+          if (related.length === 0) return null;
+          return (
+            <section className="mt-10">
+              <h2 className="mb-4 text-xl font-bold tracking-tight">Truyện liên quan</h2>
+              <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+                {related.map((r) => (
+                  <li key={r.id}>
+                    <Link
+                      to="/truyen/$slug"
+                      params={{ slug: r.slug }}
+                      className="hover-lift block"
+                      title={r.title}
+                    >
+                      <div className="aspect-[3/4] overflow-hidden rounded-xl border border-border bg-card">
+                        <ComicCover id={r.coverId} title={r.title} />
+                      </div>
+                      <span className="mt-2 line-clamp-2 block text-xs font-semibold transition-colors hover:text-primary">
+                        {r.title}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })()}
 
         <CommentSection comicId={comic.id} />
       </main>
