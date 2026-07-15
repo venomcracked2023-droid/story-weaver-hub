@@ -348,8 +348,6 @@ function Reader() {
           ))}
           <Footer />
         </main>
-      ) : (
-        null
       )}
       <StickyNav />
     </div>
