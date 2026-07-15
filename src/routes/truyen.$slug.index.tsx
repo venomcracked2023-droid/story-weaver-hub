@@ -43,7 +43,9 @@ export const Route = createFileRoute("/truyen/$slug/")({
     const chapters = loaderData?.chapters ?? [];
     const chapterCount = chapters.length;
     const genresText = Array.isArray(m.genres) && m.genres.length ? ` (${m.genres.join(", ")})` : "";
-    const title = `${m.title}${m.author ? ` — ${m.author}` : ""} | Lcucumber`;
+    const primaryGenre =
+      Array.isArray(m.genres) && m.genres.length ? ` ${m.genres[0]}` : "";
+    const title = `${m.title} — Đọc Webtoon${primaryGenre} miễn phí | Lcucumber`;
     const baseDesc = m.description
       ? m.description
       : `Đọc webtoon ${m.title}${genresText} cuộn dọc miễn phí trên Lcucumber. ${chapterCount} chương${m.author ? `, tác giả ${m.author}` : ""}, cập nhật liên tục.`;
