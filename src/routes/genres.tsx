@@ -5,4 +5,6 @@ export const Route = createFileRoute("/genres")({
     throw redirect({ to: "/the-loai", statusCode: 301 });
   },
   component: () => null,
+  notFoundComponent: () => null,
+  errorComponent: () => null,
 });

@@ -5,4 +5,6 @@ export const Route = createFileRoute("/about")({
     throw redirect({ to: "/gioi-thieu", statusCode: 301 });
   },
   component: () => null,
+  notFoundComponent: () => null,
+  errorComponent: () => null,
 });
