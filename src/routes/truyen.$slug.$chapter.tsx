@@ -81,7 +81,7 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
     const ch = loaderData?.chapter?.title;
     const coverId = loaderData?.comic?.coverId;
     if (!ct || !ch) return { meta: [{ title: "Đang đọc — Lcucumber" }] };
-    const title = `${ch} — ${ct} | Lcucumber`;
+    const title = `${ch} — ${ct} | Đọc Webtoon miễn phí | Lcucumber`;
     const summary = chapterSummary(ct, ch, loaderData?.comic?.description, loaderData?.comic?.genres);
     const desc = truncateMeta(summary);
     const url = `${SITE_URL}/truyen/${params.slug}/${params.chapter}`;
