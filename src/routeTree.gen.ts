@@ -16,12 +16,14 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LienHeRouteImport } from './routes/lien-he'
 import { Route as LatestRouteImport } from './routes/latest'
 import { Route as GioiThieuRouteImport } from './routes/gioi-thieu'
+import { Route as GenresRouteImport } from './routes/genres'
 import { Route as FeaturedRouteImport } from './routes/featured'
 import { Route as DmcaRouteImport } from './routes/dmca'
 import { Route as DieuKhoanRouteImport } from './routes/dieu-khoan'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminApplicationsRouteImport } from './routes/admin-applications'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GenreSlugRouteImport } from './routes/genre.$slug'
@@ -64,6 +66,11 @@ const GioiThieuRoute = GioiThieuRouteImport.update({
   path: '/gioi-thieu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GenresRoute = GenresRouteImport.update({
+  id: '/genres',
+  path: '/genres',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FeaturedRoute = FeaturedRouteImport.update({
   id: '/featured',
   path: '/featured',
@@ -92,6 +99,11 @@ const AdminApplicationsRoute = AdminApplicationsRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugRoute = SlugRouteImport.update({
@@ -128,12 +140,14 @@ const TruyenSlugChapterRoute = TruyenSlugChapterRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/dieu-khoan': typeof DieuKhoanRoute
   '/dmca': typeof DmcaRoute
   '/featured': typeof FeaturedRoute
+  '/genres': typeof GenresRoute
   '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
   '/lien-he': typeof LienHeRoute
@@ -149,12 +163,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/dieu-khoan': typeof DieuKhoanRoute
   '/dmca': typeof DmcaRoute
   '/featured': typeof FeaturedRoute
+  '/genres': typeof GenresRoute
   '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
   '/lien-he': typeof LienHeRoute
@@ -171,12 +187,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$slug': typeof SlugRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
   '/dieu-khoan': typeof DieuKhoanRoute
   '/dmca': typeof DmcaRoute
   '/featured': typeof FeaturedRoute
+  '/genres': typeof GenresRoute
   '/gioi-thieu': typeof GioiThieuRoute
   '/latest': typeof LatestRoute
   '/lien-he': typeof LienHeRoute
@@ -194,12 +212,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$slug'
+    | '/about'
     | '/admin'
     | '/admin-applications'
     | '/apply'
     | '/dieu-khoan'
     | '/dmca'
     | '/featured'
+    | '/genres'
     | '/gioi-thieu'
     | '/latest'
     | '/lien-he'
@@ -215,12 +235,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$slug'
+    | '/about'
     | '/admin'
     | '/admin-applications'
     | '/apply'
     | '/dieu-khoan'
     | '/dmca'
     | '/featured'
+    | '/genres'
     | '/gioi-thieu'
     | '/latest'
     | '/lien-he'
@@ -236,12 +258,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$slug'
+    | '/about'
     | '/admin'
     | '/admin-applications'
     | '/apply'
     | '/dieu-khoan'
     | '/dmca'
     | '/featured'
+    | '/genres'
     | '/gioi-thieu'
     | '/latest'
     | '/lien-he'
@@ -258,12 +282,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SlugRoute: typeof SlugRoute
+  AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   ApplyRoute: typeof ApplyRoute
   DieuKhoanRoute: typeof DieuKhoanRoute
   DmcaRoute: typeof DmcaRoute
   FeaturedRoute: typeof FeaturedRoute
+  GenresRoute: typeof GenresRoute
   GioiThieuRoute: typeof GioiThieuRoute
   LatestRoute: typeof LatestRoute
   LienHeRoute: typeof LienHeRoute
@@ -328,6 +354,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GioiThieuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/genres': {
+      id: '/genres'
+      path: '/genres'
+      fullPath: '/genres'
+      preLoaderRoute: typeof GenresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/featured': {
       id: '/featured'
       path: '/featured'
@@ -368,6 +401,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug': {
@@ -418,12 +458,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SlugRoute: SlugRoute,
+  AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
   AdminApplicationsRoute: AdminApplicationsRoute,
   ApplyRoute: ApplyRoute,
   DieuKhoanRoute: DieuKhoanRoute,
   DmcaRoute: DmcaRoute,
   FeaturedRoute: FeaturedRoute,
+  GenresRoute: GenresRoute,
   GioiThieuRoute: GioiThieuRoute,
   LatestRoute: LatestRoute,
   LienHeRoute: LienHeRoute,
@@ -439,3 +481,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
