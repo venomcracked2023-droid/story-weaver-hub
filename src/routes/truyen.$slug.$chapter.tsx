@@ -1,9 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useComics, useComicsLoaded } from "@/lib/comics-store";
 import { driveImageUrl, extractDriveId } from "@/lib/drive";
 import { ArrowLeft, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, List } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Virtuoso } from "react-virtuoso";
 import { PdfReader } from "@/components/PdfReader";
 import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
@@ -13,48 +11,60 @@ import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/truyen/$slug/$chapter")({
   component: Reader,
-  ssr: false,
   loader: async ({ params }) => {
     const { data: comic } = await supabase
       .from("comics")
-      .select("id,title,cover_id,slug")
+      .select("id,title,cover_id,slug,genres,description")
       .eq("slug", params.slug)
       .maybeSingle();
     if (!comic) {
-      return { comicTitle: null, coverId: null, chapterTitle: null, prevSlug: null, nextSlug: null, chapterCreatedAt: null };
+      return {
+        comic: null,
+        chapter: null,
+        prevSlug: null,
+        nextSlug: null,
+        chapters: [] as Array<{ id: string; slug: string; title: string }>,
+      };
     }
-    const { data: chapter } = await supabase
+    const { data: siblings } = await supabase
       .from("chapters")
-      .select("title,slug,created_at,order_index")
+      .select("id,title,slug,pages,created_at,order_index")
       .eq("comic_id", comic.id)
-      .eq("slug", params.chapter)
-      .maybeSingle();
-    let prevSlug: string | null = null;
-    let nextSlug: string | null = null;
-    if (chapter) {
-      const { data: siblings } = await supabase
-        .from("chapters")
-        .select("slug,order_index")
-        .eq("comic_id", comic.id)
-        .order("order_index", { ascending: true });
-      const list = siblings ?? [];
-      const idx = list.findIndex((c) => c.slug === chapter.slug);
-      if (idx > 0) prevSlug = list[idx - 1].slug;
-      if (idx >= 0 && idx < list.length - 1) nextSlug = list[idx + 1].slug;
-    }
+      .order("order_index", { ascending: true });
+    const list = (siblings ?? []) as Array<{
+      id: string; title: string; slug: string; pages: string[] | null; created_at: string; order_index: number;
+    }>;
+    const idx = list.findIndex((c) => c.slug === params.chapter);
+    const chapter = idx >= 0 ? list[idx] : null;
+    const prevSlug = idx > 0 ? list[idx - 1].slug : null;
+    const nextSlug = idx >= 0 && idx < list.length - 1 ? list[idx + 1].slug : null;
     return {
-      comicTitle: comic.title ?? null,
-      coverId: comic.cover_id ?? null,
-      chapterTitle: chapter?.title ?? null,
-      chapterCreatedAt: chapter?.created_at ?? null,
+      comic: {
+        id: comic.id,
+        title: comic.title ?? "",
+        slug: comic.slug ?? params.slug,
+        coverId: comic.cover_id ?? "",
+        genres: (comic.genres ?? []) as string[],
+        description: comic.description ?? "",
+      },
+      chapter: chapter
+        ? {
+            id: chapter.id,
+            title: chapter.title,
+            slug: chapter.slug,
+            pages: (chapter.pages ?? []) as string[],
+            createdAt: chapter.created_at,
+          }
+        : null,
       prevSlug,
       nextSlug,
+      chapters: list.map((c) => ({ id: c.id, slug: c.slug, title: c.title })),
     };
   },
   head: ({ loaderData, params }) => {
-    const ct = loaderData?.comicTitle;
-    const ch = loaderData?.chapterTitle;
-    const coverId = loaderData?.coverId;
+    const ct = loaderData?.comic?.title;
+    const ch = loaderData?.chapter?.title;
+    const coverId = loaderData?.comic?.coverId;
     if (!ct || !ch) return { meta: [{ title: "Đang đọc — Lcucumber" }] };
     const title = `${ch} — ${ct} | Lcucumber`;
     const desc = `Đọc ${ch} của ${ct} online cuộn dọc miễn phí trên Lcucumber.`;
@@ -108,7 +118,7 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
             mainEntityOfPage: url,
             image: img,
             inLanguage: "vi-VN",
-            datePublished: loaderData?.chapterCreatedAt ?? undefined,
+            datePublished: loaderData?.chapter?.createdAt ?? undefined,
             isPartOf: { "@type": "ComicSeries", "@id": comicUrl, name: ct, url: comicUrl },
             previousItem: prevUrl ? { "@type": "ComicIssue", url: prevUrl } : undefined,
             nextItem: nextUrl ? { "@type": "ComicIssue", url: nextUrl } : undefined,
@@ -133,12 +143,12 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
 
 function Reader() {
   const { slug, chapter: chapterSlug } = Route.useParams();
+  const loaderData = Route.useLoaderData();
   const navigate = useNavigate();
-  const comics = useComics();
-  const loaded = useComicsLoaded();
-  const comic = comics.find((c) => c.slug === slug);
-  const idx = comic?.chapters.findIndex((c) => c.slug === chapterSlug) ?? -1;
-  const chapter = comic && idx >= 0 ? comic.chapters[idx] : null;
+  const comic = loaderData?.comic ?? null;
+  const chapter = loaderData?.chapter ?? null;
+  const chapters = loaderData?.chapters ?? [];
+  const idx = chapters.findIndex((c) => c.slug === chapterSlug);
 
   const [hideUI, setHideUI] = useState(false);
   const [pdfFailed, setPdfFailed] = useState(false);
@@ -154,20 +164,17 @@ function Reader() {
   }, []);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (typeof window !== "undefined") window.scrollTo(0, 0);
     setPdfFailed(false);
   }, [chapterSlug]);
 
-  if (!loaded) {
-    return <div className="p-10 text-center text-muted-foreground">Đang tải…</div>;
-  }
   if (!comic || !chapter) throw notFound();
 
-  const prev = idx > 0 ? comic.chapters[idx - 1] : null;
-  const next = idx < comic.chapters.length - 1 ? comic.chapters[idx + 1] : null;
-  const first = comic.chapters[0];
-  const last = comic.chapters[comic.chapters.length - 1];
-  const total = comic.chapters.length;
+  const prev = idx > 0 ? chapters[idx - 1] : null;
+  const next = idx >= 0 && idx < chapters.length - 1 ? chapters[idx + 1] : null;
+  const first = chapters[0];
+  const last = chapters[chapters.length - 1];
+  const total = chapters.length;
   const progress = total > 0 ? ((idx + 1) / total) * 100 : 0;
 
   const singleId =
@@ -308,42 +315,41 @@ function Reader() {
           <Footer />
         </main>
       ) : singleId && !pdfFailed ? (
-        <PdfReader
-          fileUrl={`/api/drive-file?id=${singleId}`}
-          Footer={Footer}
-          onFail={() => setPdfFailed(true)}
-        />
-      ) : (
-        <Virtuoso
-          useWindowScroll
-          data={chapter.pages}
-          increaseViewportBy={{ top: 1500, bottom: 2000 }}
-          components={{
-            Header: () => <div className="h-14" />,
-            Footer,
-          }}
-          itemContent={(i, id) => (
-            <div className="mx-auto max-w-3xl">
-              <img
-                src={driveImageUrl(id, 1200)}
-                alt={`${comic.title} — ${chapter.title} — trang ${i + 1}`}
-                loading="lazy"
-                decoding="async"
-                className="block w-full min-h-[60vh] bg-secondary/40 object-contain"
-                onError={(e) => {
-                  const img = e.currentTarget as HTMLImageElement;
-                  if (!img.dataset.fallback) {
-                    img.dataset.fallback = "1";
-                    const m = img.src.match(/[?&]id=([A-Za-z0-9_-]+)/);
-                    if (m) img.src = `https://lh3.googleusercontent.com/d/${m[1]}=w1200`;
-                  } else {
-                    img.style.opacity = "0.3";
-                  }
-                }}
-              />
+        <>
+          <noscript>
+            <div className="mx-auto max-w-3xl px-4 pt-16">
+              <p>
+                {chapter.title} — {comic.title}.{" "}
+                {comic.description ||
+                  `Đọc ${chapter.title} của ${comic.title} trên Lcucumber, webtoon cuộn dọc miễn phí.`}
+              </p>
+              <p>
+                <a href={`/api/drive-file?id=${singleId}`}>Tải chương dạng PDF</a>
+              </p>
             </div>
-          )}
-        />
+          </noscript>
+          <PdfReader
+            fileUrl={`/api/drive-file?id=${singleId}`}
+            Footer={Footer}
+            onFail={() => setPdfFailed(true)}
+          />
+        </>
+      ) : (
+        <main className="mx-auto max-w-3xl pt-14">
+          {chapter.pages.map((id, i) => (
+            <img
+              key={`${id}-${i}`}
+              src={driveImageUrl(id, 1200)}
+              alt={`${comic.title} — ${chapter.title} — trang ${i + 1}`}
+              loading={i < 2 ? "eager" : "lazy"}
+              decoding="async"
+              className="block w-full min-h-[60vh] bg-secondary/40 object-contain"
+            />
+          ))}
+          <Footer />
+        </main>
+      ) : (
+        null
       )}
       <StickyNav />
     </div>
