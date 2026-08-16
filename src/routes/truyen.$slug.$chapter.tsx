@@ -166,7 +166,7 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
   },
   notFoundComponent: () => (
     <div className="p-10 text-center">
-      Không tìm thấy chương. <Link to="/" className="text-primary underline">Về trang chủ</Link>
+      Không tìm thấy chương. <Link to="/" search={{ q: "" }} className="text-primary underline">Về trang chủ</Link>
     </div>
   ),
   errorComponent: ({ error }) => <div className="p-10 text-destructive">{error.message}</div>,

@@ -45,7 +45,7 @@ export const Route = createFileRoute("/genre/$slug")({
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-4 py-20 text-center">
         <h1 className="text-2xl font-bold">Không tìm thấy thể loại</h1>
-        <Link to="/" className="mt-4 inline-block text-primary underline">
+        <Link to="/" search={{ q: "" }} className="mt-4 inline-block text-primary underline">
           Về trang chủ
         </Link>
       </main>
@@ -111,7 +111,7 @@ function GenrePage() {
         {matched.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
             Chưa có truyện nào thuộc thể loại này.{" "}
-            <Link to="/" className="text-primary underline">Về thư viện</Link>
+            <Link to="/" search={{ q: "" }} className="text-primary underline">Về thư viện</Link>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">

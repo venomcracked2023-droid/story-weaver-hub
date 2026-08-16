@@ -53,6 +53,7 @@ export function AgeWarning({ comicTitle }: { comicTitle: string }) {
           <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Link
               to="/"
+              search={{ q: "" }}
               className="inline-flex items-center justify-center rounded-full border border-border bg-background/60 px-4 py-2 text-sm font-medium transition hover:bg-secondary"
             >
               Quay lại

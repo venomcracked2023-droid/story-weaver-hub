@@ -204,6 +204,7 @@ export function SiteFooter() {
           <div>
             <Link
               to="/"
+              search={{ q: "" }}
               className="group inline-flex items-center gap-2"
               title={`${SITE_NAME} — Trang chủ`}
               aria-label={`${SITE_NAME} — Về trang chủ`}
