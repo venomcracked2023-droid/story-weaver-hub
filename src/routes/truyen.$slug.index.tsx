@@ -71,7 +71,7 @@ export const Route = createFileRoute("/truyen/$slug/")({
         { property: "og:type", content: "book" },
         { property: "og:url", content: url },
         { property: "og:image", content: img },
-        { property: "og:image:alt", content: `Bìa truyện ${m.title}` },
+        { property: "og:image:alt", content: `Bìa truyện ${m.title} — Đọc Webtoon miễn phí tại Lcucumber` },
         ...(m.author ? [{ property: "book:author", content: m.author }] : []),
         ...((m.genres ?? []).map((g: string) => ({ property: "book:tag", content: g }))),
         { name: "twitter:title", content: title },
@@ -229,7 +229,7 @@ function ComicPage() {
         <main className="mx-auto max-w-5xl px-4 pb-10 pt-10 sm:pt-14">
           <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
             <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
-            <ChevronRight className="h-3 w-3" />
+            <span className="text-border">/</span>
             <span className="line-clamp-1 text-foreground/80">{comic.title}</span>
           </nav>
           <div className="grid gap-8 md:grid-cols-[240px_1fr]">
