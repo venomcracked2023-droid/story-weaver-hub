@@ -15,8 +15,9 @@ export const Route = createFileRoute("/")({
   head: () => {
     const title = "Lcucumber — Đọc Webtoon cuộn dọc miễn phí";
     const desc =
-      "Khám phá kho webtoon đa dạng tại Lcucumber: đọc cuộn dọc mượt mà, cập nhật chương mới mỗi ngày, miễn phí trên mọi thiết bị.";
+      "Lcucumber là nền tảng đọc webtoon cuộn dọc miễn phí: manhwa, manhua, manga Việt hoá, cập nhật chương mới mỗi ngày, đọc mượt trên mọi thiết bị.";
     const url = `${SITE_URL}/`;
+    const img = `${SITE_URL}/og-default.jpg`;
     return {
       meta: [
         { title },
@@ -24,10 +25,16 @@ export const Route = createFileRoute("/")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
+        { property: "og:image", content: img },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: img },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [
+        { rel: "canonical", href: url },
+        { rel: "alternate", hrefLang: "vi", href: url },
+        { rel: "alternate", hrefLang: "x-default", href: url },
+      ],
     };
   },
 });

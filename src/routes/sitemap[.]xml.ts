@@ -47,8 +47,11 @@ export const Route = createFileRoute("/sitemap.xml")({
           globalLatest = maxIso(globalLatest, iso(c.updated_at));
         }
         const siteLastmod = globalLatest ?? iso(Date.now());
-        const freqByComic = new Map<string, string>();
-        for (const [id, ts] of chapterTsByComic) freqByComic.set(id, inferChangeFreq(ts));
+        const freqByComic = new Map<string, "hourly" | "daily" | "weekly" | "monthly" | "yearly">();
+        for (const [id, ts] of chapterTsByComic) {
+          const freq = inferChangeFreq(ts) as any;
+          freqByComic.set(id, freq);
+        }
 
         const urls: string[] = [
           `<url><loc>${origin}/</loc><lastmod>${siteLastmod}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,

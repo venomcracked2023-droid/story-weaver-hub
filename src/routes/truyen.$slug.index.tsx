@@ -78,7 +78,11 @@ export const Route = createFileRoute("/truyen/$slug/")({
         { name: "twitter:description", content: desc },
         { name: "twitter:image", content: img },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [
+        { rel: "canonical", href: url },
+        { rel: "alternate", hrefLang: "vi", href: url },
+        { rel: "alternate", hrefLang: "x-default", href: url },
+      ],
       scripts: [
         {
           type: "application/ld+json",
