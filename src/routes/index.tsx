@@ -10,7 +10,7 @@ import { SITE_URL } from "@/lib/seo";
 export const Route = createFileRoute("/")({
   component: Index,
   validateSearch: (s: Record<string, unknown>) => ({
-    q: typeof s.q === "string" ? s.q : undefined,
+    q: typeof s.q === "string" ? s.q : "",
   }),
   head: () => {
     const title = "Lcucumber — Đọc Webtoon cuộn dọc miễn phí";
