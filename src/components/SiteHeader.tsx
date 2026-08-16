@@ -76,7 +76,7 @@ export function SiteHeader() {
               type="button"
               onClick={() => {
                 setQ("");
-                navigate({ to: "/", search: {} });
+                navigate({ to: "/", search: { q: "" } });
               }}
               aria-label="Xoá tìm kiếm"
               className="rounded-full p-0.5 text-muted-foreground hover:bg-secondary hover:text-foreground"
