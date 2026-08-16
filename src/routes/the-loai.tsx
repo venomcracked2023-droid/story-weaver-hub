@@ -102,7 +102,7 @@ function GenresHubPage() {
         {genres.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
             Chưa có thể loại nào.{" "}
-            <Link to="/" className="text-primary underline">Về trang chủ</Link>
+            <Link to="/" search={{ q: "" }} className="text-primary underline">Về trang chủ</Link>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
