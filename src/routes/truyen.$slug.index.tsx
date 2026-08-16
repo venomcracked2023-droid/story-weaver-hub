@@ -71,7 +71,7 @@ export const Route = createFileRoute("/truyen/$slug/")({
         { property: "og:type", content: "book" },
         { property: "og:url", content: url },
         { property: "og:image", content: img },
-        { property: "og:image:alt", content: `Bìa truyện ${m.title}` },
+        { property: "og:image:alt", content: `Bìa truyện ${m.title} — Đọc Webtoon miễn phí tại Lcucumber` },
         ...(m.author ? [{ property: "book:author", content: m.author }] : []),
         ...((m.genres ?? []).map((g: string) => ({ property: "book:tag", content: g }))),
         { name: "twitter:title", content: title },

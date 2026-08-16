@@ -100,7 +100,7 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
         { property: "og:type", content: "article" },
         { property: "og:url", content: url },
         { property: "og:image", content: img },
-        { property: "og:image:alt", content: `Bìa truyện ${ct}` },
+        { property: "og:image:alt", content: `Bìa truyện ${ct} — ${ch}` },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
         { name: "twitter:image", content: img },
