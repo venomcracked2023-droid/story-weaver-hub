@@ -31,7 +31,7 @@ export function SiteHeader() {
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
     const term = q.trim();
-    navigate({ to: "/", search: term ? { q: term } : {}, hash: "library" });
+    navigate({ to: "/", search: { q: term }, hash: "library" });
   }
 
   const navClass =
@@ -42,7 +42,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/50">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link to="/" className="group flex items-center gap-2">
+        <Link to="/" search={{ q: "" }} className="group flex items-center gap-2">
           <span className="relative">
             <span className="absolute inset-0 -z-10 rounded-full bg-primary/30 blur-lg transition group-hover:bg-primary/50" />
             <img
@@ -76,7 +76,7 @@ export function SiteHeader() {
               type="button"
               onClick={() => {
                 setQ("");
-                navigate({ to: "/", search: {} });
+                navigate({ to: "/", search: { q: "" } });
               }}
               aria-label="Xoá tìm kiếm"
               className="rounded-full p-0.5 text-muted-foreground hover:bg-secondary hover:text-foreground"
@@ -89,6 +89,7 @@ export function SiteHeader() {
         <nav className="flex items-center gap-0.5 text-sm">
           <Link
             to="/"
+            search={{ q: "" }}
             activeOptions={{ exact: true }}
             className={navClass}
             activeProps={{ className: activeClass }}

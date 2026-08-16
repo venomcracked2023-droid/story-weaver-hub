@@ -78,7 +78,11 @@ export const Route = createFileRoute("/truyen/$slug/")({
         { name: "twitter:description", content: desc },
         { name: "twitter:image", content: img },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [
+        { rel: "canonical", href: url },
+        { rel: "alternate", hrefLang: "vi", href: url },
+        { rel: "alternate", hrefLang: "x-default", href: url },
+      ],
       scripts: [
         {
           type: "application/ld+json",
@@ -144,7 +148,7 @@ export const Route = createFileRoute("/truyen/$slug/")({
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <h1 className="text-2xl font-bold">Không tìm thấy truyện</h1>
-        <Link to="/" className="mt-4 inline-block text-primary underline">Về trang chủ</Link>
+        <Link to="/" search={{ q: "" }} className="mt-4 inline-block text-primary underline">Về trang chủ</Link>
       </div>
     </div>
   ),
@@ -224,7 +228,7 @@ function ComicPage() {
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/70 via-background/85 to-background" aria-hidden />
         <main className="mx-auto max-w-5xl px-4 pb-10 pt-10 sm:pt-14">
           <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Link to="/" className="transition hover:text-primary">Trang chủ</Link>
+            <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
             <ChevronRight className="h-3 w-3" />
             <span className="line-clamp-1 text-foreground/80">{comic.title}</span>
           </nav>

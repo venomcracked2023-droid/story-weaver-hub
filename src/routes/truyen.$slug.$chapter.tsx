@@ -81,7 +81,7 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
     const ch = loaderData?.chapter?.title;
     const coverId = loaderData?.comic?.coverId;
     if (!ct || !ch) return { meta: [{ title: "Đang đọc — Lcucumber" }] };
-    const title = `${ch} — ${ct} | Đọc Webtoon miễn phí | Lcucumber`;
+    const title = `${ch} — ${ct} | Lcucumber`;
     const summary = chapterSummary(ct, ch, loaderData?.comic?.description, loaderData?.comic?.genres);
     const desc = truncateMeta(summary);
     const url = `${SITE_URL}/truyen/${params.slug}/${params.chapter}`;
@@ -108,6 +108,8 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
       ],
       links: [
         { rel: "canonical", href: url },
+        { rel: "alternate", hrefLang: "vi", href: url },
+        { rel: "alternate", hrefLang: "x-default", href: url },
         ...(prevUrl ? [{ rel: "prev", href: prevUrl }] : []),
         ...(nextUrl ? [{ rel: "next", href: nextUrl }] : []),
       ],
@@ -164,7 +166,7 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
   },
   notFoundComponent: () => (
     <div className="p-10 text-center">
-      Không tìm thấy chương. <Link to="/" className="text-primary underline">Về trang chủ</Link>
+      Không tìm thấy chương. <Link to="/" search={{ q: "" }} className="text-primary underline">Về trang chủ</Link>
     </div>
   ),
   errorComponent: ({ error }) => <div className="p-10 text-destructive">{error.message}</div>,
