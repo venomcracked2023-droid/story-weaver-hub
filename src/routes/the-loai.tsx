@@ -93,6 +93,11 @@ function GenresHubPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }}
       />
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-6">
+        <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
+          <span className="text-border">/</span>
+          <span className="text-foreground/80">Thể loại truyện</span>
+        </nav>
         <header className="mb-8">
           <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
             <Tag className="h-6 w-6 text-primary" />
