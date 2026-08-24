@@ -116,7 +116,7 @@ function AdminPage() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Quản lý truyện</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Dữ liệu lưu trên Lovable Cloud. Ảnh nhúng trực tiếp từ Google Drive.
+              Dữ liệu lưu trên Supabase. Ảnh nhúng trực tiếp từ Google Drive.
             </p>
           </div>
           <button
