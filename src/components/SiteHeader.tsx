@@ -42,19 +42,21 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/50">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link to="/" search={{ q: "" }} className="group flex items-center gap-2">
-          <span className="relative">
-            <span className="absolute inset-0 -z-10 rounded-full bg-primary/30 blur-lg transition group-hover:bg-primary/50" />
+        <Link to="/" search={{ q: "" }} className="group flex items-center gap-2.5">
+          <span className="relative flex items-center justify-center">
+            <span className="absolute inset-0 -z-10 rounded-full bg-primary/40 blur-md transition group-hover:scale-125 group-hover:bg-primary/60" />
             <img
               src={cucumberLogo}
               alt="Logo Lcucumber"
-              width={32}
-              height={32}
-              className="h-8 w-8 object-contain transition-transform duration-300 group-hover:rotate-[-8deg] group-hover:scale-110"
+              width={38}
+              height={38}
+              className="h-9 w-9 rounded-full object-cover shadow-sm transition-transform duration-300 group-hover:rotate-[-10deg] group-hover:scale-110"
             />
           </span>
-          <span className="text-lg font-bold tracking-tight text-gradient-brand">Lcucumber</span>
-          <span className="hidden text-xs text-muted-foreground sm:inline">/ Webtoon</span>
+          <span className="text-xl font-black tracking-tight text-gradient-brand">Lcucumber</span>
+          <span className="hidden rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary sm:inline">
+            Webtoon
+          </span>
         </Link>
 
         <form

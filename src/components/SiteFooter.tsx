@@ -206,20 +206,20 @@ export function SiteFooter() {
             <Link
               to="/"
               search={{ q: "" }}
-              className="group inline-flex items-center gap-2"
+              className="group inline-flex items-center gap-2.5"
               title={`${SITE_NAME} — Trang chủ`}
               aria-label={`${SITE_NAME} — Về trang chủ`}
             >
               <img
                 src={cucumberLogo}
                 alt={`Logo ${SITE_NAME} — webtoon cuộn dọc`}
-                width={32}
-                height={32}
-                className="h-8 w-8 object-contain transition group-hover:rotate-[-8deg]"
+                width={36}
+                height={36}
+                className="h-9 w-9 rounded-full object-cover shadow-sm transition-transform duration-300 group-hover:rotate-[-8deg] group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
               />
-              <span className="text-lg font-bold tracking-tight text-gradient-brand">
+              <span className="text-xl font-bold tracking-tight text-gradient-brand">
                 {SITE_NAME}
               </span>
             </Link>
