@@ -9,35 +9,63 @@ const LOCAL_COVERS: Record<string, string> = {
 // Helpers for embedding Google Drive images or self-hosted assets.
 // Accepts a raw File ID, asset path or any common Drive URL and returns the File ID or asset path.
 export function extractDriveId(input: string): string | null {
-  const s = input.trim();
+  const s = (input || "").trim();
   if (!s) return null;
-  if (LOCAL_COVERS[s] || s.startsWith("/") || s.startsWith("http://") || s.startsWith("https://")) {
+  if (LOCAL_COVERS[s] || s.startsWith("/")) {
     return s;
   }
-  // Already an ID (alphanum, _-, length ~20-60)
-  if (/^[A-Za-z0-9_-]{20,}$/.test(s)) return s;
-  const patterns = [
-    /\/file\/d\/([A-Za-z0-9_-]+)/,
-    /[?&]id=([A-Za-z0-9_-]+)/,
-    /\/d\/([A-Za-z0-9_-]+)/,
-    /uc\?id=([A-Za-z0-9_-]+)/,
+
+  // Check for Google Drive URLs FIRST before checking general HTTP
+  const drivePatterns = [
+    /\/file\/d\/([A-Za-z0-9_-]+)/i,
+    /\/d\/([A-Za-z0-9_-]+)/i,
+    /[?&]id=([A-Za-z0-9_-]+)/i,
+    /uc\?id=([A-Za-z0-9_-]+)/i,
+    /thumbnail\?id=([A-Za-z0-9_-]+)/i,
+    /lh3\.googleusercontent\.com\/d\/([A-Za-z0-9_-]+)/i,
+    /open\?id=([A-Za-z0-9_-]+)/i,
+    /document\/d\/([A-Za-z0-9_-]+)/i,
   ];
-  for (const r of patterns) {
+
+  for (const r of drivePatterns) {
     const m = s.match(r);
-    if (m) return m[1];
+    if (m && m[1]) return m[1];
   }
-  return null;
+
+  // If it's a raw Drive ID (alphanumeric, -, _, length 15-60)
+  if (/^[A-Za-z0-9_-]{15,60}$/.test(s)) {
+    return s;
+  }
+
+  // Non-drive external direct image URL
+  if (s.startsWith("http://") || s.startsWith("https://")) {
+    return s;
+  }
+
+  return s;
 }
 
 export function driveImageUrl(idOrUrl: string, width = 1600): string {
   if (!idOrUrl) return "";
   const s = idOrUrl.trim();
   if (LOCAL_COVERS[s]) return LOCAL_COVERS[s];
-  if (s.startsWith("/") || s.startsWith("http://") || s.startsWith("https://")) {
-    return s;
-  }
+  if (s.startsWith("/")) return s;
+
   const id = extractDriveId(s) ?? s;
   if (LOCAL_COVERS[id]) return LOCAL_COVERS[id];
+  if (id.startsWith("/")) return id;
+
+  // If it's a full URL
+  if (id.startsWith("http://") || id.startsWith("https://")) {
+    if (id.includes("drive.google.com") || id.includes("docs.google.com") || id.includes("googleusercontent.com")) {
+      const extracted = extractDriveId(id);
+      if (extracted && !extracted.startsWith("http")) {
+        return `https://drive.google.com/thumbnail?id=${extracted}&sz=w${width}`;
+      }
+    }
+    return id;
+  }
+
   return `https://drive.google.com/thumbnail?id=${id}&sz=w${width}`;
 }
 
@@ -55,7 +83,7 @@ export function getOgImageUrl(idOrUrl?: string): string {
 
 export function parseDriveIds(text: string): string[] {
   return text
-    .split(/\s|,|;/)
+    .split(/\r?\n|,|;/)
     .map((l) => l.trim())
     .filter(Boolean)
     .map((l) => extractDriveId(l) ?? l);
