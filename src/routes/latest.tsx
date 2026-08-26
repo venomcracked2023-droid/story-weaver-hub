@@ -1,13 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
-import { useComics } from "@/lib/comics-store";
+import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { Clock } from "lucide-react";
 import { useMemo } from "react";
 import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/latest")({
   component: LatestPage,
+  loader: async () => {
+    const comics = await fetchComicsData();
+    return { comics };
+  },
   head: () => {
     const title = "Truyện mới cập nhật — Lcucumber";
     const desc =
@@ -33,7 +37,8 @@ export const Route = createFileRoute("/latest")({
 });
 
 function LatestPage() {
-  const comics = useComics();
+  const loaderData = Route.useLoaderData();
+  const comics = useComics(loaderData?.comics);
   // Sắp xếp theo thời điểm chương mới nhất (fallback createdAt nếu chưa có chương).
   const latest = useMemo(() => {
     return [...comics]
@@ -78,11 +83,6 @@ function LatestPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }}
       />
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-6">
-        <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
-          <span className="text-border">/</span>
-          <span className="text-foreground/80">Mới cập nhật</span>
-        </nav>
         <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
           <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
           <span className="text-border">/</span>

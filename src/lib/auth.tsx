@@ -24,13 +24,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<AuthState["profile"]>(null);
   const [loading, setLoading] = useState(true);
 
-  async function loadUserData(uid: string) {
+  async function loadUserData(u: User) {
+    const uid = u.id;
     const [{ data: rolesData }, { data: profileData }] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", uid),
       supabase.from("profiles").select("display_name, avatar_url, email").eq("id", uid).maybeSingle(),
     ]);
     setRoles((rolesData ?? []).map((r) => r.role as Role));
-    setProfile(profileData ?? null);
+    setProfile(
+      profileData ?? {
+        display_name:
+          u.user_metadata?.full_name ||
+          u.user_metadata?.name ||
+          u.email?.split("@")[0] ||
+          null,
+        avatar_url:
+          u.user_metadata?.avatar_url ||
+          u.user_metadata?.picture ||
+          null,
+        email: u.email || null,
+      },
+    );
   }
 
   useEffect(() => {
@@ -38,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
       if (s?.user) {
-        setTimeout(() => loadUserData(s.user.id), 0);
+        setTimeout(() => loadUserData(s.user), 0);
       } else {
         setRoles([]);
         setProfile(null);
@@ -46,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
-      if (data.session?.user) loadUserData(data.session.user.id).finally(() => setLoading(false));
+      if (data.session?.user) loadUserData(data.session.user).finally(() => setLoading(false));
       else setLoading(false);
     });
     return () => sub.subscription.unsubscribe();
@@ -61,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAdmin: roles.includes("admin"),
     isContributor: roles.includes("contributor") || roles.includes("admin"),
     refresh: async () => {
-      if (session?.user) await loadUserData(session.user.id);
+      if (session?.user) await loadUserData(session.user);
     },
     signOut: async () => {
       await supabase.auth.signOut();

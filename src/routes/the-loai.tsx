@@ -1,17 +1,32 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
-import { useComics } from "@/lib/comics-store";
-import { Tag } from "lucide-react";
+import { fetchComicsData, useComics } from "@/lib/comics-store";
+import { Tag, Sparkles, Compass } from "lucide-react";
 import { useMemo } from "react";
 import { SITE_URL } from "@/lib/seo";
 import { slugifyGenre } from "@/lib/slug";
 
+const GENRE_DESCRIPTIONS: Record<string, string> = {
+  bl: "Tình cảm lãng mạn Boys' Love đặc sắc, cốt truyện sâu sắc và nét vẽ trau chuốt.",
+  "hanh-dong": "Những pha hành động kịch tính, đánh đấm mãn nhãn và nhịp truyện dồn dập.",
+  drama: "Xung đột tâm lý, cốt truyện bất ngờ, nhiều khúc mắc và kịch tính đến nghẹt thở.",
+  manhwa: "Truyện tranh Hàn Quốc cuộn dọc chuẩn sắc màu, phong cách đồ hoạ thời thượng.",
+  "18": "Tác phẩm dành cho lứa tuổi trưởng thành với các yếu tố tâm lý và tình cảm sâu sắc.",
+  romance: "Chuyện tình lãng mạn ngọt ngào, rung động trái tim và cảm xúc chân thật.",
+  comedy: "Tình huống hài hước, dí dỏm giúp giải tỏa căng thẳng sau những giờ làm việc.",
+  fantasy: "Thế giới huyền ảo, ma thuật diệu kỳ cùng những chuyến phiêu lưu kỳ thú.",
+};
+
 export const Route = createFileRoute("/the-loai")({
   component: GenresHubPage,
+  loader: async () => {
+    const comics = await fetchComicsData();
+    return { comics };
+  },
   head: () => {
     const title = "Thể loại truyện — Lcucumber";
     const desc =
-      "Khám phá tất cả thể loại webtoon, manhwa, manhua trên Lcucumber — chọn thể loại yêu thích và đọc cuộn dọc miễn phí.";
+      "Khám phá tất cả thể loại webtoon, manhwa, manhua trên Lcucumber: BL, Hành động, Drama, Manhwa... — chọn thể loại yêu thích và đọc cuộn dọc miễn phí.";
     const url = `${SITE_URL}/the-loai`;
     return {
       meta: [
@@ -48,7 +63,8 @@ export const Route = createFileRoute("/the-loai")({
 });
 
 function GenresHubPage() {
-  const comics = useComics();
+  const loaderData = Route.useLoaderData();
+  const comics = useComics(loaderData?.comics);
 
   const genres = useMemo(() => {
     const map = new Map<string, { name: string; slug: string; count: number }>();
@@ -98,18 +114,18 @@ function GenresHubPage() {
           <span className="text-border">/</span>
           <span className="text-foreground/80">Thể loại truyện</span>
         </nav>
-        <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
-          <span className="text-border">/</span>
-          <span className="text-foreground/80">Thể loại truyện</span>
-        </nav>
+
         <header className="mb-8">
-          <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
-            <Tag className="h-6 w-6 text-primary" />
-            Thể loại truyện
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
+            <Compass className="h-3.5 w-3.5" />
+            Khám phá theo sở thích
+          </div>
+          <h1 className="mt-3 flex items-center gap-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
+            <Tag className="h-7 w-7 text-primary" />
+            Thể loại truyện Webtoon
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {genres.length} thể loại · Chọn một thể loại để xem toàn bộ truyện.
+          <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+            Tổng hợp {genres.length} thể loại truyện tranh phong phú. Chọn một thể loại để đắm chìm vào những bộ truyện hấp dẫn nhất.
           </p>
         </header>
 
@@ -119,23 +135,42 @@ function GenresHubPage() {
             <Link to="/" search={{ q: "" }} className="text-primary underline">Về trang chủ</Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {genres.map((g, i) => (
-              <Link
-                key={g.slug}
-                to="/genre/$slug"
-                params={{ slug: g.slug }}
-                className="hover-lift group flex items-center justify-between gap-2 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-primary/60 animate-fade-in-up"
-                style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }}
-              >
-                <span className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">
-                  {g.name}
-                </span>
-                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                  {g.count}
-                </span>
-              </Link>
-            ))}
+          <div className="space-y-10">
+            {/* Top Highlights Grid */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {genres.map((g, i) => {
+                const desc = GENRE_DESCRIPTIONS[g.slug] || `Khám phá các bộ truyện ${g.name} được bạn đọc yêu thích trên Lcucumber.`;
+                return (
+                  <Link
+                    key={g.slug}
+                    to="/genre/$slug"
+                    params={{ slug: g.slug }}
+                    className="hover-lift group flex flex-col justify-between rounded-2xl border border-border bg-card p-5 transition-all hover:border-primary/60 hover:shadow-lg animate-fade-in-up"
+                    style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-2 text-lg font-bold transition-colors group-hover:text-primary">
+                          <Sparkles className="h-4 w-4 text-primary" />
+                          {g.name}
+                        </span>
+                        <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                          {g.count} bộ truyện
+                        </span>
+                      </div>
+                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground line-clamp-2">
+                        {desc}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 flex items-center gap-1 text-xs font-medium text-primary">
+                      <span>Xem danh sách truyện</span>
+                      <span className="transition-transform group-hover:translate-x-1">→</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
       </main>

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
-import { useComics } from "@/lib/comics-store";
+import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { Tag } from "lucide-react";
 import { useMemo } from "react";
 import { SITE_URL } from "@/lib/seo";
@@ -9,6 +9,10 @@ import { slugifyGenre } from "@/lib/slug";
 
 export const Route = createFileRoute("/genre/$slug")({
   component: GenrePage,
+  loader: async () => {
+    const comics = await fetchComicsData();
+    return { comics };
+  },
   head: ({ params }) => {
     const slug = params.slug;
     const title = `Truyện ${slug} — Đọc Webtoon miễn phí | Lcucumber`;
@@ -59,7 +63,8 @@ export const Route = createFileRoute("/genre/$slug")({
 
 function GenrePage() {
   const { slug } = Route.useParams();
-  const comics = useComics();
+  const loaderData = Route.useLoaderData();
+  const comics = useComics(loaderData?.comics);
 
   // Tên thể loại hiển thị: lấy biến thể có dấu đầu tiên khớp slug.
   const { matched, displayName } = useMemo(() => {
@@ -102,13 +107,6 @@ function GenrePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }}
       />
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-6">
-        <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
-          <span className="text-border">/</span>
-          <Link to="/the-loai" className="transition hover:text-primary">Thể loại</Link>
-          <span className="text-border">/</span>
-          <span className="text-foreground/80">{displayName}</span>
-        </nav>
         <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
           <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
           <span className="text-border">/</span>

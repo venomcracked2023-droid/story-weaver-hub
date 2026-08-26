@@ -20,6 +20,7 @@ import { Route as GenresRouteImport } from './routes/genres'
 import { Route as FeaturedRouteImport } from './routes/featured'
 import { Route as DmcaRouteImport } from './routes/dmca'
 import { Route as DieuKhoanRouteImport } from './routes/dieu-khoan'
+import { Route as CongDongRouteImport } from './routes/cong-dong'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminApplicationsRouteImport } from './routes/admin-applications'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -27,6 +28,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GenreSlugRouteImport } from './routes/genre.$slug'
+import { Route as ApiPingSitemapRouteImport } from './routes/api/ping-sitemap'
 import { Route as ApiDriveFileRouteImport } from './routes/api/drive-file'
 import { Route as TruyenSlugIndexRouteImport } from './routes/truyen.$slug.index'
 import { Route as TruyenSlugChapterRouteImport } from './routes/truyen.$slug.$chapter'
@@ -86,6 +88,11 @@ const DieuKhoanRoute = DieuKhoanRouteImport.update({
   path: '/dieu-khoan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CongDongRoute = CongDongRouteImport.update({
+  id: '/cong-dong',
+  path: '/cong-dong',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApplyRoute = ApplyRouteImport.update({
   id: '/apply',
   path: '/apply',
@@ -121,6 +128,11 @@ const GenreSlugRoute = GenreSlugRouteImport.update({
   path: '/genre/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPingSitemapRoute = ApiPingSitemapRouteImport.update({
+  id: '/api/ping-sitemap',
+  path: '/api/ping-sitemap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiDriveFileRoute = ApiDriveFileRouteImport.update({
   id: '/api/drive-file',
   path: '/api/drive-file',
@@ -144,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
+  '/cong-dong': typeof CongDongRoute
   '/dieu-khoan': typeof DieuKhoanRoute
   '/dmca': typeof DmcaRoute
   '/featured': typeof FeaturedRoute
@@ -156,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/the-loai': typeof TheLoaiRoute
   '/api/drive-file': typeof ApiDriveFileRoute
+  '/api/ping-sitemap': typeof ApiPingSitemapRoute
   '/genre/$slug': typeof GenreSlugRoute
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
   '/truyen/$slug/': typeof TruyenSlugIndexRoute
@@ -167,6 +181,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
+  '/cong-dong': typeof CongDongRoute
   '/dieu-khoan': typeof DieuKhoanRoute
   '/dmca': typeof DmcaRoute
   '/featured': typeof FeaturedRoute
@@ -179,6 +194,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/the-loai': typeof TheLoaiRoute
   '/api/drive-file': typeof ApiDriveFileRoute
+  '/api/ping-sitemap': typeof ApiPingSitemapRoute
   '/genre/$slug': typeof GenreSlugRoute
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
   '/truyen/$slug': typeof TruyenSlugIndexRoute
@@ -191,6 +207,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/admin-applications': typeof AdminApplicationsRoute
   '/apply': typeof ApplyRoute
+  '/cong-dong': typeof CongDongRoute
   '/dieu-khoan': typeof DieuKhoanRoute
   '/dmca': typeof DmcaRoute
   '/featured': typeof FeaturedRoute
@@ -203,6 +220,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/the-loai': typeof TheLoaiRoute
   '/api/drive-file': typeof ApiDriveFileRoute
+  '/api/ping-sitemap': typeof ApiPingSitemapRoute
   '/genre/$slug': typeof GenreSlugRoute
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
   '/truyen/$slug/': typeof TruyenSlugIndexRoute
@@ -216,6 +234,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-applications'
     | '/apply'
+    | '/cong-dong'
     | '/dieu-khoan'
     | '/dmca'
     | '/featured'
@@ -228,6 +247,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/the-loai'
     | '/api/drive-file'
+    | '/api/ping-sitemap'
     | '/genre/$slug'
     | '/truyen/$slug/$chapter'
     | '/truyen/$slug/'
@@ -239,6 +259,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-applications'
     | '/apply'
+    | '/cong-dong'
     | '/dieu-khoan'
     | '/dmca'
     | '/featured'
@@ -251,6 +272,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/the-loai'
     | '/api/drive-file'
+    | '/api/ping-sitemap'
     | '/genre/$slug'
     | '/truyen/$slug/$chapter'
     | '/truyen/$slug'
@@ -262,6 +284,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-applications'
     | '/apply'
+    | '/cong-dong'
     | '/dieu-khoan'
     | '/dmca'
     | '/featured'
@@ -274,6 +297,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/the-loai'
     | '/api/drive-file'
+    | '/api/ping-sitemap'
     | '/genre/$slug'
     | '/truyen/$slug/$chapter'
     | '/truyen/$slug/'
@@ -286,6 +310,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   ApplyRoute: typeof ApplyRoute
+  CongDongRoute: typeof CongDongRoute
   DieuKhoanRoute: typeof DieuKhoanRoute
   DmcaRoute: typeof DmcaRoute
   FeaturedRoute: typeof FeaturedRoute
@@ -298,6 +323,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TheLoaiRoute: typeof TheLoaiRoute
   ApiDriveFileRoute: typeof ApiDriveFileRoute
+  ApiPingSitemapRoute: typeof ApiPingSitemapRoute
   GenreSlugRoute: typeof GenreSlugRoute
   TruyenSlugChapterRoute: typeof TruyenSlugChapterRoute
   TruyenSlugIndexRoute: typeof TruyenSlugIndexRoute
@@ -382,6 +408,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DieuKhoanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cong-dong': {
+      id: '/cong-dong'
+      path: '/cong-dong'
+      fullPath: '/cong-dong'
+      preLoaderRoute: typeof CongDongRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apply': {
       id: '/apply'
       path: '/apply'
@@ -431,6 +464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GenreSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ping-sitemap': {
+      id: '/api/ping-sitemap'
+      path: '/api/ping-sitemap'
+      fullPath: '/api/ping-sitemap'
+      preLoaderRoute: typeof ApiPingSitemapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/drive-file': {
       id: '/api/drive-file'
       path: '/api/drive-file'
@@ -462,6 +502,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AdminApplicationsRoute: AdminApplicationsRoute,
   ApplyRoute: ApplyRoute,
+  CongDongRoute: CongDongRoute,
   DieuKhoanRoute: DieuKhoanRoute,
   DmcaRoute: DmcaRoute,
   FeaturedRoute: FeaturedRoute,
@@ -474,6 +515,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TheLoaiRoute: TheLoaiRoute,
   ApiDriveFileRoute: ApiDriveFileRoute,
+  ApiPingSitemapRoute: ApiPingSitemapRoute,
   GenreSlugRoute: GenreSlugRoute,
   TruyenSlugChapterRoute: TruyenSlugChapterRoute,
   TruyenSlugIndexRoute: TruyenSlugIndexRoute,

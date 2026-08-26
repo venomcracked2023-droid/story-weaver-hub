@@ -97,6 +97,22 @@ export function SiteHeader() {
             Khám phá
           </Link>
 
+          <Link
+            to="/the-loai"
+            className={navClass}
+            activeProps={{ className: activeClass }}
+          >
+            Thể loại
+          </Link>
+
+          <Link
+            to="/cong-dong"
+            className={navClass}
+            activeProps={{ className: activeClass }}
+          >
+            Cộng đồng
+          </Link>
+
           <div ref={infoRef} className="relative">
             <button
               type="button"
@@ -130,6 +146,16 @@ export function SiteHeader() {
                 </li>
                 <li role="none">
                   <Link
+                    to="/cong-dong"
+                    role="menuitem"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                    onClick={() => setInfoOpen(false)}
+                  >
+                    Cộng đồng Lcucumber
+                  </Link>
+                </li>
+                <li role="none">
+                  <Link
                     to="/lien-he"
                     role="menuitem"
                     className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground"
@@ -146,6 +172,16 @@ export function SiteHeader() {
                     onClick={() => setInfoOpen(false)}
                   >
                     Điều khoản
+                  </Link>
+                </li>
+                <li role="none">
+                  <Link
+                    to="/dmca"
+                    role="menuitem"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                    onClick={() => setInfoOpen(false)}
+                  >
+                    Chính sách DMCA
                   </Link>
                 </li>
               </ul>

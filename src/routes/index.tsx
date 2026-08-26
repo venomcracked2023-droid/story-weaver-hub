@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
-import { useComics } from "@/lib/comics-store";
+import { fetchComicsData, useComics } from "@/lib/comics-store";
+import { fuzzyScoreVi } from "@/lib/fuzzy-search";
 import { BookOpen, Library, Sparkles, Star } from "lucide-react";
 import cucumberLogo from "@/assets/cucumber-logo.png";
 import { SITE_URL } from "@/lib/seo";
@@ -12,6 +13,10 @@ export const Route = createFileRoute("/")({
   validateSearch: (s: Record<string, unknown>) => ({
     q: typeof s.q === "string" ? s.q : "",
   }),
+  loader: async () => {
+    const comics = await fetchComicsData();
+    return { comics };
+  },
   head: () => {
     const title = "Lcucumber — Đọc Webtoon cuộn dọc miễn phí";
     const desc =
@@ -115,37 +120,73 @@ function PaginationControls({
 }
 
 function Index() {
-  const comics = useComics();
+  const loaderData = Route.useLoaderData();
+  const comics = useComics(loaderData?.comics);
   const { q } = Route.useSearch();
-  const term = (q ?? "").trim().toLowerCase();
-  const filtered = term
-    ? comics.filter((c) =>
-        [c.title, c.author, ...(c.genres ?? [])]
-          .join(" ")
-          .toLowerCase()
-          .includes(term),
-      )
-    : comics;
+  const term = (q ?? "").trim();
+
+  const [selectedGenre, setSelectedGenre] = useState<string>("");
+
+  const allGenres = useMemo(() => {
+    const set = new Set<string>();
+    for (const c of comics) {
+      for (const g of c.genres ?? []) {
+        if (g.trim()) set.add(g.trim());
+      }
+    }
+    return Array.from(set);
+  }, [comics]);
+
+  const filtered = useMemo(() => {
+    let list = comics;
+    if (selectedGenre) {
+      list = list.filter((c) => (c.genres ?? []).includes(selectedGenre));
+    }
+    if (!term) return list;
+    const scored = list
+      .map((c) => {
+        const titleScore = fuzzyScoreVi(term, c.title);
+        const authorScore = fuzzyScoreVi(term, c.author ?? "");
+        const genreScores = (c.genres ?? [])
+          .map((g) => fuzzyScoreVi(term, g))
+          .filter((s): s is number => s !== null);
+        const descScore = fuzzyScoreVi(term, c.description ?? "");
+        const candidates = [
+          titleScore,
+          authorScore !== null ? authorScore + 2 : null,
+          genreScores.length ? Math.min(...genreScores) + 1 : null,
+          descScore !== null ? descScore + 4 : null,
+        ].filter((s): s is number => s !== null);
+        if (candidates.length === 0) return null;
+        return { comic: c, score: Math.min(...candidates), tiebreak: c.title.length };
+      })
+      .filter((x): x is { comic: typeof comics[number]; score: number; tiebreak: number } => x !== null)
+      .sort((a, b) => a.score - b.score || a.tiebreak - b.tiebreak);
+    return scored.map((s) => s.comic);
+  }, [comics, term, selectedGenre]);
+
   // "Nổi bật" = các truyện vừa có chương mới nhất (tự động, không cần admin chọn).
-  const featured = [...comics]
-    .filter((c) => c.chapters.length > 0)
-    .map((c) => ({
-      comic: c,
-      lastChapterAt: Math.max(...c.chapters.map((ch) => ch.createdAt)),
-    }))
-    .sort((a, b) => b.lastChapterAt - a.lastChapterAt)
-    .slice(0, 12)
-    .map((x) => x.comic);
-  const totalChapters = comics.reduce((s, c) => s + c.chapters.length, 0);
+  const featured = useMemo(() => {
+    return [...comics]
+      .filter((c) => c.chapters.length > 0)
+      .map((c) => ({
+        comic: c,
+        lastChapterAt: Math.max(...c.chapters.map((ch) => ch.createdAt)),
+      }))
+      .sort((a, b) => b.lastChapterAt - a.lastChapterAt)
+      .slice(0, 12)
+      .map((x) => x.comic);
+  }, [comics]);
+
+  const totalChapters = useMemo(() => comics.reduce((s, c) => s + c.chapters.length, 0), [comics]);
 
   const [libraryPage, setLibraryPage] = useState(1);
-
   const libraryPerPage = 16;
 
-  // Reset to page 1 when search query changes
+  // Reset to page 1 when search query or genre filter changes
   useEffect(() => {
     setLibraryPage(1);
-  }, [term]);
+  }, [term, selectedGenre]);
 
   const libraryTotalPages = Math.max(1, Math.ceil(filtered.length / libraryPerPage));
 
@@ -182,7 +223,8 @@ function Index() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(libraryJsonLd) }}
       />
       <main className="mx-auto max-w-6xl px-4 pb-20">
-        <section className="relative mt-6 overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-secondary to-card px-6 py-9 sm:px-12 sm:py-12">
+        {/* Hero Banner */}
+        <section className="relative mt-6 overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-secondary to-card px-6 py-9 sm:px-12 sm:py-12 shadow-xl">
           <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-primary/25 blur-3xl animate-pulse-glow" />
           <div className="pointer-events-none absolute -bottom-24 -left-10 h-80 w-80 rounded-full bg-accent/20 blur-3xl animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
           <img
@@ -192,54 +234,64 @@ function Index() {
             className="pointer-events-none absolute right-6 top-6 hidden h-28 w-28 opacity-90 drop-shadow-[0_10px_30px_oklch(0.72_0.19_142_/_0.45)] animate-float-slow md:block"
           />
           <div className="relative max-w-2xl animate-fade-in-up">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-background/50 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5 text-primary" /> Webtoon — cuộn dọc, đọc liền mạch
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-background/50 px-3.5 py-1 text-xs font-semibold text-primary backdrop-blur">
+              <Sparkles className="h-3.5 w-3.5" /> Webtoon cuộn dọc — Đọc mượt không quảng cáo
             </span>
-            <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
+            <h1 className="mt-4 text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl">
               Lcucumber — Đọc Webtoon cuộn dọc miễn phí
             </h1>
-            <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
-              Khám phá thế giới webtoon cùng Lcucumber — mượt như lướt sóng, xanh như dưa leo.
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+              Nền tảng đọc truyện tranh bản quyền và Việt hóa chất lượng cao: Manhwa, Manhua, BL, Hành động, Drama. Trải nghiệm cuộn dọc liền mạch trên mọi thiết bị.
             </p>
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3">
               <a
                 href="#library"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-brand px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-brand px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95"
               >
-                <Library className="h-4 w-4" /> Vào thư viện
+                <Library className="h-4 w-4" /> Khám phá thư viện
               </a>
               <Link
                 to="/featured"
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-5 py-2.5 text-sm backdrop-blur transition hover:border-primary/60 hover:bg-secondary"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-background/60 px-5 py-3 text-sm font-medium backdrop-blur transition hover:border-primary/60 hover:bg-secondary"
               >
                 <Star className="h-4 w-4 text-primary" /> Truyện nổi bật
               </Link>
+              <Link
+                to="/cong-dong"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-background/60 px-5 py-3 text-sm font-medium backdrop-blur transition hover:border-primary/60 hover:bg-secondary"
+              >
+                Cộng đồng độc giả
+              </Link>
             </div>
 
-            <dl className="mt-5 grid max-w-md grid-cols-3 gap-3 text-sm">
-              <div className="rounded-xl border border-border bg-background/40 px-3 py-2 backdrop-blur">
-                <dt className="text-xs text-muted-foreground">Truyện</dt>
-                <dd className="mt-0.5 text-lg font-bold text-foreground tabular-nums">{comics.length}</dd>
+            <dl className="mt-6 grid max-w-md grid-cols-3 gap-3 text-sm">
+              <div className="rounded-2xl border border-border/80 bg-background/50 p-3 backdrop-blur">
+                <dt className="text-xs font-medium text-muted-foreground">Tổng truyện</dt>
+                <dd className="mt-0.5 text-xl font-extrabold text-foreground tabular-nums">{comics.length}</dd>
               </div>
-              <div className="rounded-xl border border-border bg-background/40 px-3 py-2 backdrop-blur">
-                <dt className="text-xs text-muted-foreground">Chương</dt>
-                <dd className="mt-0.5 text-lg font-bold text-foreground tabular-nums">{totalChapters}</dd>
+              <div className="rounded-2xl border border-border/80 bg-background/50 p-3 backdrop-blur">
+                <dt className="text-xs font-medium text-muted-foreground">Tổng chương</dt>
+                <dd className="mt-0.5 text-xl font-extrabold text-foreground tabular-nums">{totalChapters}</dd>
               </div>
-              <div className="rounded-xl border border-border bg-background/40 px-3 py-2 backdrop-blur">
-                <dt className="text-xs text-muted-foreground">Nổi bật</dt>
-                <dd className="mt-0.5 text-lg font-bold text-primary tabular-nums">{featured.length}</dd>
+              <div className="rounded-2xl border border-border/80 bg-background/50 p-3 backdrop-blur">
+                <dt className="text-xs font-medium text-muted-foreground">Thể loại</dt>
+                <dd className="mt-0.5 text-xl font-extrabold text-primary tabular-nums">{allGenres.length || 5}+</dd>
               </div>
             </dl>
           </div>
         </section>
 
+        {/* Featured Marquee */}
         {featured.length > 0 && (
           <section className="mt-14 animate-fade-in-up">
             <div className="mb-6 flex items-end justify-between">
-              <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-                <Star className="h-5 w-5 fill-primary text-primary drop-shadow-[0_0_10px_oklch(0.72_0.19_142_/_0.6)]" />
-                Truyện nổi bật
-              </h2>
+              <div>
+                <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                  <Star className="h-5 w-5 fill-primary text-primary drop-shadow-[0_0_10px_oklch(0.72_0.19_142_/_0.6)]" />
+                  Truyện nổi bật tuyển chọn
+                </h2>
+                <p className="mt-1 text-xs text-muted-foreground">Các bộ truyện được cập nhật chương mới và đón đọc nhiều nhất</p>
+              </div>
               <Link
                 to="/featured"
                 className="group inline-flex items-center gap-1 text-sm font-medium text-primary"
@@ -266,7 +318,7 @@ function Index() {
                       <ComicCover id={c.coverId} title={c.title} priority={i < 4} className="transition duration-500 group-hover:scale-110" />
                       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-card/90 via-card/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                       <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-primary-foreground shadow-glow backdrop-blur">
-                        <Star className="h-3 w-3 fill-current" /> Mới
+                        <Star className="h-3 w-3 fill-current" /> Hot
                       </span>
                     </div>
                     <div>
@@ -282,15 +334,93 @@ function Index() {
           </section>
         )}
 
-        <section id="library" className="mt-14 scroll-mt-24">
-          <div className="mb-6 flex items-end justify-between">
-            <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-              <Library className="h-5 w-5 text-primary" />
-              {term ? `Kết quả cho "${q}"` : "Thư viện truyện"}
-            </h2>
-            <span className="text-sm text-muted-foreground">
-              {filtered.length}/{comics.length} tác phẩm
+        {/* Why Choose Lcucumber (Value Proposition) */}
+        <section className="mt-14 rounded-3xl border border-border/80 bg-card/40 p-6 md:p-8 backdrop-blur">
+          <div className="text-center max-w-2xl mx-auto">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
+              <Sparkles className="h-3.5 w-3.5" /> Trải nghiệm khác biệt
             </span>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Tại sao nên đọc truyện tại Lcucumber?</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Chúng tôi tập trung tối đa vào trải nghiệm đọc mượt mà và tôn trọng sự gắn kết của cộng đồng.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-2xl border border-border bg-background/60 p-5 transition hover:border-primary/50">
+              <div className="text-2xl">📱</div>
+              <h3 className="mt-3 text-base font-semibold">Cuộn Dọc Vô Tận</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                Tối ưu hóa từng khung hình chuẩn Webtoon di động, đọc liền mạch không giật lag.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-background/60 p-5 transition hover:border-primary/50">
+              <div className="text-2xl">⚡</div>
+              <h3 className="mt-3 text-base font-semibold">Cập Nhật Siêu Tốc</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                Chương mới được cập nhật liên tục mỗi ngày từ các dịch giả và tác giả uy tín.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-background/60 p-5 transition hover:border-primary/50">
+              <div className="text-2xl">🛡️</div>
+              <h3 className="mt-3 text-base font-semibold">Không Pop-up Phiền Phức</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                Đọc trọn vẹn từng chương truyện mà không bị che khuất bởi các quảng cáo rác độc hại.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-background/60 p-5 transition hover:border-primary/50">
+              <div className="text-2xl">💬</div>
+              <h3 className="mt-3 text-base font-semibold">Tương Tác Đa Chiều</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                Bình luận trực tiếp dưới mỗi chương truyện, giao lưu cùng cộng đồng độc giả đam mê.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Main Library & Genre Filters */}
+        <section id="library" className="mt-14 scroll-mt-24">
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                <Library className="h-5 w-5 text-primary" />
+                {term ? `Kết quả cho "${q}"` : selectedGenre ? `Truyện thể loại "${selectedGenre}"` : "Thư viện truyện"}
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Hiển thị {filtered.length}/{comics.length} tác phẩm
+              </p>
+            </div>
+
+            {/* Genre Filter Chips */}
+            {allGenres.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setSelectedGenre("")}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                    !selectedGenre
+                      ? "bg-primary text-primary-foreground shadow"
+                      : "border border-border bg-card text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Tất cả
+                </button>
+                {allGenres.map((g) => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => setSelectedGenre(selectedGenre === g ? "" : g)}
+                    className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                      selectedGenre === g
+                        ? "bg-primary text-primary-foreground shadow"
+                        : "border border-border bg-card text-muted-foreground hover:border-primary/60 hover:text-foreground"
+                    }`}
+                  >
+                    {g}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {comics.length === 0 ? (
@@ -300,9 +430,16 @@ function Index() {
               <Link to="/admin" rel="nofollow" className="text-primary underline-offset-4 hover:underline">Vào Quản lý để thêm</Link>
             </div>
           ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border bg-card/40 p-12 text-center text-muted-foreground">
+            <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 p-12 text-center text-muted-foreground">
               <BookOpen className="h-10 w-10 text-primary/60" />
-              <p>Không tìm thấy truyện nào khớp với "{q}".</p>
+              <p>Không tìm thấy truyện nào khớp với bộ lọc hiện tại.</p>
+              <button
+                type="button"
+                onClick={() => setSelectedGenre("")}
+                className="text-xs font-medium text-primary underline"
+              >
+                Đặt lại bộ lọc thể loại
+              </button>
             </div>
           ) : (
             <>

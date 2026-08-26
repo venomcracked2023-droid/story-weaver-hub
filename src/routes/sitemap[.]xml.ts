@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { enhanceComicMetadata } from "@/lib/comics-store";
 import { inferChangeFreq } from "@/lib/sitemap-freq";
 import { slugifyGenre } from "@/lib/slug";
 import { SITE_URL } from "@/lib/seo";
@@ -10,11 +11,12 @@ export const Route = createFileRoute("/sitemap.xml")({
     handlers: {
       GET: async () => {
         const origin = SITE_URL;
-        const { data: comics } = await supabase
+        const { data: rawComics } = await supabase
           .from("comics")
-          .select("id,slug,updated_at,genres")
+          .select("id,slug,title,updated_at,genres,created_at,author,description,cover_id")
           .order("updated_at", { ascending: false })
           .limit(2000);
+        const comics = (rawComics ?? []).map(enhanceComicMetadata);
         // Dùng 1 sitemap duy nhất: trang tĩnh + thể loại + truyện + chương.
         // Với vài chục/trăm truyện thì 1 file là đủ và đơn giản nhất.
         const { data: chapters } = await supabase
@@ -44,7 +46,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           globalLatest = maxIso(globalLatest, ts);
         }
         for (const c of comics ?? []) {
-          globalLatest = maxIso(globalLatest, iso(c.updated_at));
+          globalLatest = maxIso(globalLatest, iso(c.updated_at ?? c.created_at ?? Date.now()));
         }
         const siteLastmod = globalLatest ?? iso(Date.now());
         const freqByComic = new Map<string, "hourly" | "daily" | "weekly" | "monthly" | "yearly">();
@@ -58,6 +60,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           `<url><loc>${origin}/featured</loc><lastmod>${siteLastmod}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,
           `<url><loc>${origin}/latest</loc><lastmod>${siteLastmod}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,
           `<url><loc>${origin}/the-loai</loc><lastmod>${siteLastmod}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`,
+          `<url><loc>${origin}/cong-dong</loc><lastmod>${siteLastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
           `<url><loc>${origin}/gioi-thieu</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
           `<url><loc>${origin}/lien-he</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
           `<url><loc>${origin}/dieu-khoan</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>`,
@@ -70,7 +73,7 @@ export const Route = createFileRoute("/sitemap.xml")({
             const slug = slugifyGenre(g);
             if (!slug) continue;
             const prev = genreLastmod.get(slug);
-            const ts = iso(c.updated_at);
+            const ts = iso(c.updated_at ?? c.created_at ?? Date.now());
             if (!prev || new Date(ts) > new Date(prev)) genreLastmod.set(slug, ts);
           }
         }
@@ -106,7 +109,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         return new Response(xml, {
           headers: {
             "content-type": "application/xml; charset=utf-8",
-            "cache-control": "public, max-age=900",
+            "cache-control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400",
           },
         });
       },

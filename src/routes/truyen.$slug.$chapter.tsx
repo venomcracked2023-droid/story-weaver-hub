@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { driveImageUrl, extractDriveId } from "@/lib/drive";
+import { driveImageUrl, extractDriveId, getOgImageUrl } from "@/lib/drive";
+import { enhanceComicMetadata } from "@/lib/comics-store";
 import { ArrowLeft, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, List } from "lucide-react";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +8,7 @@ import { CommentSection } from "@/components/CommentSection";
 import { AgeWarning } from "@/components/AgeWarning";
 import { isMatureComic } from "@/lib/content-rating";
 import { SITE_URL } from "@/lib/seo";
+import { slugifyGenre } from "@/lib/slug";
 
 const PdfReader = lazy(() =>
   import("@/components/PdfReader").then((module) => ({ default: module.PdfReader })),
@@ -27,12 +29,12 @@ function truncateMeta(text: string) {
 export const Route = createFileRoute("/truyen/$slug/$chapter")({
   component: Reader,
   loader: async ({ params }) => {
-    const { data: comic } = await supabase
+    const { data: comicRaw } = await supabase
       .from("comics")
       .select("id,title,cover_id,slug,genres,description")
       .eq("slug", params.slug)
       .maybeSingle();
-    if (!comic) {
+    if (!comicRaw) {
       return {
         comic: null,
         chapter: null,
@@ -41,6 +43,7 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
         chapters: [] as Array<{ id: string; slug: string; title: string }>,
       };
     }
+    const comic = enhanceComicMetadata(comicRaw);
     const { data: siblings } = await supabase
       .from("chapters")
       .select("id,title,slug,pages,created_at,order_index")
@@ -86,7 +89,7 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
     const desc = truncateMeta(summary);
     const url = `${SITE_URL}/truyen/${params.slug}/${params.chapter}`;
     const comicUrl = `${SITE_URL}/truyen/${params.slug}`;
-    const img = coverId ? driveImageUrl(coverId, 1200) : `${SITE_URL}/og-default.jpg`;
+    const img = getOgImageUrl(coverId);
     const prevUrl = loaderData?.prevSlug ? `${comicUrl}/${loaderData.prevSlug}` : null;
     const nextUrl = loaderData?.nextSlug ? `${comicUrl}/${loaderData.nextSlug}` : null;
     const pdfId = loaderData?.chapter?.pages?.length === 1 ? extractDriveId(loaderData.chapter.pages[0]) ?? loaderData.chapter.pages[0] : null;
@@ -132,7 +135,7 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "ComicIssue",
+            "@type": ["ComicIssue", "Chapter", "CreativeWork"],
             "@id": url,
             name: ch,
             headline: `${ch} — ${ct}`,
@@ -142,9 +145,10 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
             image: img,
             genre: loaderData?.comic?.genres ?? undefined,
             inLanguage: "vi-VN",
+            isFamilyFriendly: !isMatureComic(loaderData?.comic?.genres),
             isAccessibleForFree: true,
             datePublished: loaderData?.chapter?.createdAt ?? undefined,
-            isPartOf: { "@type": "ComicSeries", "@id": comicUrl, name: ct, url: comicUrl },
+            isPartOf: { "@type": ["ComicSeries", "Book"], "@id": comicUrl, name: ct, url: comicUrl },
             previousItem: prevUrl ? { "@type": "ComicIssue", url: prevUrl } : undefined,
             nextItem: nextUrl ? { "@type": "ComicIssue", url: nextUrl } : undefined,
             associatedMedia: pdfUrl
@@ -159,7 +163,10 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
               "@type": "Organization",
               name: "Lcucumber",
               url: SITE_URL,
-              logo: `${SITE_URL}/og-default.jpg`,
+              logo: {
+                "@type": "ImageObject",
+                url: `${SITE_URL}/og-default.jpg`,
+              },
             },
           }),
         },
@@ -183,6 +190,11 @@ function Reader() {
   const chapter = loaderData?.chapter ?? null;
   const chapters: ChapterNav[] = loaderData?.chapters ?? [];
   const idx = chapters.findIndex((c: ChapterNav) => c.slug === chapterSlug);
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [hideUI, setHideUI] = useState(false);
   const [pdfFailed, setPdfFailed] = useState(false);
@@ -256,6 +268,35 @@ function Reader() {
           )}
         </div>
       </nav>
+
+      {comic.genres.length > 0 && (
+        <div className="mt-8 rounded-2xl border border-border/70 bg-card/50 p-4 backdrop-blur">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="text-xs font-semibold text-muted-foreground">
+              Khám phá thể loại của truyện:
+            </span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {comic.genres.map((g: string) => (
+                <Link
+                  key={g}
+                  to="/genre/$slug"
+                  params={{ slug: slugifyGenre(g) }}
+                  className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary transition hover:bg-primary/20 hover:scale-105"
+                >
+                  {g}
+                </Link>
+              ))}
+              <Link
+                to="/the-loai"
+                className="rounded-full border border-border bg-background px-2.5 py-0.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+              >
+                Tất cả thể loại →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mt-6">
         <CommentSection comicId={comic.id} chapterId={chapter.id} />
       </div>
@@ -415,13 +456,21 @@ function Reader() {
               </ul>
             </div>
           </noscript>
-          <Suspense fallback={<main className="mx-auto max-w-3xl px-4 pt-24 text-center text-muted-foreground">Đang tải trình đọc…</main>}>
-            <PdfReader
-              fileUrl={`/api/drive-file?id=${singleId}`}
-              Footer={Footer}
-              onFail={() => setPdfFailed(true)}
-            />
-          </Suspense>
+          {mounted ? (
+            <Suspense fallback={<main className="mx-auto max-w-3xl px-4 pt-24 text-center text-muted-foreground">Đang tải trình đọc…</main>}>
+              <PdfReader
+                fileUrl={`/api/drive-file?id=${singleId}`}
+                Footer={Footer}
+                onFail={() => setPdfFailed(true)}
+              />
+            </Suspense>
+          ) : (
+            <main className="mx-auto max-w-3xl px-4 pt-24 text-center text-muted-foreground">
+              <p className="sr-only">{summary}</p>
+              Đang tải trình đọc…
+              <Footer />
+            </main>
+          )}
         </>
       ) : (
         <main className="mx-auto max-w-3xl pt-14">

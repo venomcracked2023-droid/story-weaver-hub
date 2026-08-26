@@ -2,15 +2,16 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
-import { loadComics, useComics, useComicsLoaded } from "@/lib/comics-store";
+import { enhanceComicMetadata, fetchComicsData, loadComics, useComics, useComicsLoaded } from "@/lib/comics-store";
 import { supabase } from "@/integrations/supabase/client";
-import { driveImageUrl, parseDriveIds } from "@/lib/drive";
+import { driveImageUrl, getOgImageUrl, parseDriveIds } from "@/lib/drive";
 import { BookOpen, ChevronRight, Layers, MessageCircle, Plus, User, X } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { RatingWidget } from "@/components/RatingWidget";
 import { AgeWarning } from "@/components/AgeWarning";
 import { isMatureComic } from "@/lib/content-rating";
 import { SITE_URL } from "@/lib/seo";
+import { slugifyGenre } from "@/lib/slug";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
@@ -22,20 +23,24 @@ export const Route = createFileRoute("/truyen/$slug/")({
       .select("id,title,author,description,cover_id,genres,slug,created_at,updated_at")
       .eq("slug", params.slug)
       .maybeSingle();
-    let chapters: { slug: string; title: string; created_at: string | null }[] = [];
+    let chapters: { id: string; slug: string; title: string; pages: string[]; created_at: string | null }[] = [];
     if (data?.id) {
       const { data: chs } = await supabase
         .from("chapters")
-        .select("slug,title,created_at,order_index")
+        .select("id,slug,title,pages,created_at,order_index")
         .eq("comic_id", data.id)
         .order("order_index", { ascending: true });
       chapters = (chs ?? []).map((c) => ({
+        id: c.id,
         slug: c.slug,
         title: c.title,
+        pages: c.pages ?? [],
         created_at: c.created_at,
       }));
     }
-    return { meta: data, chapters };
+    const meta = data ? enhanceComicMetadata(data) : null;
+    const allComics = await fetchComicsData();
+    return { meta, chapters, allComics };
   },
   head: ({ loaderData, params }) => {
     const m = loaderData?.meta;
@@ -50,32 +55,26 @@ export const Route = createFileRoute("/truyen/$slug/")({
       ? m.description
       : `Đọc webtoon ${m.title}${genresText} cuộn dọc miễn phí trên Lcucumber. ${chapterCount} chương${m.author ? `, tác giả ${m.author}` : ""}, cập nhật liên tục.`;
     const desc = baseDesc.slice(0, 160);
-    const img = m.cover_id
-      ? driveImageUrl(m.cover_id, 1200)
-      : `${SITE_URL}/og-default.jpg`;
+    const img = getOgImageUrl(m.cover_id ?? undefined);
     const url = `${SITE_URL}/truyen/${params.slug}`;
     const firstChapter = chapters[0];
     const lastChapter = chapters[chapters.length - 1];
-    const startDate = (m as { created_at?: string | null }).created_at ?? undefined;
-    const dateModified =
-      lastChapter?.created_at ??
-      (m as { updated_at?: string | null }).updated_at ??
-      undefined;
+    const startDate = chapters.length
+      ? chapters[0].created_at ?? undefined
+      : (m as { created_at?: string | null }).created_at ?? undefined;
+    const dateModified = (m as { updated_at?: string | null }).updated_at ?? (m as { created_at?: string | null }).created_at ?? undefined;
+
     return {
       meta: [
         { title },
         { name: "description", content: desc },
-        { name: "keywords", content: [m.title, m.author, ...(m.genres ?? []), "webtoon", "manhwa", "đọc truyện online"].filter(Boolean).join(", ") },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
-        { property: "og:type", content: "book" },
         { property: "og:url", content: url },
+        { property: "og:type", content: "books.book" },
         { property: "og:image", content: img },
-        { property: "og:image:width", content: "1200" },
-        { property: "og:image:height", content: "630" },
-        { property: "og:image:alt", content: `Bìa truyện ${m.title} — Đọc Webtoon miễn phí tại Lcucumber` },
-        ...(m.author ? [{ property: "book:author", content: m.author }] : []),
-        ...((m.genres ?? []).map((g: string) => ({ property: "book:tag", content: g }))),
+        { property: "og:image:alt", content: `Bìa truyện ${m.title}` },
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
         { name: "twitter:image", content: img },
@@ -90,7 +89,7 @@ export const Route = createFileRoute("/truyen/$slug/")({
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": ["ComicSeries", "Book"],
+            "@type": ["ComicSeries", "Book", "CreativeWorkSeries"],
             "@id": url,
             name: m.title,
             alternateName: m.title,
@@ -105,15 +104,24 @@ export const Route = createFileRoute("/truyen/$slug/")({
             url,
             mainEntityOfPage: url,
             inLanguage: "vi-VN",
+            isFamilyFriendly: !isMatureComic(m.genres),
+            workExample: {
+              "@type": "Book",
+              bookFormat: "https://schema.org/EBook",
+              inLanguage: "vi-VN",
+              url,
+            },
             numberOfEpisodes: chapterCount,
-            issn: undefined,
             datePublished: startDate,
             dateModified,
             publisher: {
               "@type": "Organization",
               name: "Lcucumber",
               url: SITE_URL,
-              logo: `${SITE_URL}/og-default.jpg`,
+              logo: {
+                "@type": "ImageObject",
+                url: `${SITE_URL}/og-default.jpg`,
+              },
             },
             startEpisode: firstChapter
               ? { "@type": "ComicIssue", name: firstChapter.title, url: `${url}/${firstChapter.slug}` }
@@ -161,9 +169,29 @@ export const Route = createFileRoute("/truyen/$slug/")({
 
 function ComicPage() {
   const { slug } = Route.useParams();
-  const comics = useComics();
+  const loaderData = Route.useLoaderData();
+  const comics = useComics(loaderData?.allComics);
   const loaded = useComicsLoaded();
-  const comic = comics.find((c) => c.slug === slug);
+  const comicFromStore = comics.find((c) => c.slug === slug);
+  const comic = comicFromStore || (loaderData?.meta ? {
+    id: loaderData.meta.id,
+    slug: (loaderData.meta as any).slug || slug,
+    title: loaderData.meta.title,
+    author: loaderData.meta.author ?? "",
+    description: loaderData.meta.description ?? "",
+    coverId: loaderData.meta.cover_id ?? "",
+    genres: (loaderData.meta.genres ?? []) as string[],
+    chapters: (loaderData.chapters ?? []).map((ch) => ({
+      id: ch.id,
+      slug: ch.slug,
+      title: ch.title,
+      pages: ch.pages ?? [],
+      createdAt: ch.created_at ? new Date(ch.created_at).getTime() : Date.now(),
+    })),
+    createdAt: loaderData.meta.created_at ? new Date(loaderData.meta.created_at).getTime() : Date.now(),
+    featured: (loaderData.meta as any).featured ?? false,
+  } : null);
+
   const [chapterCounts, setChapterCounts] = useState<Record<string, number>>({});
   const [comicCount, setComicCount] = useState(0);
   const { isContributor } = useAuth();
@@ -204,15 +232,17 @@ function ComicPage() {
     };
   }, [comic]);
 
-  if (!loaded) {
-    return (
-      <div className="min-h-screen">
-        <SiteHeader />
-        <div className="mx-auto max-w-3xl px-4 py-20 text-center text-muted-foreground">Đang tải…</div>
-      </div>
-    );
+  if (!comic) {
+    if (!loaded && !loaderData?.meta) {
+      return (
+        <div className="min-h-screen">
+          <SiteHeader />
+          <div className="mx-auto max-w-3xl px-4 py-20 text-center text-muted-foreground">Đang tải…</div>
+        </div>
+      );
+    }
+    throw notFound();
   }
-  if (!comic) throw notFound();
 
   return (
     <div className="min-h-screen">
@@ -247,12 +277,14 @@ function ComicPage() {
               {isMatureComic(comic.genres) && <AgeWarning comicTitle={comic.title} />}
               <div className="flex flex-wrap gap-2">
                 {comic.genres.map((g) => (
-                  <span
+                  <Link
                     key={g}
-                    className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+                    to="/genre/$slug"
+                    params={{ slug: slugifyGenre(g) }}
+                    className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary transition hover:bg-primary/20 hover:scale-105"
                   >
                     {g}
-                  </span>
+                  </Link>
                 ))}
               </div>
               <h1 className="mt-3 text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
@@ -348,38 +380,75 @@ function ComicPage() {
         </section>
 
         {(() => {
-          const genreSet = new Set(comic.genres);
+          const genreSet = new Set(comic.genres.map((g) => g.toLowerCase().trim()));
           const related = comics
-            .filter((c) => c.id !== comic.id && c.genres.some((g) => genreSet.has(g)))
+            .filter((c) => c.id !== comic.id && (
+              (c.author && comic.author && c.author.toLowerCase().trim() === comic.author.toLowerCase().trim()) ||
+              c.genres.some((g) => genreSet.has(g.toLowerCase().trim()))
+            ))
             .slice(0, 6);
-          if (related.length === 0) return null;
+          if (related.length > 0) {
+            return (
+              <section className="mt-10 rounded-2xl border border-border bg-card p-5">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-xl font-bold tracking-tight">Truyện cùng thể loại & Đề xuất</h2>
+                  <Link to="/the-loai" className="text-xs font-medium text-primary hover:underline">
+                    Xem tất cả thể loại →
+                  </Link>
+                </div>
+                <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+                  {related.map((r) => (
+                    <li key={r.id}>
+                      <Link
+                        to="/truyen/$slug"
+                        params={{ slug: r.slug }}
+                        className="hover-lift block group"
+                        title={r.title}
+                      >
+                        <div className="aspect-[3/4] overflow-hidden rounded-xl border border-border bg-card group-hover:border-primary/60">
+                          <ComicCover
+                            id={r.coverId}
+                            title={r.title}
+                            genres={r.genres}
+                            chapterCount={r.chapters.length}
+                          />
+                        </div>
+                        <span className="mt-2 line-clamp-2 block text-xs font-semibold transition-colors group-hover:text-primary">
+                          {r.title}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          }
           return (
-            <section className="mt-10">
-              <h2 className="mb-4 text-xl font-bold tracking-tight">Truyện liên quan</h2>
-              <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
-                {related.map((r) => (
-                  <li key={r.id}>
+            <section className="mt-10 rounded-2xl border border-border/80 bg-card/60 p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-lg font-bold">Khám phá các thể loại liên quan</h2>
+                  <p className="text-xs text-muted-foreground">Đọc thêm các bộ webtoon khác thuộc thể loại bạn yêu thích</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {comic.genres.map((g) => (
                     <Link
-                      to="/truyen/$slug"
-                      params={{ slug: r.slug }}
-                      className="hover-lift block"
-                      title={r.title}
+                      key={g}
+                      to="/genre/$slug"
+                      params={{ slug: slugifyGenre(g) }}
+                      className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary transition hover:bg-primary/20"
                     >
-                      <div className="aspect-[3/4] overflow-hidden rounded-xl border border-border bg-card">
-                        <ComicCover
-                          id={r.coverId}
-                          title={r.title}
-                          genres={r.genres}
-                          chapterCount={r.chapters.length}
-                        />
-                      </div>
-                      <span className="mt-2 line-clamp-2 block text-xs font-semibold transition-colors hover:text-primary">
-                        {r.title}
-                      </span>
+                      {g}
                     </Link>
-                  </li>
-                ))}
-              </ul>
+                  ))}
+                  <Link
+                    to="/the-loai"
+                    className="rounded-full border border-border bg-background px-3 py-1 text-xs font-semibold text-foreground transition hover:border-primary/60"
+                  >
+                    Xem tất cả thể loại →
+                  </Link>
+                </div>
+              </div>
             </section>
           );
         })()}

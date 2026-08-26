@@ -31,6 +31,7 @@ const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }
     title: "Cộng đồng",
     ariaLabel: "Liên kết cộng đồng và tài khoản",
     links: [
+      { label: "Cộng đồng độc giả", to: "/cong-dong", desc: "Không gian kết nối và quy tắc cộng đồng" },
       { label: "Ứng tuyển CTV", to: "/apply", desc: "Trở thành cộng tác viên đăng truyện" },
       { label: "Đăng nhập", to: "/login", desc: "Đăng nhập tài khoản Lcucumber" },
     ],

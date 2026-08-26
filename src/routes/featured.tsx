@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
-import { useComics } from "@/lib/comics-store";
+import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { Search, Star } from "lucide-react";
 import { useMemo, useState } from "react";
 import { fuzzyScoreVi } from "@/lib/fuzzy-search";
@@ -9,6 +9,10 @@ import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/featured")({
   component: FeaturedPage,
+  loader: async () => {
+    const comics = await fetchComicsData();
+    return { comics };
+  },
   head: () => {
     const title = "Truyện nổi bật — Lcucumber";
     const desc = "Danh sách webtoon nổi bật được Lcucumber tuyển chọn — đọc cuộn dọc miễn phí.";
@@ -33,16 +37,20 @@ export const Route = createFileRoute("/featured")({
 });
 
 function FeaturedPage() {
-  const comics = useComics();
+  const loaderData = Route.useLoaderData();
+  const comics = useComics(loaderData?.comics);
   // Tự động: các truyện vừa được cập nhật chương mới nhất.
-  const featured = [...comics]
-    .filter((c) => c.chapters.length > 0)
-    .map((c) => ({
-      comic: c,
-      lastChapterAt: Math.max(...c.chapters.map((ch) => ch.createdAt)),
-    }))
-    .sort((a, b) => b.lastChapterAt - a.lastChapterAt)
-    .map((x) => x.comic);
+  const featured = useMemo(() => {
+    return [...comics]
+      .filter((c) => c.chapters.length > 0)
+      .map((c) => ({
+        comic: c,
+        lastChapterAt: Math.max(...c.chapters.map((ch) => ch.createdAt)),
+      }))
+      .sort((a, b) => b.lastChapterAt - a.lastChapterAt)
+      .map((x) => x.comic);
+  }, [comics]);
+
   const [query, setQuery] = useState("");
   const filtered = useMemo(() => {
     const q = query.trim();
@@ -107,11 +115,6 @@ function FeaturedPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }}
       />
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-6">
-        <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
-          <span className="text-border">/</span>
-          <span className="text-foreground/80">Truyện nổi bật</span>
-        </nav>
         <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
           <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
           <span className="text-border">/</span>
