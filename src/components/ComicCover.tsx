@@ -39,17 +39,17 @@ export function ComicCover({
 
   const handleError = () => {
     if (retryCount === 0 && cleanId) {
-      // Retry with alternative Google usercontent format
+      // Retry 1: Try thumbnail endpoint
       setRetryCount(1);
       if (cleanId.startsWith("http") || cleanId.startsWith("/")) {
         setCurrentSrc(cleanId);
       } else {
-        setCurrentSrc(`https://lh3.googleusercontent.com/d/${cleanId}=w600`);
+        setCurrentSrc(`https://drive.google.com/thumbnail?id=${cleanId}&sz=w600`);
       }
     } else if (retryCount === 1 && cleanId && !cleanId.startsWith("http") && !cleanId.startsWith("/")) {
-      // Retry with proxy endpoint
+      // Retry 2: Try our server proxy endpoint
       setRetryCount(2);
-      setCurrentSrc(`/api/drive-file?id=${encodeURIComponent(cleanId)}`);
+      setCurrentSrc(`/api/og-image?id=${encodeURIComponent(cleanId)}`);
     } else {
       setFailed(true);
     }
@@ -87,6 +87,7 @@ export function ComicCover({
       loading={priority ? "eager" : "lazy"}
       decoding={priority ? "sync" : "async"}
       fetchPriority={priority ? "high" : "auto"}
+      referrerPolicy="no-referrer"
       onError={handleError}
       className={"h-full w-full object-cover transition-opacity duration-300 " + (className ?? "")}
     />

@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { SITE_URL } from "@/lib/seo";
+import { ComicCover } from "@/components/ComicCover";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -367,12 +368,19 @@ function ComicEditor({
               )}
             </Field>
             <Field label="Cover — File ID hoặc link Drive">
-              <input
-                value={draft.coverId}
-                onChange={(e) => patch({ coverId: extractDriveId(e.target.value) ?? e.target.value })}
-                className="input"
-                placeholder="1AbC… hoặc https://drive.google.com/file/d/…"
-              />
+              <div className="flex items-center gap-3">
+                <input
+                  value={draft.coverId}
+                  onChange={(e) => patch({ coverId: extractDriveId(e.target.value) ?? e.target.value })}
+                  className="input flex-1"
+                  placeholder="1AbC… hoặc https://drive.google.com/file/d/…"
+                />
+                {draft.coverId && (
+                  <div className="h-10 w-8 shrink-0 overflow-hidden rounded border border-border bg-card shadow-sm">
+                    <ComicCover id={draft.coverId} title={draft.title || "Preview"} />
+                  </div>
+                )}
+              </div>
             </Field>
           </div>
 

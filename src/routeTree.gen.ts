@@ -29,6 +29,7 @@ import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GenreSlugRouteImport } from './routes/genre.$slug'
 import { Route as ApiPingSitemapRouteImport } from './routes/api/ping-sitemap'
+import { Route as ApiOgImageRouteImport } from './routes/api/og-image'
 import { Route as ApiDriveFileRouteImport } from './routes/api/drive-file'
 import { Route as TruyenSlugIndexRouteImport } from './routes/truyen.$slug.index'
 import { Route as TruyenSlugChapterRouteImport } from './routes/truyen.$slug.$chapter'
@@ -133,6 +134,11 @@ const ApiPingSitemapRoute = ApiPingSitemapRouteImport.update({
   path: '/api/ping-sitemap',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiOgImageRoute = ApiOgImageRouteImport.update({
+  id: '/api/og-image',
+  path: '/api/og-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiDriveFileRoute = ApiDriveFileRouteImport.update({
   id: '/api/drive-file',
   path: '/api/drive-file',
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/the-loai': typeof TheLoaiRoute
   '/api/drive-file': typeof ApiDriveFileRoute
+  '/api/og-image': typeof ApiOgImageRoute
   '/api/ping-sitemap': typeof ApiPingSitemapRoute
   '/genre/$slug': typeof GenreSlugRoute
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/the-loai': typeof TheLoaiRoute
   '/api/drive-file': typeof ApiDriveFileRoute
+  '/api/og-image': typeof ApiOgImageRoute
   '/api/ping-sitemap': typeof ApiPingSitemapRoute
   '/genre/$slug': typeof GenreSlugRoute
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/the-loai': typeof TheLoaiRoute
   '/api/drive-file': typeof ApiDriveFileRoute
+  '/api/og-image': typeof ApiOgImageRoute
   '/api/ping-sitemap': typeof ApiPingSitemapRoute
   '/genre/$slug': typeof GenreSlugRoute
   '/truyen/$slug/$chapter': typeof TruyenSlugChapterRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/the-loai'
     | '/api/drive-file'
+    | '/api/og-image'
     | '/api/ping-sitemap'
     | '/genre/$slug'
     | '/truyen/$slug/$chapter'
@@ -272,6 +282,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/the-loai'
     | '/api/drive-file'
+    | '/api/og-image'
     | '/api/ping-sitemap'
     | '/genre/$slug'
     | '/truyen/$slug/$chapter'
@@ -297,6 +308,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/the-loai'
     | '/api/drive-file'
+    | '/api/og-image'
     | '/api/ping-sitemap'
     | '/genre/$slug'
     | '/truyen/$slug/$chapter'
@@ -323,6 +335,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TheLoaiRoute: typeof TheLoaiRoute
   ApiDriveFileRoute: typeof ApiDriveFileRoute
+  ApiOgImageRoute: typeof ApiOgImageRoute
   ApiPingSitemapRoute: typeof ApiPingSitemapRoute
   GenreSlugRoute: typeof GenreSlugRoute
   TruyenSlugChapterRoute: typeof TruyenSlugChapterRoute
@@ -471,6 +484,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPingSitemapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/og-image': {
+      id: '/api/og-image'
+      path: '/api/og-image'
+      fullPath: '/api/og-image'
+      preLoaderRoute: typeof ApiOgImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/drive-file': {
       id: '/api/drive-file'
       path: '/api/drive-file'
@@ -515,6 +535,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TheLoaiRoute: TheLoaiRoute,
   ApiDriveFileRoute: ApiDriveFileRoute,
+  ApiOgImageRoute: ApiOgImageRoute,
   ApiPingSitemapRoute: ApiPingSitemapRoute,
   GenreSlugRoute: GenreSlugRoute,
   TruyenSlugChapterRoute: TruyenSlugChapterRoute,

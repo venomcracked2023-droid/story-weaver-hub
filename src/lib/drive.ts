@@ -60,25 +60,39 @@ export function driveImageUrl(idOrUrl: string, width = 1600): string {
     if (id.includes("drive.google.com") || id.includes("docs.google.com") || id.includes("googleusercontent.com")) {
       const extracted = extractDriveId(id);
       if (extracted && !extracted.startsWith("http")) {
-        return `https://drive.google.com/thumbnail?id=${extracted}&sz=w${width}`;
+        return `https://lh3.googleusercontent.com/d/${extracted}=w${width}`;
       }
     }
     return id;
   }
 
-  return `https://drive.google.com/thumbnail?id=${id}&sz=w${width}`;
+  return `https://lh3.googleusercontent.com/d/${id}=w${width}`;
 }
 
 export function getOgImageUrl(idOrUrl?: string): string {
   if (!idOrUrl) return `${SITE_URL}/og-default.jpg`;
-  const resolved = driveImageUrl(idOrUrl, 1200);
-  if (resolved.startsWith("http://") || resolved.startsWith("https://")) {
-    return resolved;
+  const s = idOrUrl.trim();
+  if (LOCAL_COVERS[s]) return `${SITE_URL}${LOCAL_COVERS[s]}`;
+  if (s.startsWith("/")) return `${SITE_URL}${s}`;
+
+  const clean = extractDriveId(s);
+  if (!clean) return `${SITE_URL}/og-default.jpg`;
+  if (LOCAL_COVERS[clean]) return `${SITE_URL}${LOCAL_COVERS[clean]}`;
+  if (clean.startsWith("/")) return `${SITE_URL}${clean}`;
+
+  // Non-drive external direct image URL
+  if (clean.startsWith("http://") || clean.startsWith("https://")) {
+    if (
+      !clean.includes("drive.google.com") &&
+      !clean.includes("docs.google.com") &&
+      !clean.includes("googleusercontent.com")
+    ) {
+      return clean;
+    }
   }
-  if (resolved.startsWith("/")) {
-    return `${SITE_URL}${resolved}`;
-  }
-  return `${SITE_URL}/og-default.jpg`;
+
+  const driveId = /^[A-Za-z0-9_-]{10,60}$/.test(clean) ? clean : (extractDriveId(clean) ?? clean);
+  return `${SITE_URL}/api/og-image?id=${encodeURIComponent(driveId)}`;
 }
 
 export function parseDriveIds(text: string): string[] {
