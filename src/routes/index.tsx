@@ -5,7 +5,6 @@ import { ComicCover } from "@/components/ComicCover";
 import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { fuzzyScoreVi } from "@/lib/fuzzy-search";
 import { BookOpen, Library, Sparkles, Star } from "lucide-react";
-import cucumberLogo from "@/assets/cucumber-logo.png";
 import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
