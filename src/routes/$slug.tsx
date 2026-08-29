@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 // Reserved top-level paths that must not be treated as story slugs.
 const RESERVED = new Set([
   "admin", "admin-applications", "apply", "dieu-khoan", "dmca",
-  "featured", "gioi-thieu", "latest", "lien-he", "login",
+  "featured", "gioi-thieu", "latest", "lien-he", "login", "privacy",
   "robots.txt", "sitemap.xml", "the-loai", "genre", "truyen", "api",
 ]);
 

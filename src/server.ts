@@ -66,15 +66,53 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   return brandedErrorResponse();
 }
 
+function applySecurityHeaders(headers: Headers) {
+  if (!headers.has("Strict-Transport-Security")) {
+    headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+  }
+  if (!headers.has("X-Frame-Options")) {
+    headers.set("X-Frame-Options", "DENY");
+  }
+  if (!headers.has("X-Content-Type-Options")) {
+    headers.set("X-Content-Type-Options", "nosniff");
+  }
+  if (!headers.has("Referrer-Policy")) {
+    headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  }
+  if (!headers.has("Permissions-Policy")) {
+    headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  }
+  if (!headers.has("Content-Security-Policy")) {
+    headers.set(
+      "Content-Security-Policy",
+      "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; img-src 'self' https: data: blob:; font-src 'self' https: data:; frame-ancestors 'none';",
+    );
+  }
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const rawResponse = await handler.fetch(request, env, ctx);
+      const response = await normalizeCatastrophicSsrResponse(rawResponse);
+      const newHeaders = new Headers(response.headers);
+      applySecurityHeaders(newHeaders);
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: newHeaders,
+      });
     } catch (error) {
       console.error(error);
-      return brandedErrorResponse();
+      const res = brandedErrorResponse();
+      const headers = new Headers(res.headers);
+      applySecurityHeaders(headers);
+      return new Response(res.body, {
+        status: res.status,
+        statusText: res.statusText,
+        headers,
+      });
     }
   },
 };

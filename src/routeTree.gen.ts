@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TheLoaiRouteImport } from './routes/the-loai'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LienHeRouteImport } from './routes/lien-he'
 import { Route as LatestRouteImport } from './routes/latest'
@@ -47,6 +48,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
   id: '/robots.txt',
   path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -171,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/latest': typeof LatestRoute
   '/lien-he': typeof LienHeRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/the-loai': typeof TheLoaiRoute
@@ -197,6 +204,7 @@ export interface FileRoutesByTo {
   '/latest': typeof LatestRoute
   '/lien-he': typeof LienHeRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/the-loai': typeof TheLoaiRoute
@@ -224,6 +232,7 @@ export interface FileRoutesById {
   '/latest': typeof LatestRoute
   '/lien-he': typeof LienHeRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/the-loai': typeof TheLoaiRoute
@@ -252,6 +261,7 @@ export interface FileRouteTypes {
     | '/latest'
     | '/lien-he'
     | '/login'
+    | '/privacy'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/the-loai'
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
     | '/latest'
     | '/lien-he'
     | '/login'
+    | '/privacy'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/the-loai'
@@ -304,6 +315,7 @@ export interface FileRouteTypes {
     | '/latest'
     | '/lien-he'
     | '/login'
+    | '/privacy'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/the-loai'
@@ -331,6 +343,7 @@ export interface RootRouteChildren {
   LatestRoute: typeof LatestRoute
   LienHeRoute: typeof LienHeRoute
   LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TheLoaiRoute: typeof TheLoaiRoute
@@ -363,6 +376,13 @@ declare module '@tanstack/react-router' {
       path: '/robots.txt'
       fullPath: '/robots.txt'
       preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -531,6 +551,7 @@ const rootRouteChildren: RootRouteChildren = {
   LatestRoute: LatestRoute,
   LienHeRoute: LienHeRoute,
   LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TheLoaiRoute: TheLoaiRoute,

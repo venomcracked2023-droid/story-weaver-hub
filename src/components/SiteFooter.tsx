@@ -43,6 +43,7 @@ const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }
       { label: "Giới thiệu", to: "/gioi-thieu", desc: "Về nền tảng Lcucumber" },
       { label: "Liên hệ", to: "/lien-he", desc: "Liên hệ đội ngũ Lcucumber" },
       { label: "Điều khoản", to: "/dieu-khoan", desc: "Điều khoản sử dụng dịch vụ" },
+      { label: "Bảo mật", to: "/privacy", desc: "Chính sách bảo mật và quyền riêng tư" },
       { label: "DMCA", to: "/dmca", desc: "Yêu cầu gỡ nội dung vi phạm bản quyền" },
       { label: "Báo lỗi", href: "mailto:hello@lcucumber.com?subject=Báo lỗi", desc: "Báo lỗi nội dung hoặc kỹ thuật" },
     ],
@@ -205,7 +206,6 @@ export function SiteFooter() {
           <div>
             <Link
               to="/"
-              search={{ q: "" }}
               className="group inline-flex items-center gap-2.5"
               title={`${SITE_NAME} — Trang chủ`}
               aria-label={`${SITE_NAME} — Về trang chủ`}
@@ -324,6 +324,24 @@ export function SiteFooter() {
                   title="Điều khoản sử dụng dịch vụ"
                 >
                   Điều khoản
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/privacy"
+                  className="transition hover:text-primary"
+                  title="Chính sách bảo mật và quyền riêng tư"
+                >
+                  Bảo mật
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/dmca"
+                  className="transition hover:text-primary"
+                  title="DMCA & Gỡ nội dung"
+                >
+                  DMCA
                 </Link>
               </li>
             </ul>

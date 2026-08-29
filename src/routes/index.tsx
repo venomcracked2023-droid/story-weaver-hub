@@ -10,9 +10,10 @@ import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   component: Index,
-  validateSearch: (s: Record<string, unknown>) => ({
-    q: typeof s.q === "string" ? s.q : "",
-  }),
+  validateSearch: (s: Record<string, unknown>): { q?: string } => {
+    const q = typeof s.q === "string" ? s.q.trim() : undefined;
+    return q ? { q } : {};
+  },
   loader: async () => {
     const comics = await fetchComicsData();
     return { comics };
@@ -454,12 +455,17 @@ function Index() {
                   >
                     <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-border bg-card group-hover:border-primary/60">
                       <ComicCover id={c.coverId} title={c.title} priority={libraryPage === 1 && i < 4 && featured.length === 0} className="transition duration-500 group-hover:scale-110" />
+                      {c.chapters.length === 0 && (
+                        <span className="absolute left-2 top-2 z-10 inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-950/80 px-2 py-0.5 text-[10px] font-semibold text-amber-300 shadow backdrop-blur">
+                          Sắp ra mắt
+                        </span>
+                      )}
                       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                     </div>
                     <div>
                       <h3 className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">{c.title}</h3>
                       <p className="line-clamp-1 text-xs text-muted-foreground">
-                        {c.chapters.length} chương · {c.author || "Ẩn danh"}
+                        {c.chapters.length > 0 ? `${c.chapters.length} chương` : "Sắp ra mắt"} · {c.author || "Ẩn danh"}
                       </p>
                     </div>
                   </Link>

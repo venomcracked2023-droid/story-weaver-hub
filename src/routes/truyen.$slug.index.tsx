@@ -10,7 +10,7 @@ import { CommentSection } from "@/components/CommentSection";
 import { RatingWidget } from "@/components/RatingWidget";
 import { AgeWarning } from "@/components/AgeWarning";
 import { isMatureComic } from "@/lib/content-rating";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, formatTitle, formatDesc } from "@/lib/seo";
 import { slugifyGenre } from "@/lib/slug";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -50,11 +50,12 @@ export const Route = createFileRoute("/truyen/$slug/")({
     const genresText = Array.isArray(m.genres) && m.genres.length ? ` (${m.genres.join(", ")})` : "";
     const primaryGenre =
       Array.isArray(m.genres) && m.genres.length ? ` ${m.genres[0]}` : "";
-    const title = `${m.title} — Đọc Webtoon${primaryGenre} miễn phí | Lcucumber`;
+    const rawTitle = `${m.title} — Webtoon${primaryGenre} | Lcucumber`;
+    const title = formatTitle(rawTitle, 60);
     const baseDesc = m.description
       ? m.description
       : `Đọc webtoon ${m.title}${genresText} cuộn dọc miễn phí trên Lcucumber. ${chapterCount} chương${m.author ? `, tác giả ${m.author}` : ""}, cập nhật liên tục.`;
-    const desc = baseDesc.slice(0, 160);
+    const desc = formatDesc(baseDesc, 160);
     const img = getOgImageUrl(m.cover_id ?? undefined);
     const url = `${SITE_URL}/truyen/${params.slug}`;
     const firstChapter = chapters[0];
@@ -161,7 +162,7 @@ export const Route = createFileRoute("/truyen/$slug/")({
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <h1 className="text-2xl font-bold">Không tìm thấy truyện</h1>
-        <Link to="/" search={{ q: "" }} className="mt-4 inline-block text-primary underline">Về trang chủ</Link>
+        <Link to="/" className="mt-4 inline-block text-primary underline">Về trang chủ</Link>
       </div>
     </div>
   ),
@@ -263,7 +264,7 @@ function ComicPage() {
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/70 via-background/85 to-background" aria-hidden />
         <main className="mx-auto max-w-5xl px-4 pb-10 pt-10 sm:pt-14">
           <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
+            <Link to="/" className="transition hover:text-primary">Trang chủ</Link>
             <span className="text-border">/</span>
             <span className="line-clamp-1 text-foreground/80">{comic.title}</span>
           </nav>

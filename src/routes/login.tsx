@@ -49,7 +49,7 @@ function LoginPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/", search: { q: "" } });
+    if (!loading && user) navigate({ to: "/" });
   }, [user, loading, navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -71,7 +71,7 @@ function LoginPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Đăng nhập thành công");
-        navigate({ to: "/", search: { q: "" } });
+        navigate({ to: "/" });
       }
     } catch (e: any) {
       toast.error(e.message ?? "Lỗi");

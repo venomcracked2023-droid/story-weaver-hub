@@ -4,7 +4,7 @@ import { ComicCover } from "@/components/ComicCover";
 import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { Tag } from "lucide-react";
 import { useMemo } from "react";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, formatTitle, formatDesc } from "@/lib/seo";
 import { slugifyGenre } from "@/lib/slug";
 
 export const Route = createFileRoute("/genre/$slug")({
@@ -15,8 +15,12 @@ export const Route = createFileRoute("/genre/$slug")({
   },
   head: ({ params }) => {
     const slug = params.slug;
-    const title = `Truyện ${slug} — Đọc Webtoon miễn phí | Lcucumber`;
-    const desc = `Tổng hợp truyện thể loại ${slug} trên Lcucumber — đọc webtoon cuộn dọc miễn phí, cập nhật liên tục, không quảng cáo.`.slice(0, 160);
+    const rawTitle = `Truyện ${slug} — Webtoon | Lcucumber`;
+    const title = formatTitle(rawTitle, 60);
+    const desc = formatDesc(
+      `Tổng hợp truyện thể loại ${slug} trên Lcucumber — đọc webtoon cuộn dọc miễn phí, cập nhật liên tục, không quảng cáo.`,
+      160,
+    );
     const url = `${SITE_URL}/genre/${slug}`;
     return {
       meta: [
@@ -53,7 +57,7 @@ export const Route = createFileRoute("/genre/$slug")({
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-4 py-20 text-center">
         <h1 className="text-2xl font-bold">Không tìm thấy thể loại</h1>
-        <Link to="/" search={{ q: "" }} className="mt-4 inline-block text-primary underline">
+        <Link to="/" className="mt-4 inline-block text-primary underline">
           Về trang chủ
         </Link>
       </main>
@@ -108,7 +112,7 @@ function GenrePage() {
       />
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-6">
         <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
+          <Link to="/" className="transition hover:text-primary">Trang chủ</Link>
           <span className="text-border">/</span>
           <Link to="/the-loai" className="transition hover:text-primary">Thể loại</Link>
           <span className="text-border">/</span>
@@ -127,7 +131,7 @@ function GenrePage() {
         {matched.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
             Chưa có truyện nào thuộc thể loại này.{" "}
-            <Link to="/" search={{ q: "" }} className="text-primary underline">Về thư viện</Link>
+            <Link to="/" className="text-primary underline">Về thư viện</Link>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">

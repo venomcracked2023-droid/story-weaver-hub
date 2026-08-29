@@ -64,6 +64,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           `<url><loc>${origin}/gioi-thieu</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
           `<url><loc>${origin}/lien-he</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
           `<url><loc>${origin}/dieu-khoan</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>`,
+          `<url><loc>${origin}/privacy</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
           `<url><loc>${origin}/dmca</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
         ];
         // Trang duyệt theo thể loại — gom slug duy nhất từ tất cả truyện.

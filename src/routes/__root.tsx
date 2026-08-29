@@ -26,7 +26,6 @@ function NotFoundComponent() {
         <div className="mt-6">
           <Link
             to="/"
-            search={{ q: "" }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Go home
@@ -92,12 +91,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: `${SITE_URL}/og-default.jpg` },
       { name: "google-site-verification", content: "nuznkezATkzuBsrNT1mC972T86bQZnZgH4LhasUO4qc" },
       { name: "google-site-verification", content: "FNyknghInTmMnKo0aS-FSjZDDGaAf1F_CbHeyzpLe6A" },
-      { title: "Lcucumber — Đọc Webtoon cuộn dọc miễn phí" },
-      { property: "og:title", content: "Lcucumber — Đọc Webtoon cuộn dọc miễn phí" },
-      { name: "twitter:title", content: "Lcucumber — Đọc Webtoon cuộn dọc miễn phí" },
-      { name: "description", content: "Lcucumber là nền tảng đọc webtoon cuộn dọc miễn phí: manhwa, manhua, manga Việt hoá, cập nhật chương mới mỗi ngày, đọc mượt trên mọi thiết bị." },
-      { property: "og:description", content: "Lcucumber là nền tảng đọc webtoon cuộn dọc miễn phí: manhwa, manhua, manga Việt hoá, cập nhật chương mới mỗi ngày, đọc mượt trên mọi thiết bị." },
-      { name: "twitter:description", content: "Lcucumber là nền tảng đọc webtoon cuộn dọc miễn phí: manhwa, manhua, manga Việt hoá, cập nhật chương mới mỗi ngày, đọc mượt trên mọi thiết bị." },
     ],
     links: [
       {

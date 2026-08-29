@@ -11,3 +11,15 @@ export const SOCIAL_LINKS: string[] = [
   // "https://www.instagram.com/your-handle",
   // "https://www.tiktok.com/@your-handle",
 ];
+
+export function formatTitle(title: string, maxLen = 60): string {
+  const trimmed = title.trim();
+  if (trimmed.length <= maxLen) return trimmed;
+  return `${trimmed.slice(0, maxLen - 1).trimEnd()}…`;
+}
+
+export function formatDesc(desc: string, maxLen = 160): string {
+  const trimmed = desc.trim().replace(/\s+/g, " ");
+  if (trimmed.length <= maxLen) return trimmed;
+  return `${trimmed.slice(0, maxLen - 1).trimEnd()}…`;
+}

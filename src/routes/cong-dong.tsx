@@ -75,7 +75,7 @@ function CommunityPage() {
           aria-label="Breadcrumb"
           className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground"
         >
-          <Link to="/" search={{ q: "" }} className="transition hover:text-primary">
+          <Link to="/" className="transition hover:text-primary">
             Trang chủ
           </Link>
           <span className="text-border">/</span>

@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
 import { AgeWarning } from "@/components/AgeWarning";
 import { isMatureComic } from "@/lib/content-rating";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, formatTitle, formatDesc } from "@/lib/seo";
 import { slugifyGenre } from "@/lib/slug";
 
 const PdfReader = lazy(() =>
@@ -18,12 +18,8 @@ function chapterSummary(comicTitle: string, chapterTitle: string, description?: 
   const base = (description ?? "").trim();
   const genreText = genres.length ? ` Thuộc thể loại ${genres.join(", ")}.` : "";
   return base
-    ? `Đọc ${chapterTitle} của ${comicTitle} trên Lcucumber. ${base}${genreText} Chương được tối ưu để crawler đọc được tiêu đề, mô tả, liên kết chương trước và chương sau ngay trong HTML.`
-    : `Đọc ${chapterTitle} của ${comicTitle} online miễn phí trên Lcucumber với trải nghiệm webtoon cuộn dọc mượt trên mọi thiết bị.${genreText} Nội dung chương có tóm tắt, breadcrumb và liên kết điều hướng trong HTML để người đọc và công cụ tìm kiếm dễ khám phá.`;
-}
-
-function truncateMeta(text: string) {
-  return text.length > 160 ? `${text.slice(0, 157).trimEnd()}…` : text;
+    ? `Đọc ${chapterTitle} của ${comicTitle} trên Lcucumber. ${base}${genreText}`
+    : `Đọc ${chapterTitle} của ${comicTitle} online miễn phí trên Lcucumber với trải nghiệm webtoon cuộn dọc mượt trên mọi thiết bị.${genreText}`;
 }
 
 export const Route = createFileRoute("/truyen/$slug/$chapter")({
@@ -84,9 +80,10 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
     const ch = loaderData?.chapter?.title;
     const coverId = loaderData?.comic?.coverId;
     if (!ct || !ch) return { meta: [{ title: "Đang đọc — Lcucumber" }] };
-    const title = `${ch} — ${ct} | Lcucumber`;
+    const rawTitle = `${ch} - ${ct} | Lcucumber`;
+    const title = formatTitle(rawTitle, 60);
     const summary = chapterSummary(ct, ch, loaderData?.comic?.description, loaderData?.comic?.genres);
-    const desc = truncateMeta(summary);
+    const desc = formatDesc(summary, 160);
     const url = `${SITE_URL}/truyen/${params.slug}/${params.chapter}`;
     const comicUrl = `${SITE_URL}/truyen/${params.slug}`;
     const img = getOgImageUrl(coverId);
@@ -105,13 +102,11 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
         { property: "og:image", content: img },
         { property: "og:image:width", content: "1200" },
         { property: "og:image:height", content: "630" },
-        { property: "og:image:type", content: "image/jpeg" },
-        { property: "og:image:alt", content: `Bìa truyện ${ct} — ${ch}` },
+        { property: "og:image:alt", content: `Bìa ${ct}` },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
         { name: "twitter:image", content: img },
-        { property: "article:section", content: ct },
       ],
       links: [
         { rel: "canonical", href: url },
@@ -137,22 +132,20 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": ["ComicIssue", "Chapter", "CreativeWork"],
+            "@type": ["Chapter", "ComicIssue", "PublicationIssue"],
             "@id": url,
-            name: ch,
+            name: `${ch} — ${ct}`,
             headline: `${ch} — ${ct}`,
-            description: summary,
+            description: desc,
             url,
             mainEntityOfPage: url,
-            image: img,
-            genre: loaderData?.comic?.genres ?? undefined,
+            isPartOf: {
+              "@type": ["ComicSeries", "Book"],
+              name: ct,
+              url: comicUrl,
+            },
+            datePublished: loaderData.chapter?.createdAt ?? undefined,
             inLanguage: "vi-VN",
-            isFamilyFriendly: !isMatureComic(loaderData?.comic?.genres),
-            isAccessibleForFree: true,
-            datePublished: loaderData?.chapter?.createdAt ?? undefined,
-            isPartOf: { "@type": ["ComicSeries", "Book"], "@id": comicUrl, name: ct, url: comicUrl },
-            previousItem: prevUrl ? { "@type": "ComicIssue", url: prevUrl } : undefined,
-            nextItem: nextUrl ? { "@type": "ComicIssue", url: nextUrl } : undefined,
             associatedMedia: pdfUrl
               ? {
                   "@type": "MediaObject",
@@ -177,7 +170,7 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
   },
   notFoundComponent: () => (
     <div className="p-10 text-center">
-      Không tìm thấy chương. <Link to="/" search={{ q: "" }} className="text-primary underline">Về trang chủ</Link>
+      Không tìm thấy chương. <Link to="/" className="text-primary underline">Về trang chủ</Link>
     </div>
   ),
   errorComponent: ({ error }) => <div className="p-10 text-destructive">{error.message}</div>,

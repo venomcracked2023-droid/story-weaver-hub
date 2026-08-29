@@ -84,7 +84,7 @@ function LatestPage() {
       />
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-6">
         <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
+          <Link to="/" className="transition hover:text-primary">Trang chủ</Link>
           <span className="text-border">/</span>
           <span className="text-foreground/80">Mới cập nhật</span>
         </nav>

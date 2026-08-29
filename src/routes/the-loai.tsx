@@ -110,7 +110,7 @@ function GenresHubPage() {
       />
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-6">
         <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Link to="/" search={{ q: "" }} className="transition hover:text-primary">Trang chủ</Link>
+          <Link to="/" className="transition hover:text-primary">Trang chủ</Link>
           <span className="text-border">/</span>
           <span className="text-foreground/80">Thể loại truyện</span>
         </nav>
@@ -132,7 +132,7 @@ function GenresHubPage() {
         {genres.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
             Chưa có thể loại nào.{" "}
-            <Link to="/" search={{ q: "" }} className="text-primary underline">Về trang chủ</Link>
+            <Link to="/" className="text-primary underline">Về trang chủ</Link>
           </div>
         ) : (
           <div className="space-y-10">
