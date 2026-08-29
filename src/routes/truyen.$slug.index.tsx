@@ -23,6 +23,9 @@ export const Route = createFileRoute("/truyen/$slug/")({
       .select("id,title,author,description,cover_id,genres,slug,created_at,updated_at")
       .eq("slug", params.slug)
       .maybeSingle();
+    if (!data) {
+      throw notFound();
+    }
     let chapters: { id: string; slug: string; title: string; pages: string[]; created_at: string | null }[] = [];
     if (data?.id) {
       const { data: chs } = await supabase
@@ -245,7 +248,16 @@ function ComicPage() {
         </div>
       );
     }
-    throw notFound();
+    return (
+      <div className="min-h-screen">
+        <SiteHeader />
+        <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+          <h1 className="text-2xl font-bold">Không tìm thấy truyện</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Truyện này không tồn tại hoặc đã bị gỡ bỏ.</p>
+          <Link to="/" className="mt-4 inline-block text-primary underline">Về trang chủ</Link>
+        </div>
+      </div>
+    );
   }
 
   return (

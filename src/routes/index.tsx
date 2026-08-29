@@ -6,6 +6,7 @@ import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { fuzzyScoreVi } from "@/lib/fuzzy-search";
 import { BookOpen, Library, Sparkles, Star } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
+import cucumberLogo from "@/assets/cucumber-logo.png";
 
 export const Route = createFileRoute("/")({
   component: Index,

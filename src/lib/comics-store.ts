@@ -30,18 +30,26 @@ let loading: Promise<Comic[]> | null = null;
 
 function emit() { listeners.forEach((l) => l()); }
 
-export function enhanceComicMetadata(c: {
-  id: string;
-  slug?: string;
-  title: string;
-  author?: string | null;
-  description?: string | null;
-  cover_id?: string | null;
-  genres?: string[] | null;
-  created_at?: string | null;
-  created_by?: string | null;
-  featured?: boolean | null;
-}) {
+export function enhanceComicMetadata<
+  T extends {
+    id: string;
+    slug?: string;
+    title: string;
+    author?: string | null;
+    description?: string | null;
+    cover_id?: string | null;
+    genres?: string[] | null;
+    created_at?: string | null;
+    created_by?: string | null;
+    featured?: boolean | null;
+    updated_at?: string | null;
+  },
+>(c: T): T & {
+  author: string;
+  genres: string[];
+  description: string;
+  cover_id: string;
+} {
   const isShutline = (c.slug ?? "").toLowerCase() === "shutline" || (c.title ?? "").toLowerCase() === "shutline";
   const author = c.author || (isShutline ? "KYOU" : "");
   const genres = (c.genres && c.genres.length > 0) ? c.genres : (isShutline ? ["BL", "Hành động", "Drama", "Manhwa", "18+"] : []);

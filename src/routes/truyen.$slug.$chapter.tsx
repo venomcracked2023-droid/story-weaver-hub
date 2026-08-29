@@ -31,13 +31,7 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
       .eq("slug", params.slug)
       .maybeSingle();
     if (!comicRaw) {
-      return {
-        comic: null,
-        chapter: null,
-        prevSlug: null,
-        nextSlug: null,
-        chapters: [] as Array<{ id: string; slug: string; title: string }>,
-      };
+      throw notFound();
     }
     const comic = enhanceComicMetadata(comicRaw);
     const { data: siblings } = await supabase
@@ -50,6 +44,9 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
     }>;
     const idx = list.findIndex((c) => c.slug === params.chapter);
     const chapter = idx >= 0 ? list[idx] : null;
+    if (!chapter) {
+      throw notFound();
+    }
     const prevSlug = idx > 0 ? list[idx - 1].slug : null;
     const nextSlug = idx >= 0 && idx < list.length - 1 ? list[idx + 1].slug : null;
     return {
@@ -209,7 +206,14 @@ function Reader() {
     setPdfFailed(false);
   }, [chapterSlug]);
 
-  if (!comic || !chapter) throw notFound();
+  if (!comic || !chapter) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center p-10 text-center">
+        <p className="text-muted-foreground mb-4">Không tìm thấy chương truyện này.</p>
+        <Link to="/" className="text-primary underline">Về trang chủ</Link>
+      </div>
+    );
+  }
 
   const prev = idx > 0 ? chapters[idx - 1] : null;
   const next = idx >= 0 && idx < chapters.length - 1 ? chapters[idx + 1] : null;
