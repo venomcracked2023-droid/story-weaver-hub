@@ -46,8 +46,18 @@ export const Route = createFileRoute("/truyen/$slug/")({
     return { meta, chapters, allComics };
   },
   head: ({ loaderData, params }) => {
+    const url = `${SITE_URL}/truyen/${params.slug}`;
     const m = loaderData?.meta;
-    if (!m) return { meta: [{ title: "Truyện — Lcucumber" }] };
+    if (!m) {
+      return {
+        meta: [{ title: "Truyện — Lcucumber" }],
+        links: [
+          { rel: "canonical", href: url },
+          { rel: "alternate", hrefLang: "vi", href: url },
+          { rel: "alternate", hrefLang: "x-default", href: url },
+        ],
+      };
+    }
     const chapters = loaderData?.chapters ?? [];
     const chapterCount = chapters.length;
     const genresText = Array.isArray(m.genres) && m.genres.length ? ` (${m.genres.join(", ")})` : "";
@@ -60,7 +70,6 @@ export const Route = createFileRoute("/truyen/$slug/")({
       : `Đọc webtoon ${m.title}${genresText} cuộn dọc miễn phí trên Lcucumber. ${chapterCount} chương${m.author ? `, tác giả ${m.author}` : ""}, cập nhật liên tục.`;
     const desc = formatDesc(baseDesc, 160);
     const img = getOgImageUrl(m.cover_id ?? undefined);
-    const url = `${SITE_URL}/truyen/${params.slug}`;
     const firstChapter = chapters[0];
     const lastChapter = chapters[chapters.length - 1];
     const startDate = chapters.length
@@ -311,7 +320,15 @@ function ComicPage() {
                 <span className="mx-2 text-border">·</span>
                 <BookOpen className="h-3.5 w-3.5" /> {comic.chapters.length} chương
               </p>
-              <p className="mt-5 leading-relaxed text-foreground/90">{comic.description}</p>
+              <div className="mt-5 space-y-3 leading-relaxed text-foreground/90">
+                <p className="whitespace-pre-line">
+                  {comic.description ||
+                    `Đọc truyện tranh ${comic.title} thể loại ${comic.genres?.join(", ") || "webtoon"} bản dịch chất lượng cao, cập nhật chương mới nhất miễn phí trên Lcucumber.`}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Trọn bộ {comic.chapters.length} chương manhwa, manhua, webtoon Việt hóa đọc trực tuyến mượt mà, cuộn dọc không giới hạn trên mọi thiết bị.
+                </p>
+              </div>
               <RatingWidget comicId={comic.id} />
               {comic.chapters.length > 0 && (
                 <Link

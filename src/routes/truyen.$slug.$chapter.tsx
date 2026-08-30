@@ -73,15 +73,24 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
     };
   },
   head: ({ loaderData, params }) => {
+    const url = `${SITE_URL}/truyen/${params.slug}/${params.chapter}`;
     const ct = loaderData?.comic?.title;
     const ch = loaderData?.chapter?.title;
     const coverId = loaderData?.comic?.coverId;
-    if (!ct || !ch) return { meta: [{ title: "Đang đọc — Lcucumber" }] };
+    if (!ct || !ch) {
+      return {
+        meta: [{ title: "Đang đọc — Lcucumber" }],
+        links: [
+          { rel: "canonical", href: url },
+          { rel: "alternate", hrefLang: "vi", href: url },
+          { rel: "alternate", hrefLang: "x-default", href: url },
+        ],
+      };
+    }
     const rawTitle = `${ch} - ${ct} | Lcucumber`;
     const title = formatTitle(rawTitle, 60);
     const summary = chapterSummary(ct, ch, loaderData?.comic?.description, loaderData?.comic?.genres);
     const desc = formatDesc(summary, 160);
-    const url = `${SITE_URL}/truyen/${params.slug}/${params.chapter}`;
     const comicUrl = `${SITE_URL}/truyen/${params.slug}`;
     const img = getOgImageUrl(coverId);
     const prevUrl = loaderData?.prevSlug ? `${comicUrl}/${loaderData.prevSlug}` : null;

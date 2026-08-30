@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TheLoaiRouteImport } from './routes/the-loai'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SitemapIndexDotxmlRouteImport } from './routes/sitemap-index[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
@@ -43,6 +44,11 @@ const TheLoaiRoute = TheLoaiRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapIndexDotxmlRoute = SitemapIndexDotxmlRouteImport.update({
+  id: '/sitemap-index.xml',
+  path: '/sitemap-index.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/the-loai': typeof TheLoaiRoute
   '/api/drive-file': typeof ApiDriveFileRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/the-loai': typeof TheLoaiRoute
   '/api/drive-file': typeof ApiDriveFileRoute
@@ -234,6 +242,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap-index.xml': typeof SitemapIndexDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/the-loai': typeof TheLoaiRoute
   '/api/drive-file': typeof ApiDriveFileRoute
@@ -263,6 +272,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/privacy'
     | '/robots.txt'
+    | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/the-loai'
     | '/api/drive-file'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/privacy'
     | '/robots.txt'
+    | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/the-loai'
     | '/api/drive-file'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/privacy'
     | '/robots.txt'
+    | '/sitemap-index.xml'
     | '/sitemap.xml'
     | '/the-loai'
     | '/api/drive-file'
@@ -345,6 +357,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapIndexDotxmlRoute: typeof SitemapIndexDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TheLoaiRoute: typeof TheLoaiRoute
   ApiDriveFileRoute: typeof ApiDriveFileRoute
@@ -369,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-index.xml': {
+      id: '/sitemap-index.xml'
+      path: '/sitemap-index.xml'
+      fullPath: '/sitemap-index.xml'
+      preLoaderRoute: typeof SitemapIndexDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -553,6 +573,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapIndexDotxmlRoute: SitemapIndexDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TheLoaiRoute: TheLoaiRoute,
   ApiDriveFileRoute: ApiDriveFileRoute,

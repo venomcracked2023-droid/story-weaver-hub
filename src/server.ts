@@ -93,6 +93,16 @@ function applySecurityHeaders(headers: Headers) {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const requestUrl = new URL(request.url);
+      if (
+        requestUrl.hostname === "lcucumber.com" ||
+        requestUrl.hostname.endsWith(".pages.dev")
+      ) {
+        requestUrl.hostname = "www.lcucumber.com";
+        requestUrl.protocol = "https:";
+        return Response.redirect(requestUrl.toString(), 301);
+      }
+
       const handler = await getServerEntry();
       const rawResponse = await handler.fetch(request, env, ctx);
       const response = await normalizeCatastrophicSsrResponse(rawResponse);
