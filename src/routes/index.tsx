@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
 import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { fuzzyScoreVi } from "@/lib/fuzzy-search";
-import { BookOpen, Library, Sparkles, Star } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight, Library, Sparkles, Star } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
 import cucumberLogo from "@/assets/cucumber-logo.png";
 
@@ -166,7 +166,7 @@ function Index() {
     return scored.map((s) => s.comic);
   }, [comics, term, selectedGenre]);
 
-  // "Nổi bật" = các truyện vừa có chương mới nhất (tự động, không cần admin chọn).
+  // "Nổi bật" = ưu tiên truyện được admin đánh dấu nổi bật (c.featured), sau đó là các truyện vừa có chương mới nhất.
   const featured = useMemo(() => {
     return [...comics]
       .filter((c) => c.chapters.length > 0)
@@ -174,10 +174,24 @@ function Index() {
         comic: c,
         lastChapterAt: Math.max(...c.chapters.map((ch) => ch.createdAt)),
       }))
-      .sort((a, b) => b.lastChapterAt - a.lastChapterAt)
+      .sort((a, b) => {
+        if (Boolean(a.comic.featured) !== Boolean(b.comic.featured)) {
+          return a.comic.featured ? -1 : 1;
+        }
+        return b.lastChapterAt - a.lastChapterAt;
+      })
       .slice(0, 12)
       .map((x) => x.comic);
   }, [comics]);
+
+  const featuredScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollFeatured = (direction: "left" | "right") => {
+    if (featuredScrollRef.current) {
+      const amount = direction === "left" ? -340 : 340;
+      featuredScrollRef.current.scrollBy({ left: amount, behavior: "smooth" });
+    }
+  };
 
   const totalChapters = useMemo(() => comics.reduce((s, c) => s + c.chapters.length, 0), [comics]);
 
@@ -282,7 +296,7 @@ function Index() {
           </div>
         </section>
 
-        {/* Featured Marquee */}
+        {/* Featured Section */}
         {featured.length > 0 && (
           <section className="mt-14 animate-fade-in-up">
             <div className="mb-6 flex items-end justify-between">
@@ -293,27 +307,45 @@ function Index() {
                 </h2>
                 <p className="mt-1 text-xs text-muted-foreground">Các bộ truyện được cập nhật chương mới và đón đọc nhiều nhất</p>
               </div>
-              <Link
-                to="/featured"
-                className="group inline-flex items-center gap-1 text-sm font-medium text-primary"
-              >
-                Xem tất cả ({featured.length})
-                <span className="transition-transform group-hover:translate-x-1">→</span>
-              </Link>
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-1.5 mr-2">
+                  <button
+                    type="button"
+                    onClick={() => scrollFeatured("left")}
+                    aria-label="Cuộn sang trái"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground shadow-sm transition hover:border-primary/60 hover:bg-secondary hover:text-foreground active:scale-95"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scrollFeatured("right")}
+                    aria-label="Cuộn sang phải"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground shadow-sm transition hover:border-primary/60 hover:bg-secondary hover:text-foreground active:scale-95"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+                <Link
+                  to="/featured"
+                  className="group inline-flex items-center gap-1 text-sm font-medium text-primary"
+                >
+                  Xem tất cả ({featured.length})
+                  <span className="transition-transform group-hover:translate-x-1">→</span>
+                </Link>
+              </div>
             </div>
-            <div
-              className="featured-marquee group/marquee relative overflow-hidden"
-              style={{ ["--marquee-duration" as string]: `${Math.max(20, featured.length * 4)}s` }}
-            >
-              <div className="featured-marquee-track flex w-max gap-4">
-                {[...featured, ...featured].map((c, i) => (
+            <div className="relative">
+              <div
+                ref={featuredScrollRef}
+                className="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {featured.map((c, i) => (
                   <Link
-                    key={`${c.id}-${i}`}
+                    key={c.id}
                     to="/truyen/$slug"
                     params={{ slug: c.slug }}
-                    aria-hidden={i >= featured.length ? true : undefined}
-                    tabIndex={i >= featured.length ? -1 : 0}
-                    className="group flex w-[160px] shrink-0 flex-col gap-2 sm:w-[180px]"
+                    className="group flex w-[160px] shrink-0 snap-start flex-col gap-2 sm:w-[180px]"
                   >
                     <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-primary/40 bg-card shadow-lg shadow-primary/10 group-hover:border-primary">
                       <ComicCover id={c.coverId} title={c.title} priority={i < 4} className="transition duration-500 group-hover:scale-110" />

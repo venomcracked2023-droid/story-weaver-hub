@@ -39,7 +39,7 @@ export const Route = createFileRoute("/featured")({
 function FeaturedPage() {
   const loaderData = Route.useLoaderData();
   const comics = useComics(loaderData?.comics);
-  // Tự động: các truyện vừa được cập nhật chương mới nhất.
+  // Tự động: ưu tiên truyện được admin đánh dấu nổi bật, sau đó là các truyện vừa được cập nhật chương mới nhất.
   const featured = useMemo(() => {
     return [...comics]
       .filter((c) => c.chapters.length > 0)
@@ -47,7 +47,12 @@ function FeaturedPage() {
         comic: c,
         lastChapterAt: Math.max(...c.chapters.map((ch) => ch.createdAt)),
       }))
-      .sort((a, b) => b.lastChapterAt - a.lastChapterAt)
+      .sort((a, b) => {
+        if (Boolean(a.comic.featured) !== Boolean(b.comic.featured)) {
+          return a.comic.featured ? -1 : 1;
+        }
+        return b.lastChapterAt - a.lastChapterAt;
+      })
       .map((x) => x.comic);
   }, [comics]);
 
