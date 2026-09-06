@@ -37,6 +37,82 @@ export function buildPageLinks(pathOrUrl: string, extraLinks: Array<{ rel: strin
   ];
 }
 
+export function getPreconnectLinks() {
+  return [
+    { rel: "preconnect", href: "https://lh3.googleusercontent.com" },
+    { rel: "dns-prefetch", href: "https://lh3.googleusercontent.com" },
+    { rel: "preconnect", href: "https://drive.google.com" },
+    { rel: "dns-prefetch", href: "https://drive.google.com" },
+    { rel: "preconnect", href: "https://www.googletagmanager.com" },
+    { rel: "dns-prefetch", href: "https://www.googletagmanager.com" },
+  ];
+}
+
+export function getOrganizationSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: {
+      "@type": "ImageObject",
+      url: SITE_LOGO,
+      width: 1200,
+      height: 630,
+      caption: `${SITE_NAME} Logo`,
+    },
+    description: "Nền tảng đọc webtoon cuộn dọc miễn phí do cộng đồng Việt vận hành: manhwa, manhua, manga Việt hoá.",
+    sameAs: SOCIAL_LINKS,
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      url: `${SITE_URL}/lien-he`,
+      availableLanguage: ["Vietnamese"],
+    },
+  };
+}
+
+export function getWebSiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    inLanguage: "vi-VN",
+    description: "Nền tảng đọc truyện tranh Webtoon cuộn dọc chất lượng cao và miễn phí.",
+    publisher: {
+      "@id": `${SITE_URL}/#organization`,
+    },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${SITE_URL}/?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+}
+
+export function getWebApplicationSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Lcucumber Webtoon Reader",
+    url: SITE_URL,
+    applicationCategory: "EntertainmentApplication",
+    operatingSystem: "Any",
+    browserRequirements: "Requires JavaScript. Requires HTML5.",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "VND",
+    },
+  };
+}
+
 export interface SeoHeadOptions {
   title: string;
   description: string;
@@ -73,6 +149,8 @@ export function buildSeoHead(options: SeoHeadOptions) {
     { title: formattedTitle },
     { name: "description", content: formattedDesc },
     ...(noindex ? [{ name: "robots", content: "noindex,nofollow" }] : []),
+    { property: "og:site_name", content: SITE_NAME },
+    { property: "og:locale", content: "vi_VN" },
     { property: "og:title", content: formattedTitle },
     { property: "og:description", content: formattedDesc },
     { property: "og:url", content: url },
@@ -99,4 +177,5 @@ export function buildSeoHead(options: SeoHeadOptions) {
     scripts,
   };
 }
+
 

@@ -5,7 +5,8 @@ import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { Search, Star } from "lucide-react";
 import { useMemo, useState } from "react";
 import { fuzzyScoreVi } from "@/lib/fuzzy-search";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_NAME, SITE_URL } from "@/lib/seo";
+import { trackComicClick } from "@/lib/analytics";
 
 export const Route = createFileRoute("/featured")({
   component: FeaturedPage,
@@ -15,22 +16,45 @@ export const Route = createFileRoute("/featured")({
   },
   head: () => {
     const title = "Truyện nổi bật — Lcucumber";
-    const desc = "Danh sách webtoon nổi bật được Lcucumber tuyển chọn — đọc cuộn dọc miễn phí.";
+    const desc = "Danh sách webtoon nổi bật được Lcucumber tuyển chọn — đọc cuộn dọc miễn phí, cập nhật liên tục.";
     const url = `${SITE_URL}/featured`;
+    const img = `${SITE_URL}/og-default.jpg`;
     return {
       meta: [
         { title },
         { name: "description", content: desc },
+        { property: "og:site_name", content: SITE_NAME },
+        { property: "og:type", content: "website" },
+        { property: "og:locale", content: "vi_VN" },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
+        { property: "og:image", content: img },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:image:alt", content: "Truyện nổi bật tuyển chọn — Lcucumber" },
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: img },
       ],
       links: [
         { rel: "canonical", href: url },
         { rel: "alternate", hrefLang: "vi", href: url },
         { rel: "alternate", hrefLang: "x-default", href: url },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Trang chủ", item: `${SITE_URL}/` },
+              { "@type": "ListItem", position: 2, name: "Truyện nổi bật", item: url },
+            ],
+          }),
+        },
       ],
     };
   },
@@ -168,11 +192,12 @@ function FeaturedPage() {
                 key={c.id}
                 to="/truyen/$slug"
                 params={{ slug: c.slug }}
+                onClick={() => trackComicClick(c.id, c.title, "featured_page")}
                 className="group flex flex-col gap-2 animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i, 12) * 50}ms` }}
               >
                 <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-primary/40 bg-card shadow-lg shadow-primary/10 group-hover:border-primary">
-                  <ComicCover id={c.coverId} title={c.title} className="transition duration-500 group-hover:scale-110" />
+                  <ComicCover id={c.coverId} title={c.title} priority={i < 2} className="transition duration-500 group-hover:scale-110" />
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-card/90 via-card/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                   <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-primary-foreground shadow-glow backdrop-blur">
                     <Star className="h-3 w-3 fill-current" /> Nổi bật

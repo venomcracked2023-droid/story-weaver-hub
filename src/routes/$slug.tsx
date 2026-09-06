@@ -8,10 +8,37 @@ const RESERVED = new Set([
   "robots.txt", "sitemap.xml", "the-loai", "genre", "truyen", "api",
 ]);
 
+const CATEGORY_ALIASES: Record<string, string> = {
+  manhwa: "/genre/manhwa",
+  manhua: "/genre/manhua",
+  manga: "/genre/manga",
+  viethoa: "/genre/viet-hoa",
+  "viet-hoa": "/genre/viet-hoa",
+  hot: "/featured",
+  new: "/latest",
+  "moi-cap-nhat": "/latest",
+  complete: "/genre/hoan-thanh",
+  "hoan-thanh": "/genre/hoan-thanh",
+  contact: "/lien-he",
+  terms: "/dieu-khoan",
+  policy: "/privacy",
+};
+
 export const Route = createFileRoute("/$slug")({
   loader: async ({ params }) => {
-    const slug = params.slug;
-    if (!slug || RESERVED.has(slug)) throw notFound();
+    const slug = (params.slug || "").toLowerCase().trim();
+    if (!slug) throw notFound();
+
+    // Check category/shortcut alias redirects
+    if (CATEGORY_ALIASES[slug]) {
+      throw redirect({
+        to: CATEGORY_ALIASES[slug],
+        statusCode: 301,
+      });
+    }
+
+    if (RESERVED.has(slug)) throw notFound();
+
     const { data } = await supabase
       .from("comics")
       .select("slug")

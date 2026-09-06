@@ -4,8 +4,9 @@ import { ComicCover } from "@/components/ComicCover";
 import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { Tag } from "lucide-react";
 import { useMemo } from "react";
-import { SITE_URL, formatTitle, formatDesc } from "@/lib/seo";
+import { SITE_NAME, SITE_URL, formatTitle, formatDesc } from "@/lib/seo";
 import { slugifyGenre } from "@/lib/slug";
+import { trackComicClick } from "@/lib/analytics";
 
 export const Route = createFileRoute("/genre/$slug")({
   component: GenrePage,
@@ -13,24 +14,43 @@ export const Route = createFileRoute("/genre/$slug")({
     const comics = await fetchComicsData();
     return { comics };
   },
-  head: ({ params }) => {
+  head: ({ params, loaderData }) => {
     const slug = params.slug;
-    const rawTitle = `Truyện ${slug} — Webtoon | Lcucumber`;
+    const comics = loaderData?.comics ?? [];
+    const matchedComics = comics.filter((c) =>
+      (c.genres ?? []).some((g) => slugifyGenre(g) === slug),
+    );
+    const displayName =
+      matchedComics
+        .flatMap((c) => c.genres ?? [])
+        .find((g) => slugifyGenre(g) === slug) ?? slug;
+
+    const rawTitle = `Truyện ${displayName} — Webtoon | Lcucumber`;
     const title = formatTitle(rawTitle, 60);
     const desc = formatDesc(
-      `Tổng hợp truyện thể loại ${slug} trên Lcucumber — đọc webtoon cuộn dọc miễn phí, cập nhật liên tục, không quảng cáo.`,
+      `Tổng hợp truyện thể loại ${displayName} trên Lcucumber — đọc webtoon cuộn dọc miễn phí, cập nhật liên tục, không quảng cáo rác.`,
       160,
     );
     const url = `${SITE_URL}/genre/${slug}`;
+    const img = `${SITE_URL}/og-default.jpg`;
     return {
       meta: [
         { title },
         { name: "description", content: desc },
+        { property: "og:site_name", content: SITE_NAME },
+        { property: "og:type", content: "website" },
+        { property: "og:locale", content: "vi_VN" },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
+        { property: "og:image", content: img },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:image:alt", content: `Truyện thể loại ${displayName} — Lcucumber` },
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: img },
       ],
       links: [
         { rel: "canonical", href: url },
@@ -45,7 +65,8 @@ export const Route = createFileRoute("/genre/$slug")({
             "@type": "BreadcrumbList",
             itemListElement: [
               { "@type": "ListItem", position: 1, name: "Trang chủ", item: `${SITE_URL}/` },
-              { "@type": "ListItem", position: 2, name: `Thể loại ${slug}`, item: url },
+              { "@type": "ListItem", position: 2, name: "Thể loại", item: `${SITE_URL}/the-loai` },
+              { "@type": "ListItem", position: 3, name: `Thể loại ${displayName}`, item: url },
             ],
           }),
         },
@@ -140,11 +161,12 @@ function GenrePage() {
                 key={c.id}
                 to="/truyen/$slug"
                 params={{ slug: c.slug }}
+                onClick={() => trackComicClick(c.id, c.title, "genre_page")}
                 className="group flex flex-col gap-2 animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}
               >
                 <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-border bg-card group-hover:border-primary/60">
-                  <ComicCover id={c.coverId} title={c.title} className="transition duration-500 group-hover:scale-110" />
+                  <ComicCover id={c.coverId} title={c.title} priority={i < 2} className="transition duration-500 group-hover:scale-110" />
                 </div>
                 <div>
                   <h2 className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">{c.title}</h2>

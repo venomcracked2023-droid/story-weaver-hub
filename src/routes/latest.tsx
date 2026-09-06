@@ -4,7 +4,8 @@ import { ComicCover } from "@/components/ComicCover";
 import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { Clock } from "lucide-react";
 import { useMemo } from "react";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_NAME, SITE_URL } from "@/lib/seo";
+import { trackComicClick } from "@/lib/analytics";
 
 export const Route = createFileRoute("/latest")({
   component: LatestPage,
@@ -15,22 +16,45 @@ export const Route = createFileRoute("/latest")({
   head: () => {
     const title = "Truyện mới cập nhật — Lcucumber";
     const desc =
-      "Danh sách truyện vừa cập nhật chương mới nhất trên Lcucumber — đọc cuộn dọc miễn phí.";
+      "Danh sách truyện vừa cập nhật chương mới nhất trên Lcucumber — đọc webtoon cuộn dọc miễn phí, cập nhật nhanh nhất.";
     const url = `${SITE_URL}/latest`;
+    const img = `${SITE_URL}/og-default.jpg`;
     return {
       meta: [
         { title },
         { name: "description", content: desc },
+        { property: "og:site_name", content: SITE_NAME },
+        { property: "og:type", content: "website" },
+        { property: "og:locale", content: "vi_VN" },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
+        { property: "og:image", content: img },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:image:alt", content: "Truyện mới cập nhật — Lcucumber" },
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: img },
       ],
       links: [
         { rel: "canonical", href: url },
         { rel: "alternate", hrefLang: "vi", href: url },
         { rel: "alternate", hrefLang: "x-default", href: url },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Trang chủ", item: `${SITE_URL}/` },
+              { "@type": "ListItem", position: 2, name: "Mới cập nhật", item: url },
+            ],
+          }),
+        },
       ],
     };
   },
@@ -109,11 +133,12 @@ function LatestPage() {
                 key={c.id}
                 to="/truyen/$slug"
                 params={{ slug: c.slug }}
+                onClick={() => trackComicClick(c.id, c.title, "latest_page")}
                 className="group flex flex-col gap-2 animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}
               >
                 <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-border bg-card group-hover:border-primary/60">
-                  <ComicCover id={c.coverId} title={c.title} className="transition duration-500 group-hover:scale-110" />
+                  <ComicCover id={c.coverId} title={c.title} priority={i < 2} className="transition duration-500 group-hover:scale-110" />
                 </div>
                 <div>
                   <h2 className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">{c.title}</h2>

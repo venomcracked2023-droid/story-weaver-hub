@@ -11,7 +11,15 @@ import {
 import appCss from "../styles.css?url";
 import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "sonner";
-import { SITE_LOGO, SITE_NAME, SITE_URL, SOCIAL_LINKS } from "@/lib/seo";
+import {
+  SITE_LOGO,
+  SITE_NAME,
+  SITE_URL,
+  getOrganizationSchema,
+  getPreconnectLinks,
+  getWebApplicationSchema,
+  getWebSiteSchema,
+} from "@/lib/seo";
 import { SiteFooter } from "@/components/SiteFooter";
 
 function NotFoundComponent() {
@@ -19,16 +27,16 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Không tìm thấy trang</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          Trang bạn đang tìm kiếm không tồn tại hoặc đã được chuyển sang địa chỉ mới.
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-full bg-gradient-brand px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105"
           >
-            Go home
+            Về trang chủ
           </Link>
         </div>
       </div>
@@ -44,10 +52,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+          Đã có lỗi xảy ra khi tải trang
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Hệ thống gặp sự cố tạm thời. Bạn có thể thử tải lại hoặc quay về trang chủ.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -55,15 +63,15 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-full bg-gradient-brand px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105"
           >
-            Try again
+            Thử lại
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center justify-center rounded-full border border-border bg-card px-5 py-2.5 text-sm font-medium text-foreground transition hover:bg-secondary"
           >
-            Go home
+            Về trang chủ
           </a>
         </div>
       </div>
@@ -75,12 +83,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=5" },
       { name: "author", content: "Lcucumber" },
-      { name: "robots", content: "index,follow,max-image-preview:large" },
+      { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { name: "theme-color", content: "#0b0b10" },
-      { name: "keywords", content: "webtoon, đọc truyện online, manhwa, manhua, manga, truyện tranh, cuộn dọc, Lcucumber" },
-      { property: "og:site_name", content: "Lcucumber" },
+      { name: "keywords", content: "webtoon, đọc truyện online, manhwa, manhua, manga, truyện tranh, cuộn dọc, Lcucumber, đọc truyện miễn phí" },
+      { property: "og:site_name", content: SITE_NAME },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "vi_VN" },
       { property: "og:image", content: `${SITE_URL}/og-default.jpg` },
@@ -93,6 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "google-site-verification", content: "FNyknghInTmMnKo0aS-FSjZDDGaAf1F_CbHeyzpLe6A" },
     ],
     links: [
+      ...getPreconnectLinks(),
       {
         rel: "stylesheet",
         href: appCss,
@@ -106,33 +115,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         src: "https://www.googletagmanager.com/gtag/js?id=G-W7M4VB102V",
       },
       {
-        children: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-W7M4VB102V');`,
+        children: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-W7M4VB102V', { page_path: window.location.pathname });`,
       },
       {
         type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          name: SITE_NAME,
-          url: SITE_URL,
-          logo: SITE_LOGO,
-          sameAs: SOCIAL_LINKS,
-        }),
+        children: JSON.stringify(getOrganizationSchema()),
       },
       {
         type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: SITE_NAME,
-          url: SITE_URL,
-          inLanguage: "vi-VN",
-          potentialAction: {
-            "@type": "SearchAction",
-            target: `${SITE_URL}/?q={search_term_string}`,
-            "query-input": "required name=search_term_string",
-          },
-        }),
+        children: JSON.stringify(getWebSiteSchema()),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(getWebApplicationSchema()),
       },
     ],
   }),

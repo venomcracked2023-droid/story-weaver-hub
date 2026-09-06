@@ -5,7 +5,8 @@ import { ComicCover } from "@/components/ComicCover";
 import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { fuzzyScoreVi } from "@/lib/fuzzy-search";
 import { BookOpen, ChevronLeft, ChevronRight, Library, Sparkles, Star } from "lucide-react";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_NAME, SITE_URL } from "@/lib/seo";
+import { trackComicClick, trackGenreFilter } from "@/lib/analytics";
 import cucumberLogo from "@/assets/cucumber-logo.png";
 
 export const Route = createFileRoute("/")({
@@ -28,6 +29,9 @@ export const Route = createFileRoute("/")({
       meta: [
         { title },
         { name: "description", content: desc },
+        { property: "og:site_name", content: SITE_NAME },
+        { property: "og:type", content: "website" },
+        { property: "og:locale", content: "vi_VN" },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
@@ -35,6 +39,7 @@ export const Route = createFileRoute("/")({
         { property: "og:image:width", content: "1200" },
         { property: "og:image:height", content: "630" },
         { property: "og:image:alt", content: "Lcucumber — Đọc Webtoon cuộn dọc miễn phí" },
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
         { name: "twitter:image", content: img },
@@ -345,10 +350,11 @@ function Index() {
                     key={c.id}
                     to="/truyen/$slug"
                     params={{ slug: c.slug }}
+                    onClick={() => trackComicClick(c.id, c.title, "home_featured")}
                     className="group flex w-[160px] shrink-0 snap-start flex-col gap-2 sm:w-[180px]"
                   >
                     <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-primary/40 bg-card shadow-lg shadow-primary/10 group-hover:border-primary">
-                      <ComicCover id={c.coverId} title={c.title} priority={i < 4} className="transition duration-500 group-hover:scale-110" />
+                      <ComicCover id={c.coverId} title={c.title} priority={i < 2} className="transition duration-500 group-hover:scale-110" />
                       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-card/90 via-card/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                       <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-primary-foreground shadow-glow backdrop-blur">
                         <Star className="h-3 w-3 fill-current" /> Hot
@@ -429,7 +435,10 @@ function Index() {
               <div className="flex flex-wrap items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => setSelectedGenre("")}
+                  onClick={() => {
+                    setSelectedGenre("");
+                    trackGenreFilter("Tất cả");
+                  }}
                   className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
                     !selectedGenre
                       ? "bg-primary text-primary-foreground shadow"
@@ -442,7 +451,11 @@ function Index() {
                   <button
                     key={g}
                     type="button"
-                    onClick={() => setSelectedGenre(selectedGenre === g ? "" : g)}
+                    onClick={() => {
+                      const next = selectedGenre === g ? "" : g;
+                      setSelectedGenre(next);
+                      if (next) trackGenreFilter(next);
+                    }}
                     className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
                       selectedGenre === g
                         ? "bg-primary text-primary-foreground shadow"
@@ -482,11 +495,12 @@ function Index() {
                     key={c.id}
                     to="/truyen/$slug"
                     params={{ slug: c.slug }}
+                    onClick={() => trackComicClick(c.id, c.title, "home_library")}
                     className="group flex flex-col gap-2 animate-fade-in-up"
                     style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}
                   >
                     <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-border bg-card group-hover:border-primary/60">
-                      <ComicCover id={c.coverId} title={c.title} priority={libraryPage === 1 && i < 4 && featured.length === 0} className="transition duration-500 group-hover:scale-110" />
+                      <ComicCover id={c.coverId} title={c.title} priority={libraryPage === 1 && i < 2 && featured.length === 0} className="transition duration-500 group-hover:scale-110" />
                       {c.chapters.length === 0 && (
                         <span className="absolute left-2 top-2 z-10 inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-950/80 px-2 py-0.5 text-[10px] font-semibold text-amber-300 shadow backdrop-blur">
                           Sắp ra mắt

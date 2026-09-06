@@ -67,8 +67,15 @@ export const Route = createFileRoute("/sitemap.xml")({
           `<url><loc>${origin}/privacy</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
           `<url><loc>${origin}/dmca</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
         ];
-        // Trang duyệt theo thể loại — gom slug duy nhất từ tất cả truyện.
+        // Trang duyệt theo thể loại — gom slug duy nhất từ tất cả truyện + seed thể loại chính.
+        const CORE_GENRES = [
+          "manhwa", "manhua", "manga", "viet-hoa", "bl",
+          "hanh-dong", "drama", "18", "romance", "comedy", "fantasy", "hoan-thanh",
+        ];
         const genreLastmod = new Map<string, string>();
+        for (const slug of CORE_GENRES) {
+          genreLastmod.set(slug, siteLastmod);
+        }
         for (const c of comics ?? []) {
           for (const g of ((c as { genres?: string[] }).genres ?? [])) {
             const slug = slugifyGenre(g);

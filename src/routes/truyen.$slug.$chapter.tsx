@@ -2,13 +2,14 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { driveImageUrl, extractDriveId, getOgImageUrl } from "@/lib/drive";
 import { enhanceComicMetadata } from "@/lib/comics-store";
 import { ArrowLeft, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, List } from "lucide-react";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
 import { AgeWarning } from "@/components/AgeWarning";
 import { isMatureComic } from "@/lib/content-rating";
-import { SITE_URL, formatTitle, formatDesc } from "@/lib/seo";
+import { SITE_NAME, SITE_URL, formatTitle, formatDesc } from "@/lib/seo";
 import { slugifyGenre } from "@/lib/slug";
+import { trackChapterProgress, trackChapterReadStart } from "@/lib/analytics";
 
 const PdfReader = lazy(() =>
   import("@/components/PdfReader").then((module) => ({ default: module.PdfReader })),
@@ -101,6 +102,8 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
       meta: [
         { title },
         { name: "description", content: desc },
+        { property: "og:site_name", content: SITE_NAME },
+        { property: "og:locale", content: "vi_VN" },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
@@ -197,18 +200,39 @@ function Reader() {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (comic && chapter) {
+      trackChapterReadStart(comic.id, comic.title, chapter.slug, chapter.title);
+    }
+  }, [comic?.id, chapter?.slug]);
+
   const [hideUI, setHideUI] = useState(false);
   const [pdfFailed, setPdfFailed] = useState(false);
+  const milestonesRef = useRef<Set<number>>(new Set());
+
   useEffect(() => {
+    milestonesRef.current.clear();
     let last = 0;
     const onScroll = () => {
       const y = window.scrollY;
       setHideUI(y > 200 && y > last);
       last = y;
+
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalHeight > 100 && comic && chapter) {
+        const pct = Math.round((y / totalHeight) * 100);
+        const milestones = [25, 50, 75, 100] as const;
+        for (const m of milestones) {
+          if (pct >= m && !milestonesRef.current.has(m)) {
+            milestonesRef.current.add(m);
+            trackChapterProgress(comic.title, chapter.title, m);
+          }
+        }
+      }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [comic?.title, chapter?.title, chapterSlug]);
 
   useEffect(() => {
     if (typeof window !== "undefined") window.scrollTo(0, 0);

@@ -10,9 +10,10 @@ import { CommentSection } from "@/components/CommentSection";
 import { RatingWidget } from "@/components/RatingWidget";
 import { AgeWarning } from "@/components/AgeWarning";
 import { isMatureComic } from "@/lib/content-rating";
-import { SITE_URL, formatTitle, formatDesc } from "@/lib/seo";
+import { SITE_NAME, SITE_URL, formatTitle, formatDesc } from "@/lib/seo";
 import { slugifyGenre } from "@/lib/slug";
 import { useAuth } from "@/lib/auth";
+import { trackComicView, trackComicClick } from "@/lib/analytics";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/truyen/$slug/")({
@@ -81,6 +82,8 @@ export const Route = createFileRoute("/truyen/$slug/")({
       meta: [
         { title },
         { name: "description", content: desc },
+        { property: "og:site_name", content: SITE_NAME },
+        { property: "og:locale", content: "vi_VN" },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
@@ -215,6 +218,7 @@ function ComicPage() {
 
   useEffect(() => {
     if (!comic) return;
+    trackComicView(comic.id, comic.title, comic.genres);
     let active = true;
     const comicId = comic.id;
     async function loadCounts() {

@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { LogIn, LogOut, Search, Settings, UserPlus, ShieldCheck, X, Info, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { trackSearchQuery } from "@/lib/analytics";
 import cucumberLogo from "@/assets/cucumber-logo.png";
 
 export function SiteHeader() {
@@ -32,6 +33,7 @@ export function SiteHeader() {
     e.preventDefault();
     const term = q.trim();
     if (term) {
+      trackSearchQuery(term);
       navigate({ to: "/", search: { q: term }, hash: "library" });
     } else {
       navigate({ to: "/", hash: "library" });

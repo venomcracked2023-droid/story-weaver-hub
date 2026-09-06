@@ -3,18 +3,26 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { Tag, Sparkles, Compass } from "lucide-react";
 import { useMemo } from "react";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_NAME, SITE_URL } from "@/lib/seo";
 import { slugifyGenre } from "@/lib/slug";
+import { trackGenreFilter } from "@/lib/analytics";
 
 const GENRE_DESCRIPTIONS: Record<string, string> = {
+  manhwa: "Truyện tranh Hàn Quốc cuộn dọc chuẩn sắc màu, phong cách đồ hoạ thời thượng và cốt truyện cuốn hút.",
+  manhua: "Truyện tranh Trung Quốc đa dạng thể loại tu tiên, tổng tài, xuyên không với phong cách nét vẽ độc đáo.",
+  manga: "Truyện tranh Nhật Bản kinh điển với nội dung sâu sắc, đa tầng cảm xúc và những chuyến phiêu lưu bất tận.",
+  "viet-hoa": "Tuyển tập truyện tranh được dịch và biên tập tiếng Việt mượt mà, giữ trọn ngữ cảnh và cảm xúc gốc.",
+  viethoa: "Tuyển tập truyện tranh được dịch và biên tập tiếng Việt mượt mà, giữ trọn ngữ cảnh và cảm xúc gốc.",
   bl: "Tình cảm lãng mạn Boys' Love đặc sắc, cốt truyện sâu sắc và nét vẽ trau chuốt.",
   "hanh-dong": "Những pha hành động kịch tính, đánh đấm mãn nhãn và nhịp truyện dồn dập.",
   drama: "Xung đột tâm lý, cốt truyện bất ngờ, nhiều khúc mắc và kịch tính đến nghẹt thở.",
-  manhwa: "Truyện tranh Hàn Quốc cuộn dọc chuẩn sắc màu, phong cách đồ hoạ thời thượng.",
   "18": "Tác phẩm dành cho lứa tuổi trưởng thành với các yếu tố tâm lý và tình cảm sâu sắc.",
   romance: "Chuyện tình lãng mạn ngọt ngào, rung động trái tim và cảm xúc chân thật.",
   comedy: "Tình huống hài hước, dí dỏm giúp giải tỏa căng thẳng sau những giờ làm việc.",
   fantasy: "Thế giới huyền ảo, ma thuật diệu kỳ cùng những chuyến phiêu lưu kỳ thú.",
+  "xuyen-khong": "Hành trình xuyên không vượt thời gian, thay đổi vận mệnh đầy bất ngờ và lôi cuốn.",
+  "he-thong": "Nhân vật chính sở hữu hệ thống hỗ trợ thăng cấp sức mạnh và vượt qua nghịch cảnh.",
+  "hoan-thanh": "Danh sách các bộ truyện đã hoàn thành trọn vẹn, có thể đọc liên tục từ đầu đến cuối không cần chờ đợi.",
 };
 
 export const Route = createFileRoute("/the-loai")({
@@ -26,19 +34,27 @@ export const Route = createFileRoute("/the-loai")({
   head: () => {
     const title = "Thể loại truyện — Lcucumber";
     const desc =
-      "Khám phá tất cả thể loại webtoon, manhwa, manhua trên Lcucumber: BL, Hành động, Drama, Manhwa... — chọn thể loại yêu thích và đọc cuộn dọc miễn phí.";
+      "Khám phá tất cả thể loại webtoon, manhwa, manhua, manga trên Lcucumber: Manhwa, Manhua, BL, Hành động, Drama, Việt Hóa... — chọn thể loại yêu thích và đọc cuộn dọc miễn phí.";
     const url = `${SITE_URL}/the-loai`;
+    const img = `${SITE_URL}/og-default.jpg`;
     return {
       meta: [
         { title },
         { name: "description", content: desc },
+        { property: "og:site_name", content: SITE_NAME },
+        { property: "og:type", content: "website" },
+        { property: "og:locale", content: "vi_VN" },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
-        { property: "og:type", content: "website" },
+        { property: "og:image", content: img },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:image:alt", content: "Thể loại truyện Webtoon — Lcucumber" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: img },
       ],
       links: [
         { rel: "canonical", href: url },
