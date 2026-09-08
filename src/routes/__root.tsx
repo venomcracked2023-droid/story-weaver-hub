@@ -85,7 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=5" },
       { name: "author", content: "Lcucumber" },
-      { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:160,max-video-preview:-1" },
+      { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { name: "theme-color", content: "#0b0b10" },
       { name: "keywords", content: "webtoon, đọc truyện online, manhwa, manhua, manga, truyện tranh, cuộn dọc, Lcucumber, đọc truyện miễn phí" },
       { property: "og:site_name", content: SITE_NAME },

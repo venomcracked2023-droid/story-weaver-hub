@@ -97,8 +97,6 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
     const img = getOgImageUrl(coverId);
     const prevUrl = loaderData?.prevSlug ? `${comicUrl}/${loaderData.prevSlug}` : null;
     const nextUrl = loaderData?.nextSlug ? `${comicUrl}/${loaderData.nextSlug}` : null;
-    const pdfId = loaderData?.chapter?.pages?.length === 1 ? extractDriveId(loaderData.chapter.pages[0]) ?? loaderData.chapter.pages[0] : null;
-    const pdfUrl = pdfId ? `${SITE_URL}/api/drive-file?id=${encodeURIComponent(pdfId)}` : null;
     return {
       meta: [
         { title },
@@ -499,8 +497,8 @@ function Reader() {
               </nav>
               <h2>{chapter.title} — {comic.title}</h2>
               <p>{summary}</p>
-              <p>
-                <a href={`/api/drive-file?id=${singleId}`}>Tải chương dạng PDF</a>
+              <p className="text-muted-foreground">
+                Vui lòng bật JavaScript để trải nghiệm trình đọc truyện cuộn dọc tốt nhất trên Lcucumber.
               </p>
               <ul>
                 {prev && (

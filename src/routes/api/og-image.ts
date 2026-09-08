@@ -137,6 +137,7 @@ export const Route = createFileRoute("/api/og-image")({
               "cache-control": "public, max-age=31536000, s-maxage=31536000, immutable",
               "access-control-allow-origin": "*",
               "content-disposition": "inline",
+              "x-robots-tag": "noindex, nofollow, noarchive",
               "x-content-type-options": "nosniff",
             };
 

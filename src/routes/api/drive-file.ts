@@ -7,7 +7,13 @@ export const Route = createFileRoute("/api/drive-file")({
         const url = new URL(request.url);
         const id = url.searchParams.get("id");
         if (!id || !/^[A-Za-z0-9_-]{10,}$/.test(id)) {
-          return new Response("invalid id", { status: 400 });
+          return new Response("invalid id", {
+            status: 400,
+            headers: {
+              "content-type": "text/plain; charset=utf-8",
+              "x-robots-tag": "noindex, nofollow, noarchive",
+            },
+          });
         }
 
         const range = request.headers.get("range");
@@ -44,6 +50,8 @@ export const Route = createFileRoute("/api/drive-file")({
               "access-control-expose-headers": "content-length, content-range, accept-ranges",
               "accept-ranges": "bytes",
               "content-disposition": "inline",
+              "x-robots-tag": "noindex, nofollow, noarchive",
+              "x-content-type-options": "nosniff",
             };
 
             const len = upstream.headers.get("content-length");
@@ -60,7 +68,13 @@ export const Route = createFileRoute("/api/drive-file")({
           }
         }
 
-        return new Response("upstream unavailable", { status: 502 });
+        return new Response("upstream unavailable", {
+          status: 502,
+          headers: {
+            "content-type": "text/plain; charset=utf-8",
+            "x-robots-tag": "noindex, nofollow, noarchive",
+          },
+        });
       },
     },
   },

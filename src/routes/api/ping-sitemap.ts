@@ -20,6 +20,7 @@ export const Route = createFileRoute("/api/ping-sitemap")({
             headers: {
               "content-type": "application/json; charset=utf-8",
               "cache-control": "no-store",
+              "x-robots-tag": "noindex, nofollow, noarchive",
             },
           },
         );
@@ -49,6 +50,7 @@ export const Route = createFileRoute("/api/ping-sitemap")({
             headers: {
               "content-type": "application/json; charset=utf-8",
               "cache-control": "no-store",
+              "x-robots-tag": "noindex, nofollow, noarchive",
             },
           },
         );
