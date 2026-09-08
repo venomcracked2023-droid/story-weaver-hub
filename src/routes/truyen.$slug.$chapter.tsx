@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { driveImageUrl, extractDriveId, getOgImageUrl } from "@/lib/drive";
 import { enhanceComicMetadata } from "@/lib/comics-store";
-import { ArrowLeft, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, List } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, List, Share2 } from "lucide-react";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
@@ -9,7 +9,8 @@ import { AgeWarning } from "@/components/AgeWarning";
 import { isMatureComic } from "@/lib/content-rating";
 import { SITE_NAME, SITE_URL, formatTitle, formatDesc } from "@/lib/seo";
 import { slugifyGenre } from "@/lib/slug";
-import { trackChapterProgress, trackChapterReadStart } from "@/lib/analytics";
+import { trackChapterProgress, trackChapterReadStart, trackShare } from "@/lib/analytics";
+import { toast } from "sonner";
 
 const PdfReader = lazy(() =>
   import("@/components/PdfReader").then((module) => ({ default: module.PdfReader })),
@@ -102,6 +103,7 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
       meta: [
         { title },
         { name: "description", content: desc },
+        { name: "robots", content: "noindex,follow,noimageindex" },
         { property: "og:site_name", content: SITE_NAME },
         { property: "og:locale", content: "vi_VN" },
         { property: "og:title", content: title },
@@ -147,6 +149,8 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
             headline: `${ch} — ${ct}`,
             description: desc,
             url,
+            image: img,
+            thumbnailUrl: img,
             mainEntityOfPage: url,
             isPartOf: {
               "@type": ["ComicSeries", "Book"],
@@ -155,14 +159,6 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
             },
             datePublished: loaderData.chapter?.createdAt ?? undefined,
             inLanguage: "vi-VN",
-            associatedMedia: pdfUrl
-              ? {
-                  "@type": "MediaObject",
-                  encodingFormat: "application/pdf",
-                  contentUrl: pdfUrl,
-                  name: `${ch} — ${ct}`,
-                }
-              : undefined,
             publisher: {
               "@type": "Organization",
               name: "Lcucumber",
@@ -266,6 +262,31 @@ function Reader() {
       to: "/truyen/$slug/$chapter",
       params: { slug: comic.slug, chapter: chSlug },
     });
+
+  const handleShare = async () => {
+    if (!comic || !chapter || typeof window === "undefined") return;
+    const shareUrl = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${chapter.title} — ${comic.title}`,
+          text: `Đọc ${chapter.title} của ${comic.title} trên Lcucumber!`,
+          url: shareUrl,
+        });
+        trackShare(`${comic.title} - ${chapter.title}`, "native");
+        return;
+      } catch {
+        // user cancelled
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Đã sao chép liên kết chương truyện!");
+      trackShare(`${comic.title} - ${chapter.title}`, "copy_link");
+    } catch {
+      toast.error("Không thể sao chép liên kết");
+    }
+  };
 
   const Footer = () => (
     <div className="mx-auto max-w-3xl px-4 pb-32 pt-6">
@@ -427,7 +448,18 @@ function Reader() {
               {comic.title}
             </span>
           </Link>
-          <span className="text-xs font-bold text-foreground">{chapter.title}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-foreground">{chapter.title}</span>
+            <button
+              type="button"
+              onClick={handleShare}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/80 bg-background/80 text-muted-foreground transition hover:border-primary hover:text-foreground active:scale-95"
+              aria-label="Chia sẻ chương"
+              title="Chia sẻ chương"
+            >
+              <Share2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       </header>
 

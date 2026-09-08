@@ -87,29 +87,15 @@ export const Route = createFileRoute("/sitemap.xml")({
         }
         for (const [slug, lastmod] of genreLastmod) {
           urls.push(
-            `<url><loc>${origin}/genre/${xmlEscape(slug)}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
+            `<url><loc>${origin}/genre/${xmlEscape(slug)}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`,
           );
         }
         for (const c of comics ?? []) {
           if (!(c as any).slug) continue;
           const lastmod = maxIso(iso(c.updated_at), latestChapterByComic.get(c.id))!;
-          const freq = freqByComic.get(c.id) ?? "monthly";
+          const freq = freqByComic.get(c.id) ?? "weekly";
           urls.push(
-            `<url><loc>${origin}/truyen/${xmlEscape((c as any).slug)}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.8</priority></url>`,
-          );
-        }
-
-        // URL từng chương — gộp luôn vào sitemap chính.
-        const slugByComicId = new Map<string, string>();
-        for (const c of comics ?? []) {
-          if ((c as any).slug) slugByComicId.set(c.id as string, (c as any).slug as string);
-        }
-        for (const ch of chapters ?? []) {
-          const comicSlug = slugByComicId.get(ch.comic_id as string);
-          if (!comicSlug || !(ch as any).slug) continue;
-          const freq = freqByComic.get(ch.comic_id as string) ?? "monthly";
-          urls.push(
-            `<url><loc>${origin}/truyen/${xmlEscape(comicSlug)}/${xmlEscape((ch as any).slug)}</loc><lastmod>${iso(ch.created_at)}</lastmod><changefreq>${freq}</changefreq><priority>0.7</priority></url>`,
+            `<url><loc>${origin}/truyen/${xmlEscape((c as any).slug)}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.9</priority></url>`,
           );
         }
 

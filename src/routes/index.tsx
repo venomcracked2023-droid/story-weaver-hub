@@ -354,7 +354,7 @@ function Index() {
                     className="group flex w-[160px] shrink-0 snap-start flex-col gap-2 sm:w-[180px]"
                   >
                     <div className="hover-lift relative aspect-[3/4] overflow-hidden rounded-xl border border-primary/40 bg-card shadow-lg shadow-primary/10 group-hover:border-primary">
-                      <ComicCover id={c.coverId} title={c.title} priority={i < 2} className="transition duration-500 group-hover:scale-110" />
+                      <ComicCover id={c.coverId} title={c.title} priority={i === 0} className="transition duration-500 group-hover:scale-110" />
                       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-card/90 via-card/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                       <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-primary-foreground shadow-glow backdrop-blur">
                         <Star className="h-3 w-3 fill-current" /> Hot

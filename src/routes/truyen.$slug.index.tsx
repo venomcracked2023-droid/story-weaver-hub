@@ -5,7 +5,7 @@ import { ComicCover } from "@/components/ComicCover";
 import { enhanceComicMetadata, fetchComicsData, loadComics, useComics, useComicsLoaded } from "@/lib/comics-store";
 import { supabase } from "@/integrations/supabase/client";
 import { driveImageUrl, getOgImageUrl, parseDriveIds } from "@/lib/drive";
-import { BookOpen, ChevronRight, Layers, MessageCircle, Plus, User, X } from "lucide-react";
+import { BookOpen, Bookmark, ChevronRight, Layers, MessageCircle, Plus, Share2, User, X } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { RatingWidget } from "@/components/RatingWidget";
 import { AgeWarning } from "@/components/AgeWarning";
@@ -13,7 +13,7 @@ import { isMatureComic } from "@/lib/content-rating";
 import { SITE_NAME, SITE_URL, formatTitle, formatDesc } from "@/lib/seo";
 import { slugifyGenre } from "@/lib/slug";
 import { useAuth } from "@/lib/auth";
-import { trackComicView, trackComicClick } from "@/lib/analytics";
+import { trackComicView, trackComicClick, trackBookmark, trackShare } from "@/lib/analytics";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/truyen/$slug/")({
@@ -215,6 +215,7 @@ function ComicPage() {
   const [comicCount, setComicCount] = useState(0);
   const { isContributor } = useAuth();
   const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
 
   useEffect(() => {
     if (!comic) return;
@@ -246,11 +247,64 @@ function ComicPage() {
         () => loadCounts(),
       )
       .subscribe();
+
+    try {
+      const raw = localStorage.getItem("lc_bookmarks");
+      const list = raw ? JSON.parse(raw) : [];
+      setBookmarked(Array.isArray(list) && list.includes(comic.id));
+    } catch {}
+
     return () => {
       active = false;
       supabase.removeChannel(ch);
     };
   }, [comic]);
+
+  const toggleBookmark = () => {
+    if (!comic) return;
+    try {
+      const raw = localStorage.getItem("lc_bookmarks");
+      let list: string[] = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(list)) list = [];
+      const nextState = !bookmarked;
+      if (nextState) {
+        list = Array.from(new Set([...list, comic.id]));
+        toast.success("Đã thêm vào danh sách theo dõi");
+        trackBookmark(comic.id, comic.title, "add");
+      } else {
+        list = list.filter((id) => id !== comic.id);
+        toast.info("Đã bỏ theo dõi truyện");
+        trackBookmark(comic.id, comic.title, "remove");
+      }
+      localStorage.setItem("lc_bookmarks", JSON.stringify(list));
+      setBookmarked(nextState);
+    } catch {}
+  };
+
+  const handleShare = async () => {
+    if (!comic || typeof window === "undefined") return;
+    const shareUrl = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: comic.title,
+          text: `Đọc webtoon ${comic.title} trên Lcucumber!`,
+          url: shareUrl,
+        });
+        trackShare(comic.title, "native");
+        return;
+      } catch {
+        // user cancelled share
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Đã sao chép liên kết truyện vào bộ nhớ tạm!");
+      trackShare(comic.title, "copy_link");
+    } catch {
+      toast.error("Không thể sao chép liên kết");
+    }
+  };
 
   if (!comic) {
     if (!loaded && !loaderData?.meta) {
@@ -334,16 +388,40 @@ function ComicPage() {
                 </p>
               </div>
               <RatingWidget comicId={comic.id} />
-              {comic.chapters.length > 0 && (
-                <Link
-                  to="/truyen/$slug/$chapter"
-                  params={{ slug: comic.slug, chapter: comic.chapters[0].slug }}
-                  className="group mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-brand px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95"
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                {comic.chapters.length > 0 && (
+                  <Link
+                    to="/truyen/$slug/$chapter"
+                    params={{ slug: comic.slug, chapter: comic.chapters[0].slug }}
+                    className="group inline-flex items-center gap-2 rounded-full bg-gradient-brand px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95"
+                  >
+                    Đọc từ đầu
+                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  onClick={toggleBookmark}
+                  className={`inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition active:scale-95 ${
+                    bookmarked
+                      ? "border-primary bg-primary/15 text-primary"
+                      : "border-border bg-background/60 text-foreground hover:border-primary/60 hover:bg-secondary"
+                  }`}
+                  aria-label={bookmarked ? "Bỏ theo dõi" : "Theo dõi truyện"}
                 >
-                  Đọc từ đầu
-                  <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-              )}
+                  <Bookmark className={`h-4 w-4 ${bookmarked ? "fill-primary" : ""}`} />
+                  <span>{bookmarked ? "Đang theo dõi" : "Theo dõi"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-background/60 px-5 py-3 text-sm font-medium text-foreground transition hover:border-primary/60 hover:bg-secondary active:scale-95"
+                  aria-label="Chia sẻ truyện"
+                >
+                  <Share2 className="h-4 w-4" />
+                  <span>Chia sẻ</span>
+                </button>
+              </div>
             </div>
           </div>
         </main>

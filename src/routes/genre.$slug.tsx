@@ -1,16 +1,25 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ComicCover } from "@/components/ComicCover";
 import { fetchComicsData, useComics } from "@/lib/comics-store";
 import { Tag } from "lucide-react";
 import { useMemo } from "react";
 import { SITE_NAME, SITE_URL, formatTitle, formatDesc } from "@/lib/seo";
-import { slugifyGenre } from "@/lib/slug";
+import { slugifyGenre, getCanonicalGenreSlug } from "@/lib/slug";
 import { trackComicClick } from "@/lib/analytics";
 
 export const Route = createFileRoute("/genre/$slug")({
   component: GenrePage,
-  loader: async () => {
+  loader: async ({ params }) => {
+    const rawSlug = (params.slug || "").toLowerCase().trim();
+    const canonical = getCanonicalGenreSlug(rawSlug);
+    if (canonical !== rawSlug) {
+      throw redirect({
+        to: "/genre/$slug",
+        params: { slug: canonical },
+        statusCode: 301,
+      });
+    }
     const comics = await fetchComicsData();
     return { comics };
   },

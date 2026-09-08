@@ -31,8 +31,8 @@ export const Route = createFileRoute("/api/drive-file")({
             if (!upstream.ok || !upstream.body) continue;
 
             const ct = upstream.headers.get("content-type") || "";
-            // Reject HTML error pages
-            if (ct.includes("text/html") && !target.includes("export=download")) {
+            // Reject HTML error pages and virus scan confirmation HTML
+            if (ct.includes("text/html")) {
               continue;
             }
 
