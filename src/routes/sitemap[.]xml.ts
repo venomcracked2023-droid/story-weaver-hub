@@ -25,7 +25,15 @@ export const Route = createFileRoute("/sitemap.xml")({
           .order("created_at", { ascending: false })
           .limit(5000);
 
-        const iso = (v: string | number | Date) => new Date(v).toISOString();
+        const iso = (v?: string | number | Date | null) => {
+          if (!v) return new Date().toISOString();
+          try {
+            const d = new Date(v);
+            return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+          } catch {
+            return new Date().toISOString();
+          }
+        };
         const maxIso = (a?: string, b?: string) =>
           !a ? b : !b ? a : new Date(a) > new Date(b) ? a : b;
 
@@ -41,8 +49,11 @@ export const Route = createFileRoute("/sitemap.xml")({
             ch.comic_id,
             maxIso(latestChapterByComic.get(ch.comic_id), ts) as string,
           );
-          (chapterTsByComic.get(ch.comic_id) ?? chapterTsByComic.set(ch.comic_id, []).get(ch.comic_id)!)
-            .push(new Date(ch.created_at).getTime());
+          const t = ch.created_at ? new Date(ch.created_at).getTime() : Date.now();
+          if (!isNaN(t)) {
+            (chapterTsByComic.get(ch.comic_id) ?? chapterTsByComic.set(ch.comic_id, []).get(ch.comic_id)!)
+              .push(t);
+          }
           globalLatest = maxIso(globalLatest, ts);
         }
         for (const c of comics ?? []) {
@@ -61,11 +72,11 @@ export const Route = createFileRoute("/sitemap.xml")({
           `<url><loc>${origin}/latest</loc><lastmod>${siteLastmod}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,
           `<url><loc>${origin}/the-loai</loc><lastmod>${siteLastmod}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`,
           `<url><loc>${origin}/cong-dong</loc><lastmod>${siteLastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
-          `<url><loc>${origin}/gioi-thieu</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
-          `<url><loc>${origin}/lien-he</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
-          `<url><loc>${origin}/dieu-khoan</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>`,
-          `<url><loc>${origin}/privacy</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
-          `<url><loc>${origin}/dmca</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
+          `<url><loc>${origin}/gioi-thieu</loc><lastmod>${siteLastmod}</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
+          `<url><loc>${origin}/lien-he</loc><lastmod>${siteLastmod}</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
+          `<url><loc>${origin}/dieu-khoan</loc><lastmod>${siteLastmod}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`,
+          `<url><loc>${origin}/privacy</loc><lastmod>${siteLastmod}</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
+          `<url><loc>${origin}/dmca</loc><lastmod>${siteLastmod}</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
         ];
         // Trang duyệt theo thể loại — gom slug duy nhất từ tất cả truyện + seed thể loại chính.
         const CORE_GENRES = [
@@ -92,7 +103,8 @@ export const Route = createFileRoute("/sitemap.xml")({
         }
         for (const c of comics ?? []) {
           if (!(c as any).slug) continue;
-          const lastmod = maxIso(iso(c.updated_at), latestChapterByComic.get(c.id))!;
+          const comicDate = c.updated_at || c.created_at || Date.now();
+          const lastmod = maxIso(iso(comicDate), latestChapterByComic.get(c.id)) ?? siteLastmod;
           const freq = freqByComic.get(c.id) ?? "weekly";
           urls.push(
             `<url><loc>${origin}/truyen/${xmlEscape((c as any).slug)}</loc><lastmod>${lastmod}</lastmod><changefreq>${freq}</changefreq><priority>0.9</priority></url>`,
