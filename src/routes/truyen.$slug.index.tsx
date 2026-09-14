@@ -181,8 +181,32 @@ export const Route = createFileRoute("/truyen/$slug/")({
       </div>
     </div>
   ),
-  errorComponent: ({ error }) => (
-    <div className="p-10 text-center text-destructive">{error.message}</div>
+  errorComponent: ({ error, reset }) => (
+    <div className="min-h-screen">
+      <SiteHeader />
+      <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+        <h1 className="text-xl font-bold text-foreground">Không thể tải thông tin truyện</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Đã có lỗi xảy ra. Bạn có thể thử tải lại trang hoặc quay về trang chủ.
+        </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          {reset && (
+            <button
+              onClick={() => reset()}
+              className="inline-flex items-center justify-center rounded-full bg-gradient-brand px-5 py-2 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105"
+            >
+              Thử lại
+            </button>
+          )}
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center rounded-full border border-border bg-card px-5 py-2 text-sm font-medium text-foreground transition hover:bg-secondary"
+          >
+            Về trang chủ
+          </Link>
+        </div>
+      </div>
+    </div>
   ),
 });
 
@@ -223,30 +247,26 @@ function ComicPage() {
     let active = true;
     const comicId = comic.id;
     async function loadCounts() {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("chapter_id")
-        .eq("comic_id", comicId)
-        .limit(5000);
-      if (error || !active) return;
-      const map: Record<string, number> = {};
-      let general = 0;
-      for (const row of data ?? []) {
-        if (row.chapter_id) map[row.chapter_id] = (map[row.chapter_id] ?? 0) + 1;
-        else general += 1;
+      try {
+        const { data, error } = await supabase
+          .from("comments")
+          .select("chapter_id")
+          .eq("comic_id", comicId)
+          .limit(5000);
+        if (error || !active) return;
+        const map: Record<string, number> = {};
+        let general = 0;
+        for (const row of data ?? []) {
+          if (row.chapter_id) map[row.chapter_id] = (map[row.chapter_id] ?? 0) + 1;
+          else general += 1;
+        }
+        setChapterCounts(map);
+        setComicCount(general);
+      } catch (err) {
+        console.warn("Could not load comment counts:", err);
       }
-      setChapterCounts(map);
-      setComicCount(general);
     }
     loadCounts();
-    const ch = supabase
-      .channel(`comments-counts-${comicId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "comments", filter: `comic_id=eq.${comicId}` },
-        () => loadCounts(),
-      )
-      .subscribe();
 
     try {
       const raw = localStorage.getItem("lc_bookmarks");
@@ -256,7 +276,6 @@ function ComicPage() {
 
     return () => {
       active = false;
-      supabase.removeChannel(ch);
     };
   }, [comic]);
 

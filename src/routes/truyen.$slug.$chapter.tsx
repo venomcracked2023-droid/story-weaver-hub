@@ -172,11 +172,43 @@ export const Route = createFileRoute("/truyen/$slug/$chapter")({
     };
   },
   notFoundComponent: () => (
-    <div className="p-10 text-center">
-      Không tìm thấy chương. <Link to="/" className="text-primary underline">Về trang chủ</Link>
+    <div className="flex min-h-[60vh] flex-col items-center justify-center p-10 text-center">
+      <h2 className="text-xl font-bold text-foreground">Không tìm thấy chương truyện</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Chương truyện này có thể chưa có hoặc đã được thay đổi.
+      </p>
+      <Link
+        to="/"
+        className="mt-6 inline-flex items-center justify-center rounded-full bg-gradient-brand px-5 py-2 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105"
+      >
+        Về trang chủ
+      </Link>
     </div>
   ),
-  errorComponent: ({ error }) => <div className="p-10 text-destructive">{error.message}</div>,
+  errorComponent: ({ error, reset }) => (
+    <div className="flex min-h-[60vh] flex-col items-center justify-center p-10 text-center">
+      <h2 className="text-xl font-bold text-foreground">Không thể tải nội dung chương</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Đã có lỗi xảy ra trong quá trình hiển thị. Bạn vui lòng thử tải lại trang.
+      </p>
+      <div className="mt-6 flex flex-wrap justify-center gap-3">
+        {reset && (
+          <button
+            onClick={() => reset()}
+            className="inline-flex items-center justify-center rounded-full bg-gradient-brand px-5 py-2 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105"
+          >
+            Thử lại
+          </button>
+        )}
+        <Link
+          to="/"
+          className="inline-flex items-center justify-center rounded-full border border-border bg-card px-5 py-2 text-sm font-medium text-foreground transition hover:bg-secondary"
+        >
+          Về trang chủ
+        </Link>
+      </div>
+    </div>
+  ),
 });
 
 function Reader() {

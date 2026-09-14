@@ -85,7 +85,7 @@ function applySecurityHeaders(headers: Headers) {
   if (!headers.has("Content-Security-Policy")) {
     headers.set(
       "Content-Security-Policy",
-      "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; img-src 'self' https: data: blob:; font-src 'self' https: data:; frame-ancestors 'none';",
+      "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https: wss: ws: data: blob:; worker-src 'self' blob: https:; script-src 'self' https: 'unsafe-inline' 'unsafe-eval' blob:; style-src 'self' https: 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self' https: data:; frame-ancestors 'none';",
     );
   }
 }
