@@ -3,9 +3,12 @@ export const SITE_URL = "https://www.lcucumber.com";
 export const SITE_NAME = "Lcucumber";
 export const SITE_LOGO = `${SITE_URL}/og-default.jpg`;
 
+export const TELEGRAM_GROUP_URL = "https://t.me/+OhmAX2T8ULRkOGVl";
+
 // Thêm URL mạng xã hội vào đây — Google dùng sameAs để liên kết thương hiệu.
 export const SOCIAL_LINKS: string[] = [
   "https://www.facebook.com/profile.php?id=61577465649339",
+  "https://t.me/+OhmAX2T8ULRkOGVl",
   // "https://www.youtube.com/@your-handle",
   // "https://x.com/your-handle",
   // "https://www.instagram.com/your-handle",

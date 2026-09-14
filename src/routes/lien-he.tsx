@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
-import { Mail, Facebook, AlertTriangle } from "lucide-react";
-import { SITE_URL, SITE_NAME, SOCIAL_LINKS } from "@/lib/seo";
+import { Mail, Facebook, AlertTriangle, Send } from "lucide-react";
+import { SITE_URL, SITE_NAME, SOCIAL_LINKS, TELEGRAM_GROUP_URL } from "@/lib/seo";
 
 const CONTACT_EMAIL = "hello@lcucumber.com";
 
@@ -96,6 +96,22 @@ function ContactPage() {
               <p className="text-sm text-muted-foreground">{CONTACT_EMAIL}</p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Kênh chính thức cho góp ý, báo lỗi và yêu cầu gỡ nội dung.
+              </p>
+            </div>
+          </a>
+
+          <a
+            href={TELEGRAM_GROUP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-3 rounded-xl border border-border bg-card/60 p-4 transition hover:border-[#229ED9]/60 hover:bg-card"
+          >
+            <Send className="mt-0.5 h-5 w-5 text-[#229ED9]" />
+            <div>
+              <h2 className="text-sm font-semibold">Nhóm Telegram</h2>
+              <p className="break-all text-sm text-muted-foreground">{TELEGRAM_GROUP_URL}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Giao lưu cùng cộng đồng độc giả & nhóm dịch, thông báo chương mới sớm nhất.
               </p>
             </div>
           </a>

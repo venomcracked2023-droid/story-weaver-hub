@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Github, Heart, Mail, Star } from "lucide-react";
+import { Facebook, Github, Heart, Mail, Send, Star } from "lucide-react";
 import cucumberLogo from "@/assets/cucumber-logo.png";
-import { SITE_LOGO, SITE_NAME, SITE_URL, SOCIAL_LINKS } from "@/lib/seo";
+import { SITE_LOGO, SITE_NAME, SITE_URL, SOCIAL_LINKS, TELEGRAM_GROUP_URL } from "@/lib/seo";
 import { useComics } from "@/lib/comics-store";
 import { slugifyGenre } from "@/lib/slug";
 
@@ -32,6 +32,7 @@ const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }
     ariaLabel: "Liên kết cộng đồng và tài khoản",
     links: [
       { label: "Cộng đồng độc giả", to: "/cong-dong", desc: "Không gian kết nối và quy tắc cộng đồng" },
+      { label: "Nhóm Telegram", href: TELEGRAM_GROUP_URL, desc: "Tham gia nhóm Telegram cộng đồng Lcucumber" },
       { label: "Ứng tuyển CTV", to: "/apply", desc: "Trở thành cộng tác viên đăng truyện" },
       { label: "Đăng nhập", to: "/login", desc: "Đăng nhập tài khoản Lcucumber" },
     ],
@@ -50,8 +51,9 @@ const navGroups: Array<{ title: string; ariaLabel: string; links: FooterLink[] }
   },
 ];
 
-function socialMeta(url: string): { Icon: typeof Facebook; name: string } {
+function socialMeta(url: string): { Icon: typeof Facebook | typeof Send; name: string } {
   if (url.includes("facebook")) return { Icon: Facebook, name: "Facebook" };
+  if (url.includes("t.me") || url.includes("telegram")) return { Icon: Send, name: "Telegram" };
   if (url.includes("github")) return { Icon: Github, name: "GitHub" };
   return { Icon: Mail, name: "Liên hệ" };
 }

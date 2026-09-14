@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
-import { SITE_NAME, SITE_URL } from "@/lib/seo";
+import { SITE_NAME, SITE_URL, TELEGRAM_GROUP_URL } from "@/lib/seo";
 import {
   Users,
   Sparkles,
@@ -12,6 +12,7 @@ import {
   BookOpenCheck,
   Send,
   Share2,
+  MessageCircle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/cong-dong")({
@@ -99,18 +100,26 @@ function CommunityPage() {
               Nơi hội tụ những độc giả đam mê truyện tranh cuộn dọc và các nhóm dịch giả, cộng tác viên tận tâm. Cùng nhau chia sẻ cảm xúc, thảo luận tình tiết và xây dựng môi trường thưởng thức truyện văn minh.
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <a
+                href={TELEGRAM_GROUP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-[#229ED9] px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:scale-105 hover:bg-[#1f8ec3] active:scale-95"
+              >
+                <Send className="h-4 w-4" /> Tham gia Nhóm Telegram
+              </a>
               <Link
                 to="/apply"
                 className="inline-flex items-center gap-2 rounded-full bg-gradient-brand px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition hover:scale-105 active:scale-95"
               >
-                <Sparkles className="h-4 w-4" /> Ứng tuyển Cộng tác viên
+                <Sparkles className="h-4 w-4" /> Ứng tuyển CTV
               </Link>
               <Link
                 to="/login"
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-6 py-3 text-sm font-semibold text-foreground transition hover:border-primary/60 hover:bg-secondary"
               >
-                Tham gia thành viên <ArrowRight className="h-4 w-4" />
+                Đăng nhập <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -214,20 +223,49 @@ function CommunityPage() {
         </section>
 
         {/* Connect Channels */}
-        <section className="mt-12 rounded-2xl border border-border bg-gradient-to-r from-card via-card/70 to-card p-6 md:p-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <section className="mt-12 grid gap-6 md:grid-cols-2">
+          <div className="flex flex-col justify-between rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/10 via-card to-card p-6 md:p-8">
             <div>
-              <h2 className="text-xl font-bold">Kênh liên hệ & Góp ý</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Có thắc mắc hoặc muốn đề xuất tính năng mới? Ban quản trị luôn sẵn sàng lắng nghe bạn.
+              <div className="flex items-center gap-2 text-[#229ED9]">
+                <Send className="h-5 w-5" />
+                <span className="text-xs font-bold uppercase tracking-wider">Kênh thảo luận trực tiếp</span>
+              </div>
+              <h2 className="mt-2 text-xl font-bold">Nhóm Telegram Lcucumber</h2>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                Tham gia nhóm chat để cập nhật thông báo chương mới sớm nhất, giao lưu cùng các dịch giả và nhận hỗ trợ nhanh chóng từ BQT.
               </p>
             </div>
-            <Link
-              to="/lien-he"
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground transition hover:border-primary/60 hover:text-primary"
-            >
-              <Send className="h-4 w-4" /> Liên hệ BQT
-            </Link>
+            <div className="mt-6">
+              <a
+                href={TELEGRAM_GROUP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-[#229ED9] px-5 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-[#1f8ec3] hover:scale-105 active:scale-95"
+              >
+                <Send className="h-4 w-4" /> Vào Nhóm Telegram
+              </a>
+            </div>
+          </div>
+
+          <div className="flex flex-col justify-between rounded-2xl border border-border bg-card p-6 md:p-8">
+            <div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <MessageCircle className="h-5 w-5 text-primary" />
+                <span className="text-xs font-bold uppercase tracking-wider">Hỗ trợ & Hợp tác</span>
+              </div>
+              <h2 className="mt-2 text-xl font-bold">Liên hệ & Đóng góp ý kiến</h2>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                Có thắc mắc, phản hồi chất lượng bản dịch hoặc đề xuất hợp tác cùng phát triển nền tảng? Ban quản trị luôn sẵn sàng lắng nghe.
+              </p>
+            </div>
+            <div className="mt-6">
+              <Link
+                to="/lien-he"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground transition hover:border-primary/60 hover:text-primary"
+              >
+                Liên hệ BQT <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         </section>
       </main>
